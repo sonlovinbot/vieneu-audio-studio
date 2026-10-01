@@ -110,6 +110,18 @@ Bấm **▶ Nghe thử** để mở trình phát của GitHub. Trong app, vào m
 - 🚀 **Hướng dẫn lần đầu** — kiểm tra cấu hình máy, tải model, thử tạo giọng.
 - 🌗 Giao diện sáng / tối.
 
+## 📁 Cấu trúc repo
+
+| Thư mục / file | Nội dung |
+|---|---|
+| `webapp/` | Phần mềm AI Audio Studio: server FastAPI + giao diện web, audio nghe thử giọng |
+| `src/` | Lõi giọng nói VieNeu-TTS (SDK của model) |
+| `apps/user_voices.py` | Lưu / nạp "Giọng của tôi" |
+| `install.*`, `tao-shortcut.*`, `HUONG-DAN-*.txt` | Bộ cài cho macOS / Windows / Linux |
+| `install-online.sh`, `install-online.ps1` | Cài bằng 1 lệnh (tải bản mới nhất từ Releases) |
+| `build-installers.sh` | Đóng gói 3 file `.zip` vào `dist/` |
+| `scripts/make_voice_previews.py` | Tạo lại audio nghe thử cho các giọng |
+
 ## 🙏 Ghi nhận
 
 - Phần mềm AI Audio Studio (giao diện, tính năng, bộ cài): **Đặng Hữu Sơn** — [Facebook](https://www.facebook.com/danghuuson.182/).

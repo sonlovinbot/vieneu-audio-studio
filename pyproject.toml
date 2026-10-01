@@ -12,8 +12,7 @@ required-environments = [
 override-dependencies = [
     "nvidia-nccl-cu12; sys_platform == 'linux'",
 ]
-# uv mặc định cài nhóm `dev`; đặt rỗng để `uv sync` chỉ cài core torch-free.
-# Muốn dev/test: `uv sync --group dev`. Muốn dev GPU đầy đủ: `uv sync --group gpu`
+# `uv sync` chỉ cài core torch-free (CPU/ONNX). GPU đầy đủ: `uv sync --group gpu`
 default-groups = []
 
 [[tool.uv.index]]
@@ -35,7 +34,7 @@ explicit = true
 name = "vieneu"
 version = "3.8.3"
 description = "Advanced on-device Vietnamese TTS with instant voice cloning"
-readme = "README_PYPI.md"
+readme = "README.md"
 license = { file = "LICENSE" }
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -75,21 +74,20 @@ dependencies = [
     "kaldi-native-fbank>=1.20", # speaker-encoder fbank front-end (torch-free voice cloning)
     "tokenizers>=0.20", # phoneme tokenizer (torch-free)
     "huggingface_hub", # fetch ONNX / config / tokenizer / voices
-    "PyYAML", # gradio config.yaml
-    "gradio>=5.49.1", # web UI (vieneu-web)
     "librosa>=0.11.0",
+    # AI Audio Studio (webapp/) — FastAPI server + upload form
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "python-multipart>=0.0.9",
     # NOTE: audio watermarking is opt-in via `pip install vieneu[watermark]` (resemble-perth,
     # needs torch/torchaudio). The PyPI package literally named `perth` is an unrelated
     # threading helper and must NOT be listed here (issue #191).
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/pnnbao97/VieNeu-TTS"
-"Repository" = "https://github.com/pnnbao97/VieNeu-TTS"
-"Bug Tracker" = "https://github.com/pnnbao97/VieNeu-TTS/issues"
-"Documentation" = "https://github.com/pnnbao97/VieNeu-TTS/blob/main/README.md"
-"Source Code" = "https://github.com/pnnbao97/VieNeu-TTS"
-"Changelog" = "https://github.com/pnnbao97/VieNeu-TTS/releases"
+"Homepage" = "https://github.com/sonlovinbot/vieneu-audio-studio"
+"Releases" = "https://github.com/sonlovinbot/vieneu-audio-studio/releases"
+"VieNeu-TTS model" = "https://github.com/pnnbao97/VieNeu-TTS"
 
 [project.optional-dependencies]
 legacy = [
@@ -122,28 +120,8 @@ cuda = [
     "torchaudio==2.8.0",
 ]
 
-# LoRA fine-tuning of v3 Turbo (finetune/): GPU only.
-# Install with: uv sync --extra finetune   (or: pip install vieneu[finetune])
-finetune = [
-    "torch",
-    "transformers",
-    "peft>=0.13",
-    "accelerate",
-    "safetensors",
-    "pyarrow",
-]
 
 [dependency-groups]
-dev = [
-    "pytest",
-    "pytest-asyncio",
-    # Test-only deps for the GPU/standard/xpu backend tests (NOT in the runtime
-    # install — `pip install vieneu` stays minimal/torch-free). CI installs the dev
-    # group, so these tests can import librosa/transformers/neucodec-based engines.
-    "librosa>=0.11.0",
-    "transformers",
-    "neucodec>=0.0.4",
-]
 gpu = [
     "neucodec>=0.0.4",
     "torch==2.8.0",
@@ -154,25 +132,18 @@ gpu = [
     "trafilatura>=2.0.0",
 ]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]   # finetune/tests runs in its own process (see tests/test_finetune_lora.py)
-pythonpath = ["src"]
-
 [project.scripts]
-vieneu-web = "apps.gradio_main:main"
-vieneu-stream = "apps.web_stream:main"
 vieneu-studio = "webapp.server:main"
 
 [tool.setuptools]
-package-dir = {"" = "src", "apps" = "apps", "examples" = "examples", "webapp" = "webapp"}
+package-dir = {"" = "src", "apps" = "apps", "webapp" = "webapp"}
 
 [tool.setuptools.packages.find]
 where = ["src", "."]
-include = ["vieneu*", "vieneu_utils*", "apps*", "examples*", "webapp*"]
+include = ["vieneu*", "vieneu_utils*", "apps*", "webapp*"]
 
 [tool.setuptools.package-data]
 vieneu = ["assets/*.json", "assets/samples/*"]
-examples = ["audio_ref/*.wav", "srt/*.srt"]  # samples the Gradio app (vieneu-web) offers
 webapp = ["static/**/*", "config/*.json"]
 
 [tool.uv.sources]

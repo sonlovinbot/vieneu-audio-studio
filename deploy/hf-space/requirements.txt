@@ -1,3 +1,0 @@
-# Bản torch-free (chạy CPU qua ONNX) — đủ cho HF Spaces free tier.
-# Gói này đã bao gồm sẵn module apps.gradio_main + giao diện Gradio.
-vieneu==3.0.5

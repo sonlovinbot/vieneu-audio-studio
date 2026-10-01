@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "version": "1.6.2",
+      "date": "2026-10-01",
+      "title": "Gọn nhẹ: bỏ file thừa của repo gốc, cài nhẹ hơn 3 lần",
+      "changes": [
+        "Bỏ thư viện gradio (giao diện cũ của repo gốc, không dùng) — thư viện cài trên máy giảm từ ~1,4 GB xuống ~460 MB, cài nhanh hơn.",
+        "Repo chỉ giữ những gì phần mềm cần: webapp, lõi model VieNeu-TTS, bộ cài. Đã bỏ tài liệu, ví dụ, bộ test, fine-tune, Docker, triển khai Hugging Face và các bản cài Intel XPU của repo gốc.",
+        "Bỏ quy trình tự động \"Publish to PyPI\" của repo gốc — trước đây chạy lỗi mỗi lần phát hành.",
+        "Bộ cài .zip nhẹ hơn (~5,1 MB)."
+      ]
+    },
+    {
       "version": "1.6.1",
       "date": "2026-10-01",
       "title": "Cài bằng 1 lệnh — hết bị macOS chặn",

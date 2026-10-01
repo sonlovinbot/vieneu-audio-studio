@@ -13,13 +13,13 @@ mkdir -p "$OUT"
 
 # Các file/thư mục lõi cần để chạy app (chung cho mọi nền tảng)
 COMMON=(
-  pyproject.toml uv.lock .python-version config.yaml
-  src apps webapp examples
-  LICENSE README.md README.vi.md
+  pyproject.toml uv.lock .python-version
+  src apps webapp
+  LICENSE README.md
 )
 
 # Loại bỏ rác khi sao chép
-EXCLUDES=(--exclude='__pycache__' --exclude='*.pyc' --exclude='.DS_Store' --exclude='.gstack')
+EXCLUDES=(--exclude='__pycache__' --exclude='*.pyc' --exclude='.DS_Store' --exclude='.gstack' --exclude='*.egg-info')
 
 stage_common() {
   local dest="$1"
