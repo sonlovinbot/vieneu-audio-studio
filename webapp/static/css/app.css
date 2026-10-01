@@ -388,3 +388,34 @@ body.onb-lock { overflow: hidden; }
 .onb-center-row .btn, .onb-dl-row .btn { font-size: 15px; padding: var(--s-2) var(--s-5); min-height: 44px; }
 .onb-foot .btn { white-space: nowrap; }
 @media (max-width: 600px) { .onb-count { display: none; } .onb-foot .btn { padding: var(--s-2) var(--s-4); } }
+
+/* ── Chức danh người phát triển ──────────────────────── */
+.dev-title { font-size: 12px; font-weight: 700; color: var(--c-charcoal); }
+.dev-title-lg { font-size: 14px; font-weight: 700; color: var(--c-primary); margin-bottom: 2px; }
+
+/* ── Bộ đếm ký tự dưới ô nhập ────────────────────────── */
+.text-meta { display: flex; flex-wrap: wrap; gap: 4px var(--s-3); margin-top: 6px; font-size: 12px; line-height: 18px; color: var(--c-gray); }
+.text-meta .count-num { font-weight: 700; font-variant-numeric: tabular-nums; }
+.text-meta .count-msg:empty { display: none; }
+.text-meta.soft .count-msg { color: #B45309; }
+.text-meta.heavy .count-num, .text-meta.heavy .count-msg { color: var(--c-primary-deep); }
+.text-meta.over .count-num, .text-meta.over .count-msg { color: #DC2626; }
+.text-meta.over { padding: 6px 10px; border-radius: 8px; background: rgba(220,38,38,.08); }
+[data-theme="dark"] .text-meta.soft .count-msg { color: #FBBF24; }
+[data-theme="dark"] .text-meta.over .count-num, [data-theme="dark"] .text-meta.over .count-msg { color: #F87171; }
+#conv-turns + .text-meta { margin: 0 0 var(--s-2); }
+
+/* ── Giọng cảm xúc ───────────────────────────────────── */
+.emo-voices { margin-top: var(--s-2); padding: var(--s-4); border-radius: var(--radius); background: var(--c-bg); border: var(--bw-thin) solid var(--c-border-soft); }
+.emo-voices-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); flex-wrap: wrap; font-size: 14px; color: var(--c-charcoal); }
+.emo-voices-head .hint { font-size: 12px; }
+.emo-chips { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-3); }
+.emo-chip {
+  font: 700 13px var(--font-body); color: var(--c-ink); cursor: pointer;
+  background: var(--c-surface); border: var(--bw-thin) solid var(--c-border); border-radius: 999px; padding: 6px 12px;
+}
+.emo-chip:hover { border-color: var(--c-primary); }
+.emo-chip.active { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.emo-why { margin-top: var(--s-3); font-size: 13px; line-height: 20px; }
+.emo-why summary { cursor: pointer; font-weight: 700; color: var(--c-blue); }
+.emo-why p { margin: var(--s-2) 0 0; color: var(--c-text); }

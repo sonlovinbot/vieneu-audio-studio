@@ -1,6 +1,18 @@
 {
   "entries": [
     {
+      "version": "1.5.0",
+      "date": "2026-10-01",
+      "title": "Bộ đếm ký tự, cảnh báo văn bản dài, giọng cảm xúc tự tạo",
+      "changes": [
+        "Bộ đếm ký tự + số từ dưới ô nhập (Sinh giọng, Clone, Hội thoại). Trên 1.500 ký tự: nhắc sinh lâu hơn; trên 3.000: cảnh báo máy có thể lag; trên 5.000: khóa nút sinh.",
+        "Cảnh báo thẻ cảm xúc không hợp lệ (vd [vui]) — model chỉ hiểu [cười], [thở dài], [hắng giọng]; thẻ lạ sẽ bị đọc thành chữ.",
+        "Giọng cảm xúc tự tạo: khi lưu giọng clone, chọn nhãn cảm xúc của mẫu (Vui, Buồn, Giận, Thì thầm... hoặc tự đặt). Giọng hiện thành chip ở Sinh giọng để chọn nhanh.",
+        "Giải thích ngay trong app vì sao chỉ có 3 thẻ cảm xúc và cách tự bổ sung cảm xúc bằng giọng mẫu.",
+        "Ghi nhận người phát triển: Đặng Hữu Sơn — CEO & Co-Founder LovinBot AI."
+      ]
+    },
+    {
       "version": "1.4.0",
       "date": "2026-10-01",
       "title": "Onboarding cho người mới: kiểm tra máy → tải → thử tạo giọng",

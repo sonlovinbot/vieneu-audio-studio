@@ -120,6 +120,7 @@ async function init() {
     AUTH_REQUIRED = !!info.auth_required;
     LIBRARY_ON = info.library !== false;
     HISTORY_MAX = info.history_max || HISTORY_MAX;
+    MAX_CHARS = info.max_text_chars || MAX_CHARS;
     $("#nav-library").hidden = !LIBRARY_ON;
     $$("[data-recent-card]").forEach((c) => (c.hidden = !LIBRARY_ON));
     const b = info.branding;
@@ -142,6 +143,7 @@ async function init() {
     // Người phát triển phần mềm (khác tác giả model)
     if (dev.name) { $("#dev-name").textContent = dev.name; $("#side-dev .dev-who").textContent = dev.name + " ↗"; }
     if (dev.role) $("#dev-role").textContent = dev.role;
+    if (dev.title) { $("#dev-title").textContent = dev.title; $("#side-dev .dev-title").textContent = dev.title; }
     if (dev.intro) $("#dev-intro").textContent = dev.intro;
     if (dev.url) { $("#dev-link").href = dev.url; $("#side-dev").href = dev.url; }
     if (dev.link_label) $("#dev-link").textContent = dev.link_label + " →";
@@ -149,6 +151,7 @@ async function init() {
   } catch (e) { console.error(e); }
   loadVoices();
   buildConversation();
+  updateCounts();
   showTab(location.hash.slice(1) || "synthesize", { push: false });
   if (LIBRARY_ON) refreshCounts();
 }
@@ -178,7 +181,70 @@ function fillVoiceSelects() {
   if (sel) { const cur = sel.value; sel.innerHTML = voiceOptions(cur); }
   $$(".turn-voice").forEach((s) => { const cur = s.value; s.innerHTML = voiceOptions(cur); });
   setCount("voices", VOICES.filter((v) => v.custom).length);
+  renderEmoChips();
 }
+
+// ── Giọng cảm xúc: giọng tự clone, lưu kèm nhãn "Tên · Cảm xúc" ──
+function renderEmoChips() {
+  const box = $("#emo-chips");
+  if (!box) return;
+  const emo = VOICES.filter((v) => v.custom && v.id.includes(" · "));
+  const cur = $("#syn-voice").value;
+  box.innerHTML = emo.length
+    ? emo.map((v) => `<button type="button" class="emo-chip ${v.id === cur ? "active" : ""}" data-voice="${escapeHtml(v.id)}">${escapeHtml(v.id)}</button>`).join("")
+    : `<span class="hint" style="margin:0">Chưa có. Bấm <b>➕ Tạo giọng cảm xúc</b> để thêm giọng vui, buồn, thì thầm... của riêng bạn.</span>`;
+}
+document.addEventListener("click", (e) => {
+  const chip = e.target.closest(".emo-chip");
+  if (chip) { $("#syn-voice").value = chip.dataset.voice; renderEmoChips(); toast(`Đã chọn giọng "${chip.dataset.voice}".`); }
+});
+$("#syn-voice").addEventListener("change", renderEmoChips);
+$("#emo-new").addEventListener("click", () => {
+  showTab("clone");
+  toast("Tải lên 3–5 giây nói đúng cảm xúc bạn muốn → Clone → chọn nhãn cảm xúc → Lưu giọng.");
+  $("#clone-ref").focus();
+});
+
+// ── Đếm ký tự + cảnh báo văn bản dài / thẻ cảm xúc lạ ──
+let MAX_CHARS = 5000;
+const SOFT_CHARS = 1500;   // trên mức này sinh lâu hơn rõ rệt
+const HEAVY_CHARS = 3000;  // trên mức này máy yếu dễ lag
+const KNOWN_TAGS = ["cười", "cuoi", "thở dài", "tho dai", "hắng giọng", "hang giong", "chuckle", "sigh", "clear throat"];
+const COUNTERS = {
+  "syn-text": { text: () => $("#syn-text").value, btn: "#syn-go" },
+  "clone-text": { text: () => $("#clone-text").value, btn: "#clone-go" },
+  conv: { text: () => [...$$("#conv-turns .turn-text")].map((t) => t.value).join(""), btn: "#conv-go" },
+};
+function unknownTags(text) {
+  const bad = new Set();
+  for (const m of text.matchAll(/\[([^\]]+)\]/g)) {
+    if (!KNOWN_TAGS.includes(m[1].trim().toLowerCase())) bad.add(m[0]);
+  }
+  return [...bad];
+}
+function updateCounts() {
+  for (const [key, c] of Object.entries(COUNTERS)) {
+    const box = document.querySelector(`[data-count-for="${key}"]`);
+    if (!box) continue;
+    const text = c.text();
+    const n = text.length;
+    const words = (text.trim().match(/\S+/g) || []).length;
+    let level = "", msg = "";
+    if (n > MAX_CHARS) { level = "over"; msg = `Vượt giới hạn ${MAX_CHARS.toLocaleString("vi-VN")} ký tự — hãy cắt bớt hoặc chia thành nhiều lần.`; }
+    else if (n > HEAVY_CHARS) { level = "heavy"; msg = "Văn bản rất dài — máy có thể bị lag, sinh mất vài phút. Nên chia thành đoạn ≤ 1.500 ký tự."; }
+    else if (n > SOFT_CHARS) { level = "soft"; msg = "Văn bản khá dài — sinh lâu hơn. Chia nhỏ sẽ nhanh và mượt hơn."; }
+    const bad = unknownTags(text);
+    if (bad.length) msg += `${msg ? " " : ""}⚠️ Thẻ ${bad.slice(0, 3).join(", ")} không được hỗ trợ — sẽ bị đọc thành chữ. Chỉ dùng [cười], [thở dài], [hắng giọng].`;
+    box.className = "text-meta" + (level ? " " + level : "") + (bad.length && !level ? " soft" : "");
+    box.querySelector(".count-num").textContent = `${n.toLocaleString("vi-VN")} / ${MAX_CHARS.toLocaleString("vi-VN")} ký tự · ~${words.toLocaleString("vi-VN")} từ`;
+    box.querySelector(".count-msg").textContent = msg;
+    const btn = $(c.btn);
+    if (btn && !btn.querySelector(".spinner")) btn.disabled = n > MAX_CHARS;
+  }
+}
+document.addEventListener("input", (e) => {
+  if (e.target.matches("#syn-text, #clone-text, .turn-text")) updateCounts();
+});
 
 // ── Audio result rendering ─────────────────────────────
 function showAudio(containerSel, blob, filename) {
@@ -193,7 +259,7 @@ function showAudio(containerSel, blob, filename) {
 
 function busy(btn, on, label) {
   if (on) { btn.dataset.label = btn.textContent; btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> ${label || "Đang xử lý..."}`; }
-  else { btn.disabled = false; btn.textContent = btn.dataset.label || "Xong"; }
+  else { btn.disabled = false; btn.textContent = btn.dataset.label || "Xong"; updateCounts(); }
 }
 
 // ── Synthesize ─────────────────────────────────────────
@@ -201,7 +267,7 @@ function busy(btn, on, label) {
 // sending a whole-utterance emotion parameter.
 document.querySelectorAll(".emotion-tags [data-tag]").forEach((b) => {
   b.addEventListener("click", () => {
-    const ta = $("#syn-text");
+    const ta = document.getElementById(b.closest(".emotion-tags").dataset.target || "syn-text");
     const tag = b.dataset.tag;
     const start = ta.selectionStart ?? ta.value.length;
     const end = ta.selectionEnd ?? ta.value.length;
@@ -211,6 +277,7 @@ document.querySelectorAll(".emotion-tags [data-tag]").forEach((b) => {
     ta.value = before + ins + ta.value.slice(end);
     ta.focus();
     ta.selectionStart = ta.selectionEnd = start + ins.length;
+    updateCounts();
   });
 });
 
@@ -266,11 +333,20 @@ $("#clone-go").addEventListener("click", async () => {
 // Đổi file mẫu → form "lưu" cũ không còn khớp giọng vừa nghe.
 $("#clone-ref").addEventListener("change", () => { $("#clone-save").hidden = true; LAST_CLONE_FILE = null; });
 
+$("#clone-save-emo").addEventListener("change", (e) => {
+  const custom = $("#clone-save-emo-custom");
+  custom.hidden = e.target.value !== "__custom";
+  if (!custom.hidden) custom.focus();
+});
 $("#clone-save-go").addEventListener("click", async () => {
   const btn = $("#clone-save-go");
-  const name = $("#clone-save-name").value.trim();
+  let name = $("#clone-save-name").value.trim();
   if (!LAST_CLONE_FILE) return toast("Hãy clone thử trước khi lưu.", true);
   if (!name) return toast("Đặt tên cho giọng đã!", true);
+  const emoSel = $("#clone-save-emo").value;
+  const emo = (emoSel === "__custom" ? $("#clone-save-emo-custom").value : emoSel).trim();
+  if (emoSel === "__custom" && !emo) return toast("Nhập tên cảm xúc tự đặt!", true);
+  if (emo) name = `${name.replace(/ · .*$/, "").slice(0, 37 - emo.length)} · ${emo}`;
   busy(btn, true, "Đang lưu...");
   try {
     const fd = new FormData();
@@ -282,6 +358,8 @@ $("#clone-save-go").addEventListener("click", async () => {
     toast(`Đã lưu "${data.name}" vào Giọng của tôi.`);
     $("#clone-save").hidden = true;
     $("#clone-save-name").value = "";
+    $("#clone-save-emo").value = "";
+    $("#clone-save-emo-custom").hidden = true;
     await loadVoices();
     const sel = $("#syn-voice");
     if (sel) sel.value = data.name;
@@ -298,7 +376,7 @@ function turnRow(text = "", voice = "") {
     <select class="turn-voice">${voiceOptions(voice)}</select>
     <textarea class="turn-text" placeholder="Lời thoại...">${escapeHtml(text)}</textarea>
     <button class="btn btn-ghost turn-del" title="Xóa">✕</button>`;
-  div.querySelector(".turn-del").addEventListener("click", () => div.remove());
+  div.querySelector(".turn-del").addEventListener("click", () => { div.remove(); updateCounts(); });
   return div;
 }
 function buildConversation(turns) {
@@ -308,6 +386,7 @@ function buildConversation(turns) {
     { text: "Chào bạn, hôm nay chúng ta nói về gì?" },
     { text: "Mình sẽ giới thiệu về VieNeu Studio nhé!" },
   ]).forEach((t) => c.appendChild(turnRow(t.text || "", t.voice || "")));
+  updateCounts();
 }
 $("#conv-add").addEventListener("click", () => $("#conv-turns").appendChild(turnRow()));
 $("#conv-go").addEventListener("click", async () => {

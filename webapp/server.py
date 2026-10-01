@@ -345,7 +345,8 @@ def health() -> Dict[str, Any]:
 def info() -> Dict[str, Any]:
     # auth_required: cho frontend biết có cần X-API-Key không (KHÔNG lộ key thật).
     return {"branding": BRANDING, "status": manager.status(), "auth_required": bool(API_KEY),
-            "library": LIBRARY_ENABLED, "history_max": library.max_runs, "hosted": HOSTED}
+            "library": LIBRARY_ENABLED, "history_max": library.max_runs, "hosted": HOSTED,
+            "max_text_chars": MAX_TEXT_CHARS}
 
 
 # ── Onboarding: cấu hình máy, tải model lần đầu, bộ cài ────────────────────

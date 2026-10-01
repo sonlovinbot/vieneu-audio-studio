@@ -18,8 +18,8 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
-  <link rel="stylesheet" href="/css/coachio-theme.css?v=17" />
-  <link rel="stylesheet" href="/css/app.css?v=17" />
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=19" />
+  <link rel="stylesheet" href="/css/app.css?v=19" />
 </head>
 <body>
   <div class="app">
@@ -59,6 +59,7 @@
         <a class="dev-credit" id="side-dev" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">
           <span class="dev-by">Phát triển bởi</span>
           <span class="dev-who">Đặng Hữu Sơn ↗</span>
+          <span class="dev-title">CEO &amp; Co-Founder LovinBot AI</span>
           <span class="dev-base">Dựa trên model AI VieNeu-TTS</span>
         </a>
         <div class="nav-label">Giao diện</div>
@@ -85,6 +86,7 @@
         <div class="field">
           <label for="syn-text">Nội dung</label>
           <textarea id="syn-text" placeholder="Nhập văn bản tiếng Việt... Có thể chèn tag cảm xúc như [cười], [thở dài], [hắng giọng].">[cười] Xin chào cả nhà, đây là giọng đọc tự nhiên từ AI Audio Studio!</textarea>
+          <div class="text-meta" data-count-for="syn-text"><span class="count-num"></span><span class="count-msg"></span></div>
         </div>
         <div class="row two">
           <div class="field">
@@ -92,13 +94,25 @@
             <select id="syn-voice"></select>
           </div>
           <div class="field">
-            <label>Cảm xúc (chèn vào văn bản)</label>
-            <div class="emotion-tags">
+            <label>Cảm xúc (chèn vào chỗ con trỏ)</label>
+            <div class="emotion-tags" data-target="syn-text">
               <button type="button" class="btn btn-ghost" data-tag="[cười]">😄 Cười</button>
               <button type="button" class="btn btn-ghost" data-tag="[thở dài]">😮‍💨 Thở dài</button>
               <button type="button" class="btn btn-ghost" data-tag="[hắng giọng]">🗣️ Hắng giọng</button>
             </div>
           </div>
+        </div>
+        <div class="emo-voices">
+          <div class="emo-voices-head">
+            <span>🎭 <b>Giọng cảm xúc của bạn</b> <span class="hint">— vui, buồn, giận, thì thầm... tự tạo bằng Clone giọng</span></span>
+            <button type="button" class="link-btn" id="emo-new">➕ Tạo giọng cảm xúc</button>
+          </div>
+          <div class="emo-chips" id="emo-chips"></div>
+          <details class="emo-why">
+            <summary>Vì sao chỉ có 3 thẻ cảm xúc?</summary>
+            <p>Model VieNeu-TTS chỉ được huấn luyện 3 âm thanh phi ngôn ngữ: <b>[cười]</b>, <b>[thở dài]</b>, <b>[hắng giọng]</b> (tiếng Anh: [chuckle], [sigh], [clear throat]). Thẻ tự đặt như <code>[vui]</code> model không hiểu và sẽ <b>đọc thành chữ</b> “vui”.</p>
+            <p>Muốn giọng đọc mang cảm xúc riêng: vào <b>Clone giọng</b>, tải lên 3–5 giây bạn (hoặc ai đó) nói với đúng cảm xúc đó, rồi lưu kèm nhãn cảm xúc. Giọng mới sẽ hiện ở đây để chọn nhanh — cả câu sẽ được đọc theo cảm xúc của mẫu.</p>
+          </details>
         </div>
         <details class="advanced">
           <summary>Tùy chọn nâng cao</summary>
@@ -123,7 +137,7 @@
         </div>
         <div class="card side-card tips">
           <div class="side-title">💡 Mẹo</div>
-          <ul><li>Chèn <b>[cười]</b>, <b>[thở dài]</b>, <b>[hắng giọng]</b> ngay chỗ muốn có cảm xúc.</li><li>Dấu chấm, phẩy giúp giọng ngắt nghỉ tự nhiên hơn.</li><li>Văn bản tối đa ~5000 ký tự mỗi lần.</li><li>Giọng clone đã lưu nằm đầu danh sách <b>⭐ Giọng của tôi</b>.</li></ul>
+          <ul><li>Chèn <b>[cười]</b>, <b>[thở dài]</b>, <b>[hắng giọng]</b> ngay chỗ muốn có cảm xúc.</li><li>Dấu chấm, phẩy giúp giọng ngắt nghỉ tự nhiên hơn.</li><li>Tối đa <b>5.000 ký tự</b>/lần. Trên ~1.500 ký tự nên chia nhỏ — văn bản quá dài dễ làm máy lag.</li><li>Giọng clone đã lưu nằm đầu danh sách <b>⭐ Giọng của tôi</b>.</li></ul>
         </div>
       </aside>
     </div>
@@ -142,6 +156,7 @@
         <div class="field">
           <label for="clone-text">Nội dung cần đọc</label>
           <textarea id="clone-text" placeholder="Văn bản sẽ được đọc bằng giọng vừa tải lên...">Đây là giọng nói được nhân bản từ đoạn âm thanh mẫu.</textarea>
+          <div class="text-meta" data-count-for="clone-text"><span class="count-num"></span><span class="count-msg"></span></div>
         </div>
         <div class="actions">
           <button class="btn btn-primary" id="clone-go">Clone &amp; sinh audio</button>
@@ -156,6 +171,17 @@
               <label for="clone-save-name">Hài lòng? Lưu vào <b>Giọng của tôi</b> để dùng lại</label>
               <input type="text" id="clone-save-name" maxlength="40" placeholder="Đặt tên, vd: Giọng thầy Sơn" />
             </div>
+            <div class="field" style="margin:0">
+              <label for="clone-save-emo">Cảm xúc của mẫu (tùy chọn)</label>
+              <select id="clone-save-emo">
+                <option value="">Bình thường</option>
+                <option>😄 Vui</option><option>🤩 Hào hứng</option><option>😢 Buồn</option>
+                <option>😠 Giận</option><option>🤫 Thì thầm</option><option>😌 Trầm ấm</option>
+                <option>😨 Sợ hãi</option><option>😏 Châm biếm</option><option>📢 Hô hào</option>
+                <option value="__custom">✏️ Tự đặt...</option>
+              </select>
+              <input type="text" id="clone-save-emo-custom" maxlength="16" placeholder="vd: Năng lượng" hidden style="margin-top:8px" />
+            </div>
             <button class="btn btn-primary btn-sm" id="clone-save-go">💾 Lưu giọng</button>
           </div>
         </div>
@@ -165,7 +191,7 @@
         </div>
         <div class="card side-card tips">
           <div class="side-title">💡 Mẹo</div>
-          <ul><li>Mẫu 3–5 giây, một người nói, không nhạc nền.</li><li>Thu ở phòng yên tĩnh, micro gần miệng cho kết quả rõ nhất.</li><li>Clone xong, đặt tên và bấm <b>Lưu giọng</b> để dùng lại ở Sinh giọng &amp; Hội thoại.</li></ul>
+          <ul><li>Mẫu 3–5 giây, một người nói, không nhạc nền.</li><li>Thu ở phòng yên tĩnh, micro gần miệng cho kết quả rõ nhất.</li><li>Clone xong, đặt tên và bấm <b>Lưu giọng</b> để dùng lại ở Sinh giọng &amp; Hội thoại.</li><li>Muốn giọng <b>vui, buồn, thì thầm...</b>? Thu mẫu nói đúng cảm xúc đó, rồi chọn nhãn <b>Cảm xúc của mẫu</b> khi lưu.</li></ul>
         </div>
       </aside>
     </div>
@@ -178,6 +204,7 @@
         <div class="section-title">Hội thoại đa nhân vật</div>
         <p class="hint">Mỗi dòng là một lượt thoại. Chọn giọng cho từng nhân vật để tạo podcast/hội thoại.</p>
         <div id="conv-turns"></div>
+        <div class="text-meta" data-count-for="conv"><span class="count-num"></span><span class="count-msg"></span></div>
         <div class="actions">
           <button class="btn btn-ghost" id="conv-add">+ Thêm lượt</button>
           <button class="btn btn-primary" id="conv-go">Sinh hội thoại</button>
@@ -297,6 +324,7 @@
       <div class="card dev-card">
         <div class="section-title">👨‍💻 Người phát triển</div>
         <div class="author-name" id="dev-name">Đặng Hữu Sơn</div>
+        <div class="dev-title-lg" id="dev-title">CEO &amp; Co-Founder LovinBot AI</div>
         <div class="kv" id="dev-role">Người phát triển phần mềm AI Audio Studio</div>
         <p id="dev-intro" class="hint"></p>
         <a id="dev-link" class="btn btn-primary btn-sm" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">Facebook Đặng Hữu Sơn →</a>
@@ -376,7 +404,7 @@
     </div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="/js/app.js?v=17"></script>
-  <script src="/js/onboarding.js?v=17"></script>
+  <script src="/js/app.js?v=19"></script>
+  <script src="/js/onboarding.js?v=19"></script>
 </body>
 </html>
