@@ -595,7 +595,8 @@ async function loadVersion() {
   } catch (e) { console.error(e); }
   try {
     const info = await (await fetch("/api/info")).json();
-    const gh = info.branding.links && info.branding.links.github;
+    const L = info.branding.links || {};
+    const gh = L.app_github || L.github;
     if (gh) $("#ver-github").href = gh + "/releases";
   } catch {}
   try {

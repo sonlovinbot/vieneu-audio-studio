@@ -19,7 +19,8 @@
     "huggingface": "https://huggingface.co/pnnbao-ump",
     "discord": "https://discord.gg/yJt8kzjzWZ",
     "model_v3_turbo": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo",
-    "model_v2": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v2"
+    "model_v2": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v2",
+    "app_github": "https://github.com/sonlovinbot/vieneu-audio-studio"
   },
   "credits": "Phần mềm do Đặng Hữu Sơn phát triển, dựa trên model AI và mã nguồn mở VieNeu-TTS của Phạm Nguyễn Ngọc Bảo. Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.",
   "license_note": "Sử dụng theo giấy phép của dự án VieNeu-TTS gốc.",
@@ -32,9 +33,9 @@
     "intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn, CEO & Co-Founder LovinBot AI: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Thư viện, API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo."
   },
   "downloads": {
-    "_note": "Để trống = dùng file .zip trong dist/ (build-installers.sh). Điền URL (GitHub Releases, Google Drive...) để tải từ nơi khác.",
-    "macos": "",
-    "windows": "",
-    "linux": ""
+    "_note": "Link bộ cài trên GitHub Releases (luôn trỏ bản mới nhất). Để trống = dùng file .zip trong dist/.",
+    "macos": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-macOS.zip",
+    "windows": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Windows.zip",
+    "linux": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Linux.zip"
   }
 }

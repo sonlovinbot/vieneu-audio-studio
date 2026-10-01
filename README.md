@@ -1,3 +1,55 @@
+# ⚡ AI Audio Studio — Giọng nói AI tiếng Việt chạy trên máy tính của bạn
+
+Biến văn bản tiếng Việt thành giọng nói tự nhiên, **clone giọng từ 3–5 giây audio**, tạo **hội thoại nhiều nhân vật**, và **xuất API** cho phần mềm khác (n8n, Make, script, OBS...) — chạy 100% trên máy, không cần card đồ họa.
+
+**Phát triển bởi [Đặng Hữu Sơn](https://www.facebook.com/danghuuson.182/) — CEO & Co-Founder LovinBot AI**, dựa trên model AI mã nguồn mở [VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS) của Phạm Nguyễn Ngọc Bảo.
+
+## ⬇️ Tải bộ cài
+
+| Hệ điều hành | Tải về | Cách cài |
+|---|---|---|
+| 🍎 **macOS** 12+ (chip M hoặc Intel) | [**AI-Audio-Studio-macOS.zip**](https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-macOS.zip) | Giải nén → nhấp đúp `install.command` |
+| 🪟 **Windows** 10/11 (64-bit) | [**AI-Audio-Studio-Windows.zip**](https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Windows.zip) | Giải nén (Extract All) → nhấp đúp `install.bat` |
+| 🐧 **Linux** 64-bit | [**AI-Audio-Studio-Linux.zip**](https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Linux.zip) | Giải nén → `bash install.sh` |
+
+Xem tất cả phiên bản và ghi chú cập nhật ở mục [**Releases**](https://github.com/sonlovinbot/vieneu-audio-studio/releases).
+
+**Yêu cầu:** RAM 8 GB (tối thiểu 4 GB) · ổ trống ~5 GB · Internet ở lần cài đầu tiên (sau đó chạy offline).
+
+### Cài đặt từng bước
+
+1. Tải file zip đúng hệ điều hành ở bảng trên và **giải nén** vào chỗ cố định (vd: Documents).
+2. Chạy file cài:
+   - **macOS:** nhấp đúp `install.command`. Nếu báo *"nhà phát triển không xác định"*: chuột phải → **Open** → **Open**.
+   - **Windows:** nhấp đúp `install.bat`. Nếu hiện *"Windows protected your PC"*: bấm **More info → Run anyway**.
+3. Chờ cài xong (5–10 phút lần đầu). Khi được hỏi *tự chạy khi mở máy?* nên chọn **có**.
+4. Trình duyệt tự mở **http://127.0.0.1:8001** — làm theo hướng dẫn trên màn hình để kiểm tra máy và tạo giọng đầu tiên.
+
+Lần sau chỉ cần mở icon **AI Audio Studio** trên Desktop.
+
+> [!IMPORTANT]
+> **Đây là phần mềm chạy trên máy tính của bạn.** Khi máy bật và app đang chạy, bạn dùng được giao diện và các phần mềm khác gọi được **API** tại `http://127.0.0.1:8001`. Khi tắt máy, máy ngủ hoặc thoát app thì giao diện và API ngừng hoạt động.
+
+## ✨ Tính năng
+
+- 🔊 **Sinh giọng** — 25 giọng có sẵn, chèn cảm xúc `[cười]` `[thở dài]` `[hắng giọng]`, bộ đếm ký tự (tối đa 5.000 ký tự/lần).
+- 🎙️ **Clone giọng** — từ 3–5 giây audio mẫu; lưu lại kèm nhãn cảm xúc (vui, buồn, thì thầm...) để dùng lại.
+- 💬 **Hội thoại** — nhiều nhân vật, mỗi lượt một giọng, làm podcast.
+- ⭐ **Thư viện** — Giọng của tôi và Lịch sử 50 lượt gần nhất.
+- 🔌 **API** — ví dụ curl / JavaScript / Python và prompt sẵn cho AI agent.
+- 🚀 **Hướng dẫn lần đầu** — kiểm tra cấu hình máy, tải model, thử tạo giọng.
+- 🌗 Giao diện sáng / tối.
+
+## 🙏 Ghi nhận
+
+- Phần mềm AI Audio Studio (giao diện, tính năng, bộ cài): **Đặng Hữu Sơn** — [Facebook](https://www.facebook.com/danghuuson.182/).
+- Model AI và SDK giọng nói: **[VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS)** — thiết kế và huấn luyện bởi **Phạm Nguyễn Ngọc Bảo**, giấy phép Apache 2.0. Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.
+
+---
+
+<details>
+<summary><b>📖 Tài liệu gốc của model VieNeu-TTS (tiếng Anh)</b></summary>
+
 # 🦜 VieNeu-TTS
 
 [![Awesome](https://img.shields.io/badge/Awesome-NLP-green?logo=github)](https://github.com/keon/awesome-nlp)
@@ -620,3 +672,6 @@ Thanks to all the amazing people who have contributed to this project!
 This project uses [neucodec](https://huggingface.co/neuphonic/neucodec) (v1/v2) and [MOSS-Audio-Tokenizer-Nano](https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano) (v3 Turbo) for audio coding, and [sea-g2p](https://github.com/pnnbao97/sea-g2p) for text normalization and phonemization.
 
 **Made with ❤️ for the Vietnamese TTS community**
+
+
+</details>
