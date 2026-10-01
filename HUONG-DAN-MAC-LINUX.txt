@@ -1,0 +1,37 @@
+============================================================
+  AI Audio Studio (Coachio Edition) — Hướng dẫn macOS & Linux
+============================================================
+
+CÀI ĐẶT
+  • macOS:  nhấp đúp file   install.command
+            (nếu báo chặn: chuột phải → Open → Open)
+  • Linux:  mở Terminal trong thư mục này, chạy:
+                bash install.sh
+
+Bộ cài sẽ tự động:
+  - Cài công cụ "uv" (nếu chưa có)
+  - Tải thư viện cần thiết
+  - Tạo icon "AI Audio Studio" trên Desktop
+  - Hỏi có muốn tự chạy khi mở máy không
+  - Mở giao diện tại:  http://127.0.0.1:8001
+
+LƯU Ý
+  - Lần chạy ĐẦU TIÊN cần Internet để tải mô hình giọng nói
+    (vài phút). Các lần sau chạy offline.
+  - Bản mặc định chạy bằng CPU — không cần card đồ họa.
+  - Linux: lần đầu nhấp icon trên Desktop có thể phải
+    chuột phải → "Allow Launching" (cho phép chạy).
+
+MỞ LẠI APP SAU KHI CÀI
+  - Nhấp icon "AI Audio Studio" trên Desktop.
+  - Hoặc chạy:  uv run vieneu-studio
+
+KHÔNG THẤY ICON TRÊN DESKTOP?
+  • macOS:  nhấp đúp   tao-shortcut.command
+  • Linux:  chạy        bash tao-shortcut.sh
+  Lệnh này tạo lại lối tắt trên Desktop mà KHÔNG cần cài lại.
+  (Tự dò đúng thư mục Desktop kể cả khi tên bị đổi theo ngôn ngữ.)
+
+CẦN GIÚP ĐỠ
+  - Xem chi tiết trong: webapp/README.md
+============================================================

@@ -1,0 +1,60 @@
+============================================================
+  Đưa VieNeu Studio lên mạng MIỄN PHÍ — Hugging Face Spaces
+============================================================
+
+VÌ SAO LÀ HUGGING FACE SPACES (KHÔNG PHẢI VERCEL)?
+  - Vercel KHÔNG chạy được app này: nó là serverless cho web tĩnh,
+    không giữ tiến trình Python nạp model trong RAM, giới hạn dung
+    lượng ~250MB, không có GPU. => Backend TTS không sống được.
+  - Hugging Face Spaces free: 2 vCPU + 16GB RAM, model nằm sẵn trên HF,
+    có sẵn giao diện Gradio. Chạy CPU (ONNX), KHÔNG cần GPU. => Hợp nhất.
+
+CẦN CHUẨN BỊ:
+  - 1 tài khoản Hugging Face (miễn phí): https://huggingface.co/join
+
+CHỈ CÓ 3 FILE CẦN ĐẨY LÊN (đã tạo sẵn trong thư mục deploy/hf-space/):
+  - app.py            (điểm khởi chạy)
+  - requirements.txt  (chỉ 1 dòng: vieneu==3.0.5)
+  - README.md         (cấu hình Space: sdk gradio, app_file app.py...)
+
+------------------------------------------------------------
+CÁCH 1 — Kéo–thả trên web (dễ nhất, không cần git)
+------------------------------------------------------------
+  1. Vào: https://huggingface.co/new-space
+  2. Đặt tên Space (vd: vieneu-studio).
+     - Chọn SDK = Gradio
+     - Hardware = CPU basic (Free)
+     - Public hoặc Private tùy bạn
+  3. Bấm "Create Space".
+  4. Mở tab "Files" của Space -> "Add file" -> "Upload files".
+  5. Kéo 3 file trong deploy/hf-space/ (app.py, requirements.txt,
+     README.md) thả vào. Bấm "Commit".
+  6. Space tự build (~3–5 phút). Lần đầu sẽ tải model về.
+  7. Xong! App chạy tại:
+     https://huggingface.co/spaces/<tên-bạn>/vieneu-studio
+
+------------------------------------------------------------
+CÁCH 2 — Dùng git (cho người quen dòng lệnh)
+------------------------------------------------------------
+  # Tạo Space trống trên web trước (như bước 1–3 ở Cách 1), rồi:
+
+  git clone https://huggingface.co/spaces/<tên-bạn>/vieneu-studio
+  cd vieneu-studio
+  # Chép 3 file từ repo này sang:
+  cp /duong-dan/VieNeu-TTS/deploy/hf-space/* .
+  git add app.py requirements.txt README.md
+  git commit -m "Deploy VieNeu Studio"
+  git push
+
+LƯU Ý:
+  - Lần build đầu tải model (vài phút). Các lần sau nhanh hơn.
+  - Space free sẽ "ngủ" khi không ai dùng, tự thức khi có người mở
+    (lần thức dậy chờ ~30–60s).
+  - Muốn nhanh/mạnh hơn: nâng Hardware lên CPU upgrade hoặc GPU (trả phí).
+  - Giao diện này là bản GRADIO (apps/gradio_main.py), khác bản webapp
+    FastAPI có tab "API + AI Prompt". Muốn deploy bản webapp đó thì dùng
+    HF Spaces kiểu Docker (hỏi mình sẽ tạo Dockerfile cho).
+
+CẦN GIÚP ĐỠ:
+  - Tài liệu HF Spaces: https://huggingface.co/docs/hub/spaces
+============================================================

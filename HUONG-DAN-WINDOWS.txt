@@ -1,0 +1,35 @@
+============================================================
+  AI Audio Studio (Coachio Edition) — Hướng dẫn cho Windows
+============================================================
+
+CÀI ĐẶT (chỉ 1 bước):
+
+  1. Giải nén toàn bộ thư mục này ra ổ đĩa (vd: C:\VieNeu-Studio).
+  2. Nhấp đúp file:   install.bat
+  3. Làm theo hướng dẫn trên màn hình.
+
+Bộ cài sẽ tự động:
+  - Cài công cụ "uv" (nếu máy chưa có)
+  - Tải thư viện cần thiết
+  - Tạo icon "AI Audio Studio" trên Desktop
+  - Hỏi bạn có muốn tự chạy khi mở máy không
+  - Mở giao diện tại:  http://127.0.0.1:8001
+
+LƯU Ý:
+  - Lần chạy ĐẦU TIÊN cần Internet để tải mô hình giọng nói
+    (vài phút, tùy tốc độ mạng). Các lần sau chạy offline.
+  - Nếu Windows hiện cảnh báo "Windows protected your PC":
+    bấm "More info" -> "Run anyway" (do file chưa ký số).
+  - Bản mặc định chạy bằng CPU — không cần card đồ họa.
+
+MỞ LẠI APP SAU KHI CÀI:
+  - Nhấp icon "AI Audio Studio" trên Desktop.
+
+KHÔNG THẤY ICON TRÊN DESKTOP?
+  - Nhấp đúp file "tao-shortcut.bat" trong thư mục cài đặt.
+    Nó tạo lại lối tắt "AI Audio Studio" trên Desktop (kể cả khi
+    Desktop bị OneDrive chuyển hướng — lỗi hay gặp).
+
+CẦN GIÚP ĐỠ:
+  - Xem chi tiết trong: webapp\README.md
+============================================================

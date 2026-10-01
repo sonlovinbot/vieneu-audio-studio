@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Audio Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Sans:wght@400;500;700&family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script>
+    // Áp theme trước khi vẽ trang để không bị "chớp sáng" ở dark mode.
+    (function () {
+      var t = "light";
+      try {
+        var pref = localStorage.getItem("vieneu_theme") || "system";
+        t = pref === "dark" || (pref === "system" && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+      } catch (e) {}
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=13" />
+  <link rel="stylesheet" href="/css/app.css?v=13" />
+</head>
+<body>
+  <div class="app">
+    <!-- ── Sidebar ─────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="logo">⚡</span>
+        <div>
+          <span class="title" id="app-title">AI Audio Studio</span>
+          <span class="edition" id="app-edition"></span>
+        </div>
+      </div>
+      <span class="status-pill"><span class="dot gray" id="status-dot"></span><span id="status-text">Chưa tải model</span></span>
+
+      <nav class="nav" aria-label="Điều hướng">
+        <div class="nav-group">
+          <div class="nav-label">Tạo</div>
+          <button class="nav-item active" data-tab="synthesize"><span class="ico">🔊</span>Sinh giọng</button>
+          <button class="nav-item" data-tab="clone"><span class="ico">🎙️</span>Clone giọng</button>
+          <button class="nav-item" data-tab="conversation"><span class="ico">💬</span>Hội thoại</button>
+        </div>
+        <div class="nav-group" id="nav-library">
+          <div class="nav-label">Thư viện</div>
+          <button class="nav-item" data-tab="voices"><span class="ico">⭐</span>Giọng của tôi<span class="count" id="count-voices"></span></button>
+          <button class="nav-item" data-tab="history"><span class="ico">🕘</span>Lịch sử<span class="count" id="count-history"></span></button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Hệ thống</div>
+          <button class="nav-item" data-tab="api"><span class="ico">🔌</span>API</button>
+          <button class="nav-item" data-tab="version"><span class="ico">📋</span>Phiên bản &amp; Logs</button>
+          <button class="nav-item" data-tab="settings"><span class="ico">⚙️</span>Cài đặt</button>
+        </div>
+      </nav>
+
+      <div class="sidebar-foot">
+        <a class="dev-credit" id="side-dev" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">
+          <span class="dev-by">Phát triển bởi</span>
+          <span class="dev-who">Đặng Hữu Sơn ↗</span>
+          <span class="dev-base">Dựa trên model AI VieNeu-TTS</span>
+        </a>
+        <div class="nav-label">Giao diện</div>
+        <div class="theme-switch" role="radiogroup" aria-label="Chế độ sáng/tối">
+          <button data-theme-pref="light" role="radio" title="Sáng">☀️ Sáng</button>
+          <button data-theme-pref="dark" role="radio" title="Tối">🌙 Tối</button>
+          <button data-theme-pref="system" role="radio" title="Theo hệ thống">💻 Tự động</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Main ───────────────────────────────────────── -->
+    <main class="main">
+    <header class="page-head">
+      <h1 class="page-title" id="page-title">Sinh giọng</h1>
+      <div class="tagline" id="app-tagline"></div>
+    </header>
+
+    <!-- ── Tab: Synthesize ──────────────────────────────── -->
+    <section class="panel active" id="tab-synthesize">
+    <div class="workspace">
+      <div class="card">
+        <div class="section-title">Sinh giọng từ văn bản</div>
+        <div class="field">
+          <label for="syn-text">Nội dung</label>
+          <textarea id="syn-text" placeholder="Nhập văn bản tiếng Việt... Có thể chèn tag cảm xúc như [cười], [thở dài], [hắng giọng].">[cười] Xin chào cả nhà, đây là giọng đọc tự nhiên từ AI Audio Studio!</textarea>
+        </div>
+        <div class="row two">
+          <div class="field">
+            <label for="syn-voice">Giọng đọc</label>
+            <select id="syn-voice"></select>
+          </div>
+          <div class="field">
+            <label>Cảm xúc (chèn vào văn bản)</label>
+            <div class="emotion-tags">
+              <button type="button" class="btn btn-ghost" data-tag="[cười]">😄 Cười</button>
+              <button type="button" class="btn btn-ghost" data-tag="[thở dài]">😮‍💨 Thở dài</button>
+              <button type="button" class="btn btn-ghost" data-tag="[hắng giọng]">🗣️ Hắng giọng</button>
+            </div>
+          </div>
+        </div>
+        <details class="advanced">
+          <summary>Tùy chọn nâng cao</summary>
+          <div class="row two" style="margin-top:12px">
+            <div class="field"><label for="syn-temp">Temperature (0.1–1.5)</label><input type="number" id="syn-temp" value="0.8" step="0.1" min="0.1" max="1.5" /></div>
+            <div class="field"><label for="syn-topk">Top-k</label><input type="number" id="syn-topk" value="25" step="1" min="1" max="100" /></div>
+          </div>
+        </details>
+        <div class="actions">
+          <button class="btn btn-primary" id="syn-go">Sinh audio</button>
+          <span class="hint">Lần đầu sẽ tải model (vài phút).</span>
+        </div>
+      </div>
+      <aside class="side">
+        <div class="card side-card">
+          <div class="side-title">🎧 Kết quả</div>
+          <div class="result" id="syn-result"><div class="result-empty">Audio sẽ hiện ở đây sau khi bạn bấm sinh.</div></div>
+        </div>
+        <div class="card side-card" data-recent-card>
+          <div class="side-title">🕘 Gần đây <button class="link-btn" data-goto="history">Xem tất cả →</button></div>
+          <div class="recent" data-recent="tts"></div>
+        </div>
+        <div class="card side-card tips">
+          <div class="side-title">💡 Mẹo</div>
+          <ul><li>Chèn <b>[cười]</b>, <b>[thở dài]</b>, <b>[hắng giọng]</b> ngay chỗ muốn có cảm xúc.</li><li>Dấu chấm, phẩy giúp giọng ngắt nghỉ tự nhiên hơn.</li><li>Văn bản tối đa ~5000 ký tự mỗi lần.</li><li>Giọng clone đã lưu nằm đầu danh sách <b>⭐ Giọng của tôi</b>.</li></ul>
+        </div>
+      </aside>
+    </div>
+    </section>
+
+    <!-- ── Tab: Clone ───────────────────────────────────── -->
+    <section class="panel" id="tab-clone">
+    <div class="workspace">
+      <div class="card">
+        <div class="section-title">Nhân bản giọng (Voice Cloning)</div>
+        <p class="hint">Tải lên 3–5 giây audio mẫu (WAV/MP3) → đọc văn bản bằng chính giọng đó.</p>
+        <div class="field">
+          <label for="clone-ref">Audio mẫu (3–5s)</label>
+          <input type="file" id="clone-ref" accept="audio/*" />
+        </div>
+        <div class="field">
+          <label for="clone-text">Nội dung cần đọc</label>
+          <textarea id="clone-text" placeholder="Văn bản sẽ được đọc bằng giọng vừa tải lên...">Đây là giọng nói được nhân bản từ đoạn âm thanh mẫu.</textarea>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="clone-go">Clone &amp; sinh audio</button>
+        </div>
+      </div>
+      <aside class="side">
+        <div class="card side-card">
+          <div class="side-title">🎧 Kết quả</div>
+          <div class="result" id="clone-result"><div class="result-empty">Audio sẽ hiện ở đây sau khi bạn bấm sinh.</div></div>
+          <div class="save-voice" id="clone-save" hidden>
+            <div class="field" style="flex:1;margin:0">
+              <label for="clone-save-name">Hài lòng? Lưu vào <b>Giọng của tôi</b> để dùng lại</label>
+              <input type="text" id="clone-save-name" maxlength="40" placeholder="Đặt tên, vd: Giọng thầy Sơn" />
+            </div>
+            <button class="btn btn-primary btn-sm" id="clone-save-go">💾 Lưu giọng</button>
+          </div>
+        </div>
+        <div class="card side-card" data-recent-card>
+          <div class="side-title">🕘 Gần đây <button class="link-btn" data-goto="history">Xem tất cả →</button></div>
+          <div class="recent" data-recent="clone"></div>
+        </div>
+        <div class="card side-card tips">
+          <div class="side-title">💡 Mẹo</div>
+          <ul><li>Mẫu 3–5 giây, một người nói, không nhạc nền.</li><li>Thu ở phòng yên tĩnh, micro gần miệng cho kết quả rõ nhất.</li><li>Clone xong, đặt tên và bấm <b>Lưu giọng</b> để dùng lại ở Sinh giọng &amp; Hội thoại.</li></ul>
+        </div>
+      </aside>
+    </div>
+    </section>
+
+    <!-- ── Tab: Conversation ────────────────────────────── -->
+    <section class="panel" id="tab-conversation">
+    <div class="workspace">
+      <div class="card">
+        <div class="section-title">Hội thoại đa nhân vật</div>
+        <p class="hint">Mỗi dòng là một lượt thoại. Chọn giọng cho từng nhân vật để tạo podcast/hội thoại.</p>
+        <div id="conv-turns"></div>
+        <div class="actions">
+          <button class="btn btn-ghost" id="conv-add">+ Thêm lượt</button>
+          <button class="btn btn-primary" id="conv-go">Sinh hội thoại</button>
+        </div>
+      </div>
+      <aside class="side">
+        <div class="card side-card">
+          <div class="side-title">🎧 Kết quả</div>
+          <div class="result" id="conv-result"><div class="result-empty">Audio sẽ hiện ở đây sau khi bạn bấm sinh.</div></div>
+        </div>
+        <div class="card side-card" data-recent-card>
+          <div class="side-title">🕘 Gần đây <button class="link-btn" data-goto="history">Xem tất cả →</button></div>
+          <div class="recent" data-recent="conversation"></div>
+        </div>
+        <div class="card side-card tips">
+          <div class="side-title">💡 Mẹo</div>
+          <ul><li>Mỗi lượt chọn một giọng — xen kẽ 2 giọng nam/nữ nghe như podcast.</li><li>Câu ngắn, tự nhiên giúp hội thoại sống động hơn.</li><li>Có thể chèn thẻ cảm xúc <b>[cười]</b> trong từng lượt.</li></ul>
+        </div>
+      </aside>
+    </div>
+    </section>
+
+    <!-- ── Tab: My voices ───────────────────────────────── -->
+    <section class="panel" id="tab-voices">
+      <div class="lib-toolbar">
+        <p class="hint" style="margin:0">Giọng bạn đã clone thành công và lưu lại. Chúng xuất hiện ở đầu danh sách giọng khi sinh audio và hội thoại.</p>
+        <button class="btn btn-ghost btn-sm" data-goto="clone">+ Clone giọng mới</button>
+      </div>
+      <div id="voices-list" class="voice-grid"></div>
+    </section>
+
+    <!-- ── Tab: History ─────────────────────────────────── -->
+    <section class="panel" id="tab-history">
+      <div class="lib-toolbar">
+        <p class="hint" style="margin:0" id="history-summary">Các lượt sinh audio gần đây.</p>
+        <div class="actions" style="margin:0">
+          <select id="history-filter" style="width:auto;min-height:36px;padding:4px 12px">
+            <option value="">Tất cả</option>
+            <option value="tts">Sinh giọng</option>
+            <option value="clone">Clone</option>
+            <option value="conversation">Hội thoại</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" id="history-refresh">↻ Làm mới</button>
+          <button class="btn btn-ghost btn-sm btn-danger" id="history-clear">Xóa tất cả</button>
+        </div>
+      </div>
+      <div id="history-list"></div>
+    </section>
+
+    <!-- ── Tab: API ─────────────────────────────────────── -->
+    <section class="panel" id="tab-api">
+      <div class="card">
+        <div class="section-title">🔌 API endpoint — cắm vào phần mềm khác</div>
+        <p class="hint">Server đang chạy tại <code id="api-base"></code>. Dùng các đoạn dưới để vibe-code hoặc tích hợp (n8n, Make, Zapier, OBS, script riêng...). Bấm <b>Sao chép</b> rồi dán thẳng.</p>
+
+        <div class="field">
+          <label>Ngôn ngữ ví dụ</label>
+          <div class="tabs sub-tabs" id="api-lang-tabs">
+            <button class="tab active" data-lang="curl">curl</button>
+            <button class="tab" data-lang="fetch">JavaScript (fetch)</button>
+            <button class="tab" data-lang="python">Python</button>
+            <button class="tab" data-lang="ai">🤖 AI Prompt</button>
+          </div>
+        </div>
+
+        <div id="api-endpoints"></div>
+
+        <div class="advanced">
+          <summary style="list-style:none"><b>Bảng endpoint</b></summary>
+          <div class="api-table" id="api-table"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Tab: Version & Logs ──────────────────────────── -->
+    <section class="panel" id="tab-version">
+      <div class="row two">
+        <div class="card">
+          <div class="section-title">📋 Phiên bản</div>
+          <div class="kv"><b>Ứng dụng:</b> <span id="ver-app">—</span></div>
+          <div class="kv"><b>Phiên bản:</b> <span id="ver-num" class="badge badge-blue">—</span></div>
+          <div class="kv"><b>VieNeu SDK:</b> <span id="ver-sdk">—</span></div>
+          <div class="kv"><b>Python:</b> <span id="ver-py">—</span></div>
+          <div class="kv"><b>Hệ điều hành:</b> <span id="ver-os">—</span></div>
+          <div class="actions">
+            <a class="btn btn-ghost" id="ver-github" target="_blank" rel="noopener">Kiểm tra bản mới trên GitHub ↗</a>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">✨ Cập nhật mới</div>
+          <div id="changelog"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <div class="section-title">🧾 Logs (nhật ký server)</div>
+        <div class="actions" style="margin-top:0">
+          <select id="log-level" style="max-width:160px">
+            <option value="ALL">Tất cả</option>
+            <option value="INFO">INFO</option>
+            <option value="WARNING">WARNING</option>
+            <option value="ERROR">ERROR</option>
+          </select>
+          <button class="btn btn-ghost" id="log-refresh">↻ Làm mới</button>
+          <label style="display:flex;align-items:center;gap:8px;margin:0;font-weight:700">
+            <input type="checkbox" id="log-auto" style="width:auto;min-height:auto" /> Tự cập nhật (3s)
+          </label>
+          <button class="btn btn-ghost" id="log-copy">Sao chép logs</button>
+        </div>
+        <pre class="log-viewer" id="log-viewer">Đang tải logs...</pre>
+      </div>
+    </section>
+
+    <!-- ── Tab: Settings & About ────────────────────────── -->
+    <section class="panel" id="tab-settings">
+      <div class="settings-grid">
+      <div class="card dev-card">
+        <div class="section-title">👨‍💻 Người phát triển</div>
+        <div class="author-name" id="dev-name">Đặng Hữu Sơn</div>
+        <div class="kv" id="dev-role">Người phát triển phần mềm AI Audio Studio</div>
+        <p id="dev-intro" class="hint"></p>
+        <a id="dev-link" class="btn btn-primary btn-sm" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">Facebook Đặng Hữu Sơn →</a>
+      </div>
+      <div class="card">
+          <div class="section-title">🧠 Model AI VieNeu-TTS</div>
+          <div class="author-name" id="author-name">—</div>
+          <div class="kv" id="author-role"></div>
+          <p id="author-note" class="hint"></p>
+          <ul class="link-list" id="author-links"></ul>
+          <p class="hint" id="credits"></p>
+        </div>
+      <div class="card">
+        <div class="section-title">🔑 Khóa truy cập (API key)</div>
+        <p class="hint">Nếu chủ Space bật bảo mật, bạn cần nhập <b>API key</b> để tạo giọng. Key lưu trong trình duyệt của bạn (localStorage), không gửi đi đâu khác ngoài server này.</p>
+        <div class="field">
+          <label for="set-apikey">API key (tạo giọng)</label>
+          <input type="password" id="set-apikey" placeholder="Dán API key chủ Space cấp..." autocomplete="off" />
+        </div>
+        <details class="advanced">
+          <summary>Admin key (chỉ chủ Space — đổi model / xem logs)</summary>
+          <div class="field" style="margin-top:12px">
+            <label for="set-adminkey">Admin key</label>
+            <input type="password" id="set-adminkey" placeholder="Chỉ chủ Space mới có..." autocomplete="off" />
+          </div>
+        </details>
+        <button class="btn btn-primary" id="set-savekeys">Lưu khóa</button>
+      </div>
+      <div class="card">
+          <div class="section-title">⚙️ Trạng thái &amp; Model</div>
+          <div class="kv"><b>Backbone:</b> <span id="set-backbone">—</span></div>
+          <div class="kv"><b>Thiết bị:</b> <span id="set-device">—</span></div>
+          <div class="kv"><b>Sample rate:</b> <span id="set-sr">—</span></div>
+          <details class="advanced">
+            <summary>Đổi model (nâng cao)</summary>
+            <div class="field" style="margin-top:12px">
+              <label for="set-mode">Chế độ</label>
+              <select id="set-mode">
+                <option value="v3turbo">v3 Turbo (CPU/ONNX — mặc định)</option>
+                <option value="turbo_gpu">v2 Turbo (GPU)</option>
+                <option value="standard">Standard (GGUF/CPU)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="set-repo">Backbone repo (tùy chọn)</label>
+              <input type="text" id="set-repo" placeholder="vd: pnnbao-ump/VieNeu-TTS-v3-Turbo" />
+            </div>
+            <div class="field">
+              <label for="set-device-sel">Thiết bị</label>
+              <select id="set-device-sel">
+                <option value="auto">Auto</option>
+                <option value="cpu">CPU</option>
+                <option value="cuda">GPU (CUDA)</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary" id="set-load">Tải lại model</button>
+            <p class="hint">v2/GPU/LoRA cần cài thêm <code>uv sync --group gpu</code>.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/js/app.js?v=13"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "app": {
+    "name": "AI Audio Studio",
+    "edition": "",
+    "version": "1.3.0",
+    "tagline": "Text-to-Speech tiếng Việt offline — giọng tự nhiên, clone giọng tức thì",
+    "description": "Giao diện đào tạo gọn nhẹ cho VieNeu-TTS: sinh giọng, nhân bản giọng từ 3–5s, hội thoại đa nhân vật, chạy 100% trên máy của bạn.",
+    "default_port": 8001
+  },
+  "about_note": "AI Audio Studio do Đặng Hữu Sơn phát triển (giao diện, tính năng, đóng gói phần mềm), dựa trên model AI VieNeu-TTS mã nguồn mở của Phạm Nguyễn Ngọc Bảo.",
+  "author": {
+    "name": "Phạm Nguyễn Ngọc Bảo",
+    "role": "Tác giả & nhà phát triển VieNeu-TTS",
+    "email": "pnnbao@gmail.com",
+    "note": "Toàn bộ mô hình VieNeu-TTS (v1/v2/v3 Turbo) được thiết kế và huấn luyện bởi Phạm Nguyễn Ngọc Bảo."
+  },
+  "links": {
+    "github": "https://github.com/pnnbao97/VieNeu-TTS",
+    "huggingface": "https://huggingface.co/pnnbao-ump",
+    "discord": "https://discord.gg/yJt8kzjzWZ",
+    "model_v3_turbo": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo",
+    "model_v2": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v2"
+  },
+  "credits": "Phần mềm do Đặng Hữu Sơn phát triển, dựa trên model AI và mã nguồn mở VieNeu-TTS của Phạm Nguyễn Ngọc Bảo. Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.",
+  "license_note": "Sử dụng theo giấy phép của dự án VieNeu-TTS gốc.",
+  "developer": {
+    "name": "Đặng Hữu Sơn",
+    "role": "Người phát triển phần mềm AI Audio Studio",
+    "url": "https://www.facebook.com/danghuuson.182/",
+    "link_label": "Facebook Đặng Hữu Sơn",
+    "intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Thư viện, API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo."
+  }
+}

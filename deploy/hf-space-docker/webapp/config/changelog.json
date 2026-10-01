@@ -1,0 +1,55 @@
+{
+  "entries": [
+    {
+      "version": "1.3.0",
+      "date": "2026-10-01",
+      "title": "Bố cục 2 cột, giao diện nhẹ nhàng hơn, ghi nhận người phát triển",
+      "changes": [
+        "Trang Sinh giọng / Clone giọng / Hội thoại có cột phải: Kết quả (nghe & tải audio), Gần đây (3 lượt mới nhất, bấm để dùng lại) và Mẹo — không còn khoảng trống bên phải.",
+        "Giảm viền đen: viền mảnh màu xám, bo góc, bóng mềm; giữ màu cam nhận diện cho nút chính và menu đang chọn.",
+        "Cài đặt sắp xếp lại thành lưới 2 cột: Người phát triển, Model AI VieNeu-TTS, Khóa truy cập, Trạng thái & Model.",
+        "Ghi nhận rõ: phần mềm do Đặng Hữu Sơn phát triển, dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo. Link VibeCreators được thay bằng Facebook Đặng Hữu Sơn.",
+        "Sửa ô nhập API key / Admin key chưa có kiểu hiển thị."
+      ]
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-09-30",
+      "title": "Giao diện mới: menu trái, dark mode, Lịch sử và Giọng của tôi",
+      "changes": [
+        "Bố cục mới: menu bên trái chia nhóm Tạo / Thư viện / Hệ thống, nội dung bên phải; màn hẹp tự chuyển menu lên trên.",
+        "Chế độ Sáng / Tối / Tự động (theo hệ điều hành), nhớ lựa chọn trong trình duyệt.",
+        "Giọng của tôi: clone thành công thì bấm Lưu giọng — giọng xuất hiện đầu danh sách khi sinh audio và hội thoại. Nghe thử, đổi tên, xóa.",
+        "Lịch sử: lưu 50 lượt gần nhất (văn bản, giọng, model, thời lượng, file audio) — nghe lại, tải xuống, Dùng lại, lọc theo loại.",
+        "Dữ liệu lưu ở ~/.vieneu (đổi bằng VIENEU_HOME), ngoài thư mục cài đặt nên cập nhật phiên bản không bị mất. Giọng đã lưu dùng chung với app Gradio.",
+        "Tắt Thư viện bằng VIENEU_LIBRARY=off (bản HF Space công khai đã tắt sẵn)."
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-09-30",
+      "title": "Nâng cấp engine VieNeu-TTS 3.0.5 → 3.8.3",
+      "changes": [
+        "Cập nhật SDK VieNeu-TTS lên 3.8.3 (bản mới nhất) và tải checkpoint v3 Turbo mới nhất.",
+        "Bộ giọng mặc định tăng từ 10 lên 25 giọng; giọng mặc định mới là Hải Đăng.",
+        "Giới hạn văn bản nâng từ 1000 lên 5000 ký tự (đổi qua biến môi trường VIENEU_MAX_TEXT_CHARS).",
+        "Cảm xúc chuyển sang thẻ inline trong văn bản: [cười], [thở dài], [hắng giọng] — thay cho ô chọn Vui/Buồn/Giận cũ (engine 3.8.3 đã bỏ tham số emotion).",
+        "Dockerfile HF Space cập nhật pin vieneu==3.8.3 cho khớp bản local."
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2026-06-19",
+      "title": "Phát hành đầu tiên — VieNeu Studio (Coachio Edition)",
+      "changes": [
+        "Giao diện neo-brutalist theo bộ nhận diện Coachio (cam #F67D1C, viền đậm, bóng cứng).",
+        "4 chức năng: Sinh giọng, Clone giọng (3–5s), Hội thoại đa nhân vật, Cài đặt & Giới thiệu.",
+        "REST API đầy đủ: /api/tts, /api/clone, /api/conversation, /api/stream, /api/voices.",
+        "Khu vực API với ví dụ curl / fetch / Python có nút sao chép.",
+        "Khu vực Phiên bản & Logs: xem changelog và nhật ký server trực tiếp.",
+        "Bộ cài 1-cú-nhấp cho macOS (install.command) và Windows (install.bat), tùy chọn tự chạy khi mở máy.",
+        "Mặc định chạy CPU/ONNX (v3 Turbo 48 kHz, torch-free); v2/GPU/LoRA là tùy chọn nâng cao."
+      ]
+    }
+  ]
+}

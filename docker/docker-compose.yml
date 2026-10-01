@@ -1,0 +1,170 @@
+x-base-config: &base-config
+  volumes:
+    - ./:/workspace
+    - huggingface_cache:/home/app/.cache/huggingface
+    - ./output_audio:/workspace/output_audio
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    - HF_HOME=${HF_HOME:-/home/app/.cache/huggingface}
+    - PYTHONUNBUFFERED=1
+    - PORT=${PORT:-7860}
+    - GRADIO_SERVER_PORT=${GRADIO_SERVER_PORT:-7860}
+    - GRADIO_SERVER_NAME=${GRADIO_SERVER_NAME:-0.0.0.0}
+    - GRADIO_SHARE=${GRADIO_SHARE:-0}
+  ports:
+    - "${PORT:-7860}:${GRADIO_SERVER_PORT:-7860}"
+  stdin_open: true
+  tty: true
+
+services:
+  # ========================================================
+  # CPU profile — Web UI, v3 Turbo (ONNX) + v3 Nano, torch-free
+  #   docker compose -f docker/docker-compose.yml --profile cpu up
+  # ========================================================
+  cpu:
+    <<: *base-config
+    profiles: ["cpu"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cpu
+    container_name: vieneu-tts-cpu
+    command: ["python", "apps/gradio_main.py"]
+
+  # ========================================================
+  # GPU profile — Web UI, v3 Turbo on CUDA (PyTorch) + v3 Nano
+  #   docker compose -f docker/docker-compose.yml --profile gpu up
+  # ========================================================
+  gpu:
+    <<: *base-config
+    profiles: ["gpu"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.gpu
+      target: dev
+    container_name: vieneu-tts-gpu-dev
+    command: ["python", "apps/gradio_main.py"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ========================================================
+  # API profiles — OpenAI-compatible streaming speech API (apps/openai_speech.py)
+  #   docker compose -f docker/docker-compose.yml --profile api-gpu up   # RTX: 16 streams
+  #   docker compose -f docker/docker-compose.yml --profile api-cpu up   # no GPU: 1-2 streams
+  #   -> POST http://localhost:8000/v1/audio/speech  (docs/streaming.vi.md)
+  # ========================================================
+  api-gpu:
+    profiles: ["api-gpu"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.gpu
+      target: prod
+    container_name: vieneu-tts-api-gpu
+    command: ["python", "-m", "apps.openai_speech"]
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - HF_HOME=${HF_HOME:-/home/app/.cache/huggingface}
+      - PYTHONUNBUFFERED=1
+      - HOST=0.0.0.0   # the server defaults to loopback; the published port needs all interfaces
+      - PORT=8000
+      - VIENEU_MAX_STREAMS=${VIENEU_MAX_STREAMS:-16}
+      - VIENEU_QUEUE=${VIENEU_QUEUE:-16}
+      - VIENEU_QUEUE_TIMEOUT=${VIENEU_QUEUE_TIMEOUT:-10}
+      - VIENEU_API_KEY=${VIENEU_API_KEY:-}
+      - VIENEU_WATERMARK=${VIENEU_WATERMARK:-1}
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - huggingface_cache:/home/app/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  api-cpu:
+    profiles: ["api-cpu"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cpu
+    container_name: vieneu-tts-api-cpu
+    command: ["python", "-m", "apps.openai_speech"]
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - HF_HOME=${HF_HOME:-/home/app/.cache/huggingface}
+      - PYTHONUNBUFFERED=1
+      - HOST=0.0.0.0   # the server defaults to loopback; the published port needs all interfaces
+      - PORT=8000
+      - VIENEU_BACKEND=onnx
+      - VIENEU_PRECISION=${VIENEU_PRECISION:-fp32}   # int8: nhanh ~2x, cần CPU có VNNI
+      - VIENEU_QUEUE=${VIENEU_QUEUE:-4}
+      - VIENEU_QUEUE_TIMEOUT=${VIENEU_QUEUE_TIMEOUT:-10}
+      - VIENEU_API_KEY=${VIENEU_API_KEY:-}
+      - VIENEU_WATERMARK=${VIENEU_WATERMARK:-1}
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - huggingface_cache:/home/app/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3).status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 180s
+      retries: 3
+    restart: unless-stopped
+
+  # ========================================================
+  # Serve profile — LEGACY v1/v2 LMDeploy API server (not used by v3)
+  # ========================================================
+  serve:
+    profiles: ["serve"]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.serve
+    container_name: vieneu-tts-serve
+    ports:
+      - "${SERVE_PORT:-23333}:23333"
+    environment:
+      - HF_HOME=${HF_HOME:-/root/.cache/huggingface}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface
+    command:
+      - "--model"
+      - "${MODEL:-pnnbao-ump/VieNeu-TTS-v2}"
+      - "--model-name"
+      - "${MODEL_NAME:-pnnbao-ump/VieNeu-TTS-v2}"
+      - "--port"
+      - "23333"
+      - "--memory-util"
+      - "${MEMORY_UTIL:-0.3}"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+volumes:
+  huggingface_cache:

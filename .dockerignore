@@ -1,0 +1,68 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Git
+.git/
+.github/
+.gitignore
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+
+# Output files
+output_audio/
+
+# Web UI (React)
+web_ui/node_modules/
+web_ui/dist/
+web_ui/.vite/
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Audio files (except samples)
+*.wav
+!sample/*.wav
+outputs/
+
+# Temporary files
+*.tmp
+.cache/
+
+
+
+
+
+
+# Fine-tune data / outputs and stray root clips
+finetune/dataset/
+finetune/output/
+/*.mp3
+readmehf.md

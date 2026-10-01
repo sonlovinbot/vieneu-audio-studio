@@ -1,0 +1,49 @@
+FROM nvidia/cuda:12.8.0-runtime-ubuntu24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    HF_HOME=/root/.cache/huggingface \
+    PATH="/workspace/.venv/bin:$PATH"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    python3.12 \
+    python3.12-dev \
+    build-essential \
+    git \
+    curl \
+    wget \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install bore (for tunneling)
+RUN curl -LsSf https://github.com/ekzhang/bore/releases/download/v0.5.1/bore-v0.5.1-x86_64-unknown-linux-musl.tar.gz | tar zxf - -C /usr/local/bin
+
+# Install pip and uv
+# Install uv directly
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN ln -s /bin/uv /bin/dep-installer
+
+WORKDIR /workspace
+
+# Copy only requirements first
+COPY pyproject.toml uv.lock ./
+# Note: We use --no-dev and only gpu group
+RUN dep-installer sync --frozen --no-dev --group gpu --no-install-project
+
+# Copy the rest
+COPY . .
+
+# Install the project itself (creates the vieneu-serve CLI)
+RUN dep-installer sync --frozen --no-dev --group gpu
+
+# Expose LMDeploy port
+EXPOSE 23333
+
+# Use Python to run the serve module directly
+ENTRYPOINT ["python", "src/vieneu/serve.py"]
+# Default arguments
+CMD ["--model", "pnnbao-ump/VieNeu-TTS", "--tunnel"]
