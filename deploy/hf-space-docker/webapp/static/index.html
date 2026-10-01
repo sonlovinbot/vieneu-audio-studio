@@ -18,8 +18,8 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
-  <link rel="stylesheet" href="/css/coachio-theme.css?v=20" />
-  <link rel="stylesheet" href="/css/app.css?v=20" />
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=22" />
+  <link rel="stylesheet" href="/css/app.css?v=22" />
 </head>
 <body>
   <div class="app">
@@ -40,6 +40,7 @@
           <button class="nav-item active" data-tab="synthesize"><span class="ico">🔊</span>Sinh giọng</button>
           <button class="nav-item" data-tab="clone"><span class="ico">🎙️</span>Clone giọng</button>
           <button class="nav-item" data-tab="conversation"><span class="ico">💬</span>Hội thoại</button>
+          <button class="nav-item" data-tab="gallery"><span class="ico">🎧</span>Kho giọng<span class="count" id="count-gallery"></span></button>
         </div>
         <div class="nav-group" id="nav-library">
           <div class="nav-label">Thư viện</div>
@@ -91,7 +92,11 @@
         <div class="row two">
           <div class="field">
             <label for="syn-voice">Giọng đọc</label>
-            <select id="syn-voice"></select>
+            <div class="voice-pick">
+              <select id="syn-voice"></select>
+              <button type="button" class="btn btn-ghost preview-btn" id="syn-preview" title="Nghe thử giọng này">▶ Nghe thử</button>
+            </div>
+            <button type="button" class="link-btn" data-goto="gallery" style="margin-top:6px">🎧 Nghe và so sánh tất cả giọng →</button>
           </div>
           <div class="field">
             <label>Cảm xúc (chèn vào chỗ con trỏ)</label>
@@ -228,6 +233,23 @@
     </section>
 
     <!-- ── Tab: My voices ───────────────────────────────── -->
+    <section class="panel" id="tab-gallery">
+      <div class="lib-toolbar">
+        <p class="hint" style="margin:0">Nghe thử từng giọng có sẵn với cùng một câu mẫu, rồi bấm <b>Dùng giọng này</b>.</p>
+        <div class="gallery-filters" id="gallery-filters">
+          <button class="chip active" data-f="">Tất cả</button>
+          <button class="chip" data-f="g:Nữ">👩 Nữ</button>
+          <button class="chip" data-f="g:Nam">👨 Nam</button>
+          <button class="chip" data-f="r:Bắc">Miền Bắc</button>
+          <button class="chip" data-f="r:Trung">Miền Trung</button>
+          <button class="chip" data-f="r:Nam">Miền Nam</button>
+          <button class="chip" data-f="star">⭐ Nổi bật</button>
+        </div>
+      </div>
+      <details class="sample-text"><summary>Câu mẫu dùng để nghe thử</summary><p id="gallery-text"></p></details>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </section>
+
     <section class="panel" id="tab-voices">
       <div class="lib-toolbar">
         <p class="hint" style="margin:0">Giọng bạn đã clone thành công và lưu lại. Chúng xuất hiện ở đầu danh sách giọng khi sinh audio và hội thoại.</p>
@@ -404,7 +426,7 @@
     </div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="/js/app.js?v=20"></script>
-  <script src="/js/onboarding.js?v=20"></script>
+  <script src="/js/app.js?v=22"></script>
+  <script src="/js/onboarding.js?v=22"></script>
 </body>
 </html>

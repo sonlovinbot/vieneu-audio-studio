@@ -152,6 +152,7 @@ async function init() {
   loadVoices();
   buildConversation();
   updateCounts();
+  loadPreviews();
   showTab(location.hash.slice(1) || "synthesize", { push: false });
   if (LIBRARY_ON) refreshCounts();
 }
@@ -931,5 +932,99 @@ if (_saveKeysBtn) _saveKeysBtn.addEventListener("click", () => {
   renderApiEndpoints();  // cập nhật lại ví dụ API để điền key mới
 });
 initKeys();
+
+// ── Kho giọng: nghe thử các giọng có sẵn (file tĩnh trong /previews) ──
+let PREVIEWS = null;          // { text, voices: { id: {file, duration, gender, region, style, featured} } }
+let GALLERY_FILTER = "";
+const PREVIEW_AUDIO = new Audio();
+let PREVIEW_ID = null;        // giọng đang phát
+
+async function loadPreviews() {
+  if (PREVIEWS) return PREVIEWS;
+  try { PREVIEWS = await (await fetch("/previews/voices.json")).json(); }
+  catch { PREVIEWS = { text: "", voices: {} }; }
+  setCount("gallery", Object.keys(PREVIEWS.voices).length);
+  return PREVIEWS;
+}
+function previewUrl(id) {
+  const v = PREVIEWS && PREVIEWS.voices[id];
+  if (v) return "/previews/" + encodeURIComponent(v.file);
+  const mine = VOICES.find((x) => x.id === id && x.custom);
+  return mine ? withKey("/api/voices/custom/clip?name=" + encodeURIComponent(id)) : null;
+}
+function togglePreview(id) {
+  if (PREVIEW_ID === id && !PREVIEW_AUDIO.paused) { PREVIEW_AUDIO.pause(); return; }
+  const url = previewUrl(id);
+  if (!url) return toast("Giọng này chưa có audio nghe thử.", true);
+  PREVIEW_ID = id;
+  PREVIEW_AUDIO.src = url;
+  PREVIEW_AUDIO.play().catch((e) => toast("Không phát được: " + e.message, true));
+}
+function syncPreviewUi() {
+  const playing = !PREVIEW_AUDIO.paused;
+  $$("[data-preview]").forEach((b) => {
+    const on = playing && b.dataset.preview === PREVIEW_ID;
+    b.classList.toggle("playing", on);
+    b.innerHTML = on ? "❚❚" : "▶";
+    b.closest(".gv-card")?.classList.toggle("playing", on);
+  });
+  const sb = $("#syn-preview");
+  const on = playing && PREVIEW_ID === $("#syn-voice").value;
+  sb.textContent = on ? "❚❚ Dừng" : "▶ Nghe thử";
+  sb.classList.toggle("playing", on);
+}
+["play", "pause", "ended"].forEach((ev) => PREVIEW_AUDIO.addEventListener(ev, syncPreviewUi));
+PREVIEW_AUDIO.addEventListener("timeupdate", () => {
+  const bar = document.querySelector(`.gv-card[data-id="${CSS.escape(PREVIEW_ID || "")}"] .gv-progress span`);
+  if (bar && PREVIEW_AUDIO.duration) bar.style.width = (100 * PREVIEW_AUDIO.currentTime / PREVIEW_AUDIO.duration) + "%";
+});
+PREVIEW_AUDIO.addEventListener("ended", () => { $$(".gv-progress span").forEach((s) => (s.style.width = "0")); });
+
+$("#syn-preview").addEventListener("click", async () => { await loadPreviews(); togglePreview($("#syn-voice").value); });
+$("#syn-voice").addEventListener("change", () => { if (!PREVIEW_AUDIO.paused) PREVIEW_AUDIO.pause(); syncPreviewUi(); });
+
+function renderGallery() {
+  const grid = $("#gallery-grid");
+  const all = Object.entries(PREVIEWS.voices);
+  $("#gallery-text").textContent = (PREVIEWS.text || "").replace("{name}", "<tên giọng>");
+  const f = GALLERY_FILTER;
+  const list = all.filter(([, v]) =>
+    !f || (f === "star" ? v.featured : f.startsWith("g:") ? v.gender === f.slice(2) : v.region === f.slice(2)));
+  if (!list.length) { grid.innerHTML = `<div class="empty">Không có giọng nào khớp bộ lọc.</div>`; return; }
+  grid.innerHTML = list.map(([id, v]) => `
+    <article class="gv-card" data-id="${escapeHtml(id)}">
+      <div class="gv-top">
+        <button class="gv-play" data-preview="${escapeHtml(id)}" title="Nghe thử">▶</button>
+        <div class="gv-info">
+          <div class="gv-name">${escapeHtml(id)}${v.featured ? ' <span title="Nổi bật">⭐</span>' : ""}</div>
+          <div class="gv-tags"><span>${v.gender === "Nữ" ? "👩" : "👨"} ${escapeHtml(v.gender)}</span><span>Miền ${escapeHtml(v.region)}</span><span>${fmtDur(v.duration)}</span></div>
+        </div>
+      </div>
+      <div class="gv-style">${escapeHtml(v.style)}</div>
+      <div class="gv-progress"><span></span></div>
+      <button class="btn btn-ghost btn-sm" data-use="${escapeHtml(id)}">Dùng giọng này →</button>
+    </article>`).join("");
+  syncPreviewUi();
+}
+TAB_HOOKS.gallery = async () => { await loadPreviews(); renderGallery(); };
+$("#gallery-filters").addEventListener("click", (e) => {
+  const c = e.target.closest(".chip");
+  if (!c) return;
+  GALLERY_FILTER = c.dataset.f;
+  $$("#gallery-filters .chip").forEach((x) => x.classList.toggle("active", x === c));
+  renderGallery();
+});
+document.addEventListener("click", (e) => {
+  const p = e.target.closest("[data-preview]");
+  if (p) return togglePreview(p.dataset.preview);
+  const u = e.target.closest("[data-use]");
+  if (u) {
+    PREVIEW_AUDIO.pause();
+    showTab("synthesize");
+    if (VOICES.some((v) => v.id === u.dataset.use)) $("#syn-voice").value = u.dataset.use;
+    renderEmoChips();
+    toast(`Đã chọn giọng "${u.dataset.use}".`);
+  }
+});
 
 init();

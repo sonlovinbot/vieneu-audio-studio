@@ -1,0 +1,205 @@
+{
+  "text": "Chào bạn, đây là giọng đọc {name}. Giọng đọc được tạo bằng trí tuệ nhân tạo, sử dụng mô hình Vi Neu ti ti ét với giấy phép mã nguồn mở. Các tính năng của phần mềm này được phát triển bởi anh Đặng Hữu Sơn. Cảm ơn bạn đã sử dụng, chúc bạn có trải nghiệm thật tốt.",
+  "voices": {
+    "Adam bựa": {
+      "file": "adam-bua.mp3",
+      "duration": 15.2,
+      "featured": true,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách tự nhiên"
+    },
+    "Trúc Ly": {
+      "file": "truc-ly.mp3",
+      "duration": 12.4,
+      "featured": true,
+      "gender": "Nữ",
+      "region": "Bắc",
+      "style": "Phong cách tự nhiên"
+    },
+    "Thiện Minh": {
+      "file": "thien-minh.mp3",
+      "duration": 13.9,
+      "featured": true,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách kể chuyện"
+    },
+    "Mai Anh": {
+      "file": "mai-anh.mp3",
+      "duration": 14.8,
+      "featured": true,
+      "gender": "Nữ",
+      "region": "Bắc",
+      "style": "Phong cách tin tức"
+    },
+    "Hải Đăng": {
+      "file": "hai-dang.mp3",
+      "duration": 13.1,
+      "featured": true,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách tự nhiên"
+    },
+    "Thùy Dung": {
+      "file": "thuy-dung.mp3",
+      "duration": 12.7,
+      "featured": true,
+      "gender": "Nữ",
+      "region": "Nam",
+      "style": "Phong cách tin tức"
+    },
+    "Thiền Tâm Đức": {
+      "file": "thien-tam-duc.mp3",
+      "duration": 18.9,
+      "featured": true,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách kể chuyện"
+    },
+    "Ngọc Huyền": {
+      "file": "ngoc-huyen.mp3",
+      "duration": 14.4,
+      "featured": true,
+      "gender": "Nữ",
+      "region": "Bắc",
+      "style": "Giọng đọc tự nhiên"
+    },
+    "Quang Sơn": {
+      "file": "quang-son.mp3",
+      "duration": 16.4,
+      "featured": true,
+      "gender": "Nam",
+      "region": "Trung",
+      "style": "Phong cách tự nhiên"
+    },
+    "Ngọc Trân": {
+      "file": "ngoc-tran.mp3",
+      "duration": 16.1,
+      "featured": true,
+      "gender": "Nữ",
+      "region": "Trung",
+      "style": "Phong cách tự nhiên"
+    },
+    "Minh Đức": {
+      "file": "minh-duc.mp3",
+      "duration": 17.4,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách tin tức"
+    },
+    "Phạm Tuyên": {
+      "file": "pham-tuyen.mp3",
+      "duration": 15.1,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách tự nhiên"
+    },
+    "Thái Sơn": {
+      "file": "thai-son.mp3",
+      "duration": 17.0,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Nam",
+      "style": "Phong cách kể chuyện"
+    },
+    "Xuân Vĩnh": {
+      "file": "xuan-vinh.mp3",
+      "duration": 14.8,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách tự nhiên"
+    },
+    "Thanh Bình": {
+      "file": "thanh-binh.mp3",
+      "duration": 13.4,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách kể chuyện"
+    },
+    "Ngọc Linh": {
+      "file": "ngoc-linh.mp3",
+      "duration": 14.6,
+      "featured": false,
+      "gender": "Nữ",
+      "region": "Bắc",
+      "style": "Phong cách kể chuyện"
+    },
+    "Đoan Trang": {
+      "file": "doan-trang.mp3",
+      "duration": 15.7,
+      "featured": false,
+      "gender": "Nữ",
+      "region": "Bắc",
+      "style": "Phong cách tự nhiên"
+    },
+    "Thục Đoan": {
+      "file": "thuc-doan.mp3",
+      "duration": 15.5,
+      "featured": false,
+      "gender": "Nữ",
+      "region": "Nam",
+      "style": "Phong cách kể chuyện"
+    },
+    "Minh Triết": {
+      "file": "minh-triet.mp3",
+      "duration": 13.7,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Nam",
+      "style": "Phong cách tin tức"
+    },
+    "Mỹ Duyên": {
+      "file": "my-duyen.mp3",
+      "duration": 18.2,
+      "featured": false,
+      "gender": "Nữ",
+      "region": "Nam",
+      "style": "Phong cách đọc truyện"
+    },
+    "Quỳnh Anh": {
+      "file": "quynh-anh.mp3",
+      "duration": 15.1,
+      "featured": false,
+      "gender": "Nữ",
+      "region": "Bắc",
+      "style": "Phong cách đọc truyện"
+    },
+    "Đức Trí": {
+      "file": "duc-tri.mp3",
+      "duration": 18.7,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Nam",
+      "style": "Phong cách đọc truyện"
+    },
+    "Kim Thanh": {
+      "file": "kim-thanh.mp3",
+      "duration": 20.6,
+      "featured": false,
+      "gender": "Nữ",
+      "region": "Nam",
+      "style": "Phong cách đọc truyện"
+    },
+    "Adam": {
+      "file": "adam.mp3",
+      "duration": 13.8,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Nam",
+      "style": "Giọng đọc tự nhiên"
+    },
+    "Quốc Tuấn": {
+      "file": "quoc-tuan.mp3",
+      "duration": 13.8,
+      "featured": false,
+      "gender": "Nam",
+      "region": "Bắc",
+      "style": "Phong cách tự nhiên"
+    }
+  }
+}

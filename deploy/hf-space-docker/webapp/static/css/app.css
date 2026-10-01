@@ -419,3 +419,40 @@ body.onb-lock { overflow: hidden; }
 .emo-why { margin-top: var(--s-3); font-size: 13px; line-height: 20px; }
 .emo-why summary { cursor: pointer; font-weight: 700; color: var(--c-blue); }
 .emo-why p { margin: var(--s-2) 0 0; color: var(--c-text); }
+
+/* ── Nghe thử giọng ──────────────────────────────────── */
+.voice-pick { display: flex; gap: var(--s-2); }
+.voice-pick select { flex: 1; min-width: 0; }
+.preview-btn { white-space: nowrap; flex: none; }
+.preview-btn.playing, .gv-play.playing { background: var(--c-primary); border-color: var(--c-primary); color: #fff; }
+.gallery-filters { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.chip {
+  font: 700 13px var(--font-body); color: var(--c-ink); cursor: pointer;
+  background: var(--c-surface); border: var(--bw-thin) solid var(--c-border); border-radius: 999px; padding: 6px 14px;
+}
+.chip:hover { border-color: var(--c-primary); }
+.chip.active { background: var(--c-ink); border-color: var(--c-ink); color: var(--c-surface); }
+.sample-text { margin-bottom: var(--s-5); font-size: 14px; }
+.sample-text summary { cursor: pointer; font-weight: 700; color: var(--c-blue); }
+.sample-text p { margin: var(--s-2) 0 0; padding: var(--s-3) var(--s-4); border-radius: var(--radius); background: var(--c-surface); border: var(--bw-thin) solid var(--c-border); font-style: italic; }
+.gallery-grid { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.gv-card {
+  display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-4);
+  background: var(--c-surface); border: var(--bw-thin) solid var(--c-border); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-deepest); transition: border-color .12s, box-shadow .12s;
+}
+.gv-card:hover { box-shadow: var(--shadow-deep); }
+.gv-card.playing { border-color: var(--c-primary); }
+.gv-top { display: flex; gap: var(--s-3); align-items: center; }
+.gv-play {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  font-size: 14px; color: var(--c-primary); background: var(--c-hover); border: var(--bw-thin) solid transparent;
+}
+.gv-play:hover { border-color: var(--c-primary); }
+.gv-info { min-width: 0; }
+.gv-name { font-size: 16px; font-weight: 700; color: var(--c-charcoal); }
+.gv-tags { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--c-gray); }
+.gv-style { font-size: 13px; color: var(--c-text); }
+.gv-progress { height: 4px; border-radius: 2px; background: var(--c-light-gray); overflow: hidden; }
+.gv-progress span { display: block; height: 100%; width: 0; background: var(--c-primary); transition: width .2s linear; }
+.gv-card .btn { align-self: flex-start; }

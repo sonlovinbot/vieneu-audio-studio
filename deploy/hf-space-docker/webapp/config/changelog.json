@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "version": "1.6.0",
+      "date": "2026-10-01",
+      "title": "Kho giọng — nghe thử 25 giọng có sẵn",
+      "changes": [
+        "Trang mới 🎧 Kho giọng: nghe thử 25 giọng có sẵn cùng một câu mẫu, lọc theo Nam/Nữ, miền Bắc/Trung/Nam, giọng nổi bật; bấm Dùng giọng này để chọn ngay.",
+        "Nút ▶ Nghe thử cạnh ô chọn giọng ở trang Sinh giọng (giọng tự lưu thì phát audio mẫu đã clone).",
+        "Audio nghe thử đóng gói sẵn trong phần mềm (MP3, ~3 MB) — nghe được ngay cả khi chưa tải model, không cần mạng.",
+        "Script scripts/make_voice_previews.py để tạo lại audio nghe thử khi có giọng mới."
+      ]
+    },
+    {
       "version": "1.5.0",
       "date": "2026-10-01",
       "title": "Bộ đếm ký tự, cảnh báo văn bản dài, giọng cảm xúc tự tạo",

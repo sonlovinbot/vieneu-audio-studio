@@ -2,7 +2,7 @@
   "app": {
     "name": "AI Audio Studio",
     "edition": "",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "tagline": "Text-to-Speech tiếng Việt offline — giọng tự nhiên, clone giọng tức thì",
     "description": "Giao diện đào tạo gọn nhẹ cho VieNeu-TTS: sinh giọng, nhân bản giọng từ 3–5s, hội thoại đa nhân vật, chạy 100% trên máy của bạn.",
     "default_port": 8001
