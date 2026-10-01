@@ -1,8 +1,16 @@
+<p align="center"><img src="assets/readme/banner.png" alt="AI Audio Studio — Cần giọng đọc tiếng Việt?" width="100%"></p>
+
 # ⚡ AI Audio Studio — Giọng nói AI tiếng Việt chạy trên máy tính của bạn
 
 Biến văn bản tiếng Việt thành giọng nói tự nhiên, **clone giọng từ 3–5 giây audio**, tạo **hội thoại nhiều nhân vật**, và **xuất API** cho phần mềm khác (n8n, Make, script, OBS...) — chạy 100% trên máy, không cần card đồ họa.
 
 **Phát triển bởi [Đặng Hữu Sơn](https://www.facebook.com/danghuuson.182/) — CEO & Co-Founder LovinBot AI**, dựa trên model AI mã nguồn mở [VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS) của Phạm Nguyễn Ngọc Bảo.
+
+## 🎬 Video giới thiệu
+
+<a href="https://youtu.be/rsjhXh7OSHg"><img src="assets/readme/video-thumbnail.jpg" alt="Xem video giới thiệu AI Audio Studio trên YouTube" width="100%"></a>
+
+▶️ **[Xem trên YouTube](https://youtu.be/rsjhXh7OSHg)** — giới thiệu AI Audio Studio và cách dùng.
 
 ## 🚀 Cài đặt — chỉ 1 lệnh (khuyên dùng)
 
@@ -110,6 +118,16 @@ Bấm **▶ Nghe thử** để mở trình phát của GitHub. Trong app, vào m
 - 🚀 **Hướng dẫn lần đầu** — kiểm tra cấu hình máy, tải model, thử tạo giọng.
 - 🌗 Giao diện sáng / tối.
 
+### 📸 Giao diện
+
+**Sinh giọng** — nhập văn bản, chọn giọng, chèn cảm xúc; cột phải là kết quả, lượt gần đây và mẹo:
+
+<img src="assets/readme/screenshot-sinh-giong.png" alt="Trang Sinh giọng" width="100%">
+
+**Kho giọng** — nghe thử và so sánh 25 giọng có sẵn, lọc theo giới tính và vùng miền:
+
+<img src="assets/readme/screenshot-kho-giong.png" alt="Trang Kho giọng" width="100%">
+
 ## 📁 Cấu trúc repo
 
 | Thư mục / file | Nội dung |
@@ -121,6 +139,7 @@ Bấm **▶ Nghe thử** để mở trình phát của GitHub. Trong app, vào m
 | `install-online.sh`, `install-online.ps1` | Cài bằng 1 lệnh (tải bản mới nhất từ Releases) |
 | `build-installers.sh` | Đóng gói 3 file `.zip` vào `dist/` |
 | `scripts/make_voice_previews.py` | Tạo lại audio nghe thử cho các giọng |
+| `assets/readme/` | Ảnh banner, ảnh chụp giao diện, ảnh bìa video cho README |
 
 ## 🙏 Ghi nhận
 
