@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "version": "1.6.1",
+      "date": "2026-10-01",
+      "title": "Cài bằng 1 lệnh — hết bị macOS chặn",
+      "changes": [
+        "Cài bằng 1 lệnh: macOS/Linux dán vào Terminal, Windows dán vào PowerShell — tự tải bản mới nhất, cài vào thư mục AI-Audio-Studio, không bị macOS (\"Apple could not verify\") hay SmartScreen chặn. Chạy lại lệnh = cập nhật.",
+        "Hướng dẫn mở file bị chặn đúng cho macOS 15 Sequoia (Cài đặt hệ thống → Quyền riêng tư & Bảo mật → Vẫn mở) — cách chuột phải → Open cũ không còn tác dụng.",
+        "Onboarding bước Tải & cài đặt: lệnh 1 dòng kèm nút Sao chép, cách tải .zip chuyển xuống mục phụ.",
+        "README chỉ còn nội dung tiếng Việt của AI Audio Studio (bỏ tài liệu gốc tiếng Anh, giữ ghi nhận tác giả model)."
+      ]
+    },
+    {
       "version": "1.6.0",
       "date": "2026-10-01",
       "title": "Kho giọng — nghe thử 25 giọng có sẵn",

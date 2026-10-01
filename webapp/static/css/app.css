@@ -456,3 +456,14 @@ body.onb-lock { overflow: hidden; }
 .gv-progress { height: 4px; border-radius: 2px; background: var(--c-light-gray); overflow: hidden; }
 .gv-progress span { display: block; height: 100%; width: 0; background: var(--c-primary); transition: width .2s linear; }
 .gv-card .btn { align-self: flex-start; }
+
+/* ── Onboarding: cài bằng 1 lệnh ─────────────────────── */
+.onb-oneliner { background: var(--c-hover); border-radius: var(--radius); padding: var(--s-4) var(--s-5); margin: var(--s-3) 0 var(--s-4); }
+.onb-oneliner .hint { margin: var(--s-1) 0 var(--s-3); }
+.onb-cmd { display: flex; gap: var(--s-2); align-items: stretch; }
+.onb-cmd code {
+  flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; display: flex; align-items: center;
+  font: 13px/1.4 "Courier New", monospace; background: var(--c-code-bg); color: #F9FAFB; padding: var(--s-3);
+}
+.onb-cmd .btn { flex: none; }
+.onb-manual summary { cursor: pointer; font-weight: 700; color: var(--c-blue); font-size: 14px; margin-bottom: var(--s-2); }

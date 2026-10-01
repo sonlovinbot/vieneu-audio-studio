@@ -190,7 +190,7 @@
     macos: [
       "Bấm <b>Tải bộ cài</b> → nhấp đúp file <code>AI-Audio-Studio-macOS.zip</code> trong thư mục Downloads để giải nén.",
       "Chuyển thư mục vừa giải nén sang chỗ cố định (vd: <b>Documents</b>) — đừng xóa thư mục này sau khi cài.",
-      "Nhấp đúp <code>install.command</code>. Nếu macOS chặn “nhà phát triển không xác định”: <b>chuột phải → Open → Open</b> (hoặc Cài đặt hệ thống → Quyền riêng tư & Bảo mật → <b>Vẫn mở</b>).",
+      "Nhấp đúp <code>install.command</code>. Nếu hiện <i>“install.command” Not Opened</i>: bấm <b>Done</b> → 🍎 <b>Cài đặt hệ thống → Quyền riêng tư & Bảo mật</b> → kéo xuống, bấm <b>Vẫn mở (Open Anyway)</b> → nhập mật khẩu → nhấp đúp lại. (macOS 14 trở về trước: chuột phải → Open → Open.)",
       "Cửa sổ Terminal tự cài (5–10 phút lần đầu). Khi hỏi <i>tự chạy khi mở máy?</i> nên gõ <b>y</b> để máy bật là API sẵn sàng.",
       "Trình duyệt tự mở <code>" + LOCAL_URL + "</code> — xong! Lần sau mở icon <b>AI Audio Studio</b> trên Desktop.",
     ],
@@ -209,6 +209,15 @@
     ],
   };
 
+  const ONE_LINER = {
+    macos: { app: "Terminal", how: "bấm ⌘ + Space, gõ <b>Terminal</b>, Enter",
+      cmd: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.sh)"' },
+    linux: { app: "Terminal", how: "mở Terminal",
+      cmd: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.sh)"' },
+    windows: { app: "PowerShell", how: "bấm Start, gõ <b>PowerShell</b>, mở Windows PowerShell",
+      cmd: "irm https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.ps1 | iex" },
+  };
+
   function fmtSize(b) { return b ? ` (${(b / 1024 / 1024).toFixed(1)} MB)` : ""; }
 
   function renderInstall() {
@@ -224,8 +233,16 @@
     return `<h2 class="onb-h" id="onb-title">Tải bộ cài &amp; cài đặt</h2>
       <p class="onb-lead">${S.facts && S.facts.platform === os ? `Đã chọn sẵn theo máy bạn (${escapeHtml(S.facts.osLabel)}).` : "Chọn hệ điều hành của máy sẽ cài."}</p>
       <div class="tabs sub-tabs">${tabs}</div>
-      <div class="actions onb-dl-row">${dl}</div>
-      <ol class="onb-install">${INSTALL_STEPS[os].map((s) => `<li>${s}</li>`).join("")}</ol>`;
+      <div class="onb-oneliner">
+        <div class="onb-note-title">⚡ Cách nhanh nhất — cài bằng 1 lệnh <span class="badge badge-green">Khuyên dùng</span></div>
+        <p class="hint">Mở <b>${ONE_LINER[os].app}</b> (${ONE_LINER[os].how}), dán lệnh dưới rồi nhấn Enter. Tự tải bản mới nhất và cài${os === "macos" ? " — <b>không bị macOS chặn</b>" : os === "windows" ? " — <b>không bị SmartScreen chặn</b>" : ""}. Chạy lại lệnh này để cập nhật.</p>
+        <div class="onb-cmd"><code id="onb-cmd">${escapeHtml(ONE_LINER[os].cmd)}</code><button class="btn btn-primary btn-sm" id="onb-copy" type="button">Sao chép</button></div>
+      </div>
+      <details class="onb-manual">
+        <summary>Hoặc tải file .zip và cài thủ công</summary>
+        <div class="actions onb-dl-row">${dl}</div>
+        <ol class="onb-install">${INSTALL_STEPS[os].map((s) => `<li>${s}</li>`).join("")}</ol>
+      </details>`;
   }
 
   function renderModel() {
@@ -397,6 +414,13 @@
     if (e.target.closest("#onb-run-check")) return runCheck();
     if (e.target.closest("#onb-load")) return startModel();
     if (e.target.closest("#onb-find")) return findLocal();
+    if (e.target.closest("#onb-copy")) {
+      const cmd = $("#onb-cmd").textContent;
+      (navigator.clipboard ? navigator.clipboard.writeText(cmd) : Promise.reject())
+        .then(() => toast("Đã sao chép lệnh — dán vào " + ONE_LINER[S.os || "macos"].app + " rồi nhấn Enter."))
+        .catch(() => toast("Không sao chép được — hãy bôi đen lệnh và copy thủ công.", true));
+      return;
+    }
     if (e.target.closest("#onb-api")) { close(); return showTab("api"); }
     const os = e.target.closest("[data-onb-os]");
     if (os) { S.os = os.dataset.onbOs; render(); }

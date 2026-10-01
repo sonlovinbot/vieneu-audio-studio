@@ -1,10 +1,26 @@
 ============================================================
-  AI Audio Studio (Coachio Edition) — Hướng dẫn macOS & Linux
+  AI Audio Studio — Hướng dẫn macOS & Linux
 ============================================================
 
 CÀI ĐẶT
   • macOS:  nhấp đúp file   install.command
-            (nếu báo chặn: chuột phải → Open → Open)
+
+    ⚠️ NẾU MACOS BÁO: "install.command" Not Opened /
+       "Apple could not verify..." → KHÔNG PHẢI VIRUS. Làm 1 trong 3 cách:
+
+    Cách 1 (macOS 15 Sequoia trở lên):
+       - Bấm Done
+       - 🍎 → System Settings → Privacy & Security
+       - Kéo xuống mục Security → bấm "Open Anyway" → nhập mật khẩu
+       - Nhấp đúp install.command lần nữa → "Open Anyway"
+       (macOS 14 trở về trước: chuột phải install.command → Open → Open)
+
+    Cách 2 (nhanh): mở Terminal, gõ   xattr -cr   (có dấu cách cuối),
+       kéo thả thư mục này vào Terminal, nhấn Enter, rồi nhấp đúp lại.
+
+    Cách 3 (không bao giờ bị chặn): xóa thư mục này, mở Terminal, dán:
+       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.sh)"
+
   • Linux:  mở Terminal trong thư mục này, chạy:
                 bash install.sh
 
