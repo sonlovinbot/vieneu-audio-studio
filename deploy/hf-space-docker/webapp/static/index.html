@@ -18,8 +18,8 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
-  <link rel="stylesheet" href="/css/coachio-theme.css?v=13" />
-  <link rel="stylesheet" href="/css/app.css?v=13" />
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=17" />
+  <link rel="stylesheet" href="/css/app.css?v=17" />
 </head>
 <body>
   <div class="app">
@@ -55,6 +55,7 @@
       </nav>
 
       <div class="sidebar-foot">
+        <button class="onb-open" id="onb-open" type="button">🚀 Hướng dẫn cài đặt &amp; bắt đầu</button>
         <a class="dev-credit" id="side-dev" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">
           <span class="dev-by">Phát triển bởi</span>
           <span class="dev-who">Đặng Hữu Sơn ↗</span>
@@ -360,7 +361,22 @@
     </main>
   </div>
 
+
+  <!-- ── Onboarding (lần đầu sử dụng) ─────────────────── -->
+  <div class="onb-backdrop" id="onb" hidden>
+    <div class="onb-modal" role="dialog" aria-modal="true" aria-labelledby="onb-title">
+      <button class="onb-close" id="onb-close" type="button" aria-label="Đóng">✕</button>
+      <ol class="onb-steps" id="onb-steps"></ol>
+      <div class="onb-body" id="onb-body"></div>
+      <div class="onb-foot">
+        <button class="btn btn-ghost" id="onb-back" type="button">← Quay lại</button>
+        <span class="onb-count" id="onb-count"></span>
+        <button class="btn btn-primary" id="onb-next" type="button">Tiếp tục →</button>
+      </div>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
-  <script src="/js/app.js?v=13"></script>
+  <script src="/js/app.js?v=17"></script>
+  <script src="/js/onboarding.js?v=17"></script>
 </body>
 </html>

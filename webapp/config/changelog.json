@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "version": "1.4.0",
+      "date": "2026-10-01",
+      "title": "Onboarding cho người mới: kiểm tra máy → tải → thử tạo giọng",
+      "changes": [
+        "Lần đầu mở app tự hiện hướng dẫn 4 bước; mở lại bất cứ lúc nào bằng nút 🚀 Hướng dẫn cài đặt ở menu trái.",
+        "Kiểm tra cấu hình: hệ điều hành (macOS 12+, Windows 10/11, Linux), chip Apple Silicon/Intel, RAM, CPU, ổ trống, Internet — báo ✅ / ⚠️ / ❌ và kết luận máy có đủ điều kiện không. Bản cài trên máy đo cấu hình thật; bản web đo bằng trình duyệt.",
+        "Bản web: tải bộ cài đúng hệ điều hành (macOS / Windows / Linux) kèm hướng dẫn cài từng bước, rồi dò xem app đã chạy trên máy (127.0.0.1:8001) chưa.",
+        "Bản trên máy: tải model giọng nói lần đầu có tiến trình, xong bấm Thử tạo giọng là sinh audio ngay.",
+        "Giải thích rõ: phần mềm chạy trên máy tính — máy bật và app chạy thì dùng được giao diện + API cho phần mềm khác; tắt máy hoặc máy ngủ thì không dùng được.",
+        "API mới: /api/system, /api/warmup, /api/downloads, /api/download/{macos|windows|linux}. Link bộ cài có thể đổi sang GitHub Releases/Drive trong branding.json → downloads."
+      ]
+    },
+    {
       "version": "1.3.0",
       "date": "2026-10-01",
       "title": "Bố cục 2 cột, giao diện nhẹ nhàng hơn, ghi nhận người phát triển",

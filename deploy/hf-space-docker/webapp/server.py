@@ -62,6 +62,16 @@ MAX_CONCURRENCY = max(1, int(os.environ.get("VIENEU_MAX_CONCURRENCY", "2")))
 # VIENEU_LIBRARY   : "off" tắt Lịch sử + Giọng của tôi (nên tắt trên Space công khai,
 #                    vì mọi người dùng chung một thư viện).
 LIBRARY_ENABLED = os.environ.get("VIENEU_LIBRARY", "on").strip().lower() not in ("0", "off", "false", "no")
+# Bản web công khai (HF Space tự đặt SPACE_ID): onboarding hướng dẫn tải về máy
+# thay vì đo cấu hình server.
+HOSTED = bool(os.environ.get("SPACE_ID")) or os.environ.get("VIENEU_HOSTED", "").strip().lower() in ("1", "on", "true", "yes")
+# Bộ cài .zip cho nút "Tải về" (tạo bằng build-installers.sh).
+DOWNLOAD_DIR = Path(os.environ.get("VIENEU_DOWNLOAD_DIR") or (HERE.parent / "dist"))
+INSTALLERS = {
+    "macos": "AI-Audio-Studio-macOS.zip",
+    "windows": "AI-Audio-Studio-Windows.zip",
+    "linux": "AI-Audio-Studio-Linux.zip",
+}
 
 # ──────────────────────────────────────────────────────────────────────────
 # In-memory log capture — keeps the last N records so the UI can show logs
@@ -335,7 +345,139 @@ def health() -> Dict[str, Any]:
 def info() -> Dict[str, Any]:
     # auth_required: cho frontend biết có cần X-API-Key không (KHÔNG lộ key thật).
     return {"branding": BRANDING, "status": manager.status(), "auth_required": bool(API_KEY),
-            "library": LIBRARY_ENABLED, "history_max": library.max_runs}
+            "library": LIBRARY_ENABLED, "history_max": library.max_runs, "hosted": HOSTED}
+
+
+# ── Onboarding: cấu hình máy, tải model lần đầu, bộ cài ────────────────────
+def _run(cmd: List[str]) -> str:
+    import subprocess
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=3).stdout.strip()
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def _ram_bytes() -> Optional[int]:
+    try:
+        import psutil  # type: ignore[import-not-found]
+        return int(psutil.virtual_memory().total)
+    except Exception:  # noqa: BLE001
+        pass
+    sysname = platform.system()
+    try:
+        if sysname == "Darwin":
+            return int(_run(["sysctl", "-n", "hw.memsize"]))
+        if sysname == "Windows":
+            import ctypes
+
+            class MEMSTAT(ctypes.Structure):
+                _fields_ = [("dwLength", ctypes.c_ulong), ("dwMemoryLoad", ctypes.c_ulong),
+                            ("ullTotalPhys", ctypes.c_ulonglong), ("ullAvailPhys", ctypes.c_ulonglong),
+                            ("ullTotalPageFile", ctypes.c_ulonglong), ("ullAvailPageFile", ctypes.c_ulonglong),
+                            ("ullTotalVirtual", ctypes.c_ulonglong), ("ullAvailVirtual", ctypes.c_ulonglong),
+                            ("ullAvailExtendedVirtual", ctypes.c_ulonglong)]
+            st = MEMSTAT()
+            st.dwLength = ctypes.sizeof(MEMSTAT)
+            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(st))  # type: ignore[attr-defined]
+            return int(st.ullTotalPhys)
+        return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def system_info() -> Dict[str, Any]:
+    """Thông tin thô về máy đang chạy server — frontend tự chấm đạt/không đạt."""
+    import shutil
+    sysname = platform.system()
+    arch = platform.machine().lower()
+    os_name, os_version, cpu = sysname, platform.release(), platform.processor()
+    if sysname == "Darwin":
+        os_name, os_version = "macOS", platform.mac_ver()[0]
+        cpu = _run(["sysctl", "-n", "machdep.cpu.brand_string"]) or cpu
+        # Python x86 chạy qua Rosetta trên chip Apple → vẫn là Apple Silicon.
+        if _run(["sysctl", "-n", "sysctl.proc_translated"]) == "1":
+            arch = "arm64"
+    elif sysname == "Windows":
+        build = platform.version().split(".")[-1]
+        os_name = "Windows 11" if build.isdigit() and int(build) >= 22000 else f"Windows {platform.release()}"
+        os_version = platform.version()
+    elif sysname == "Linux":
+        try:
+            for line in Path("/etc/os-release").read_text().splitlines():
+                if line.startswith("PRETTY_NAME="):
+                    os_version = line.split("=", 1)[1].strip('"')
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            for line in Path("/proc/cpuinfo").read_text().splitlines():
+                if line.startswith("model name"):
+                    cpu = line.split(":", 1)[1].strip()
+                    break
+        except Exception:  # noqa: BLE001
+            pass
+    try:
+        disk_free = shutil.disk_usage(Path.home()).free
+    except Exception:  # noqa: BLE001
+        disk_free = None
+    return {
+        "platform": {"Darwin": "macos", "Windows": "windows"}.get(sysname, "linux"),
+        "os": os_name, "os_version": os_version, "arch": arch, "cpu": cpu,
+        "cores": os.cpu_count(), "ram_bytes": _ram_bytes(), "disk_free_bytes": disk_free,
+        "python": platform.python_version(),
+    }
+
+
+@app.get("/api/system")
+def system() -> Dict[str, Any]:
+    if HOSTED:  # máy server không phải máy người dùng — để trình duyệt tự đo
+        return {"hosted": True}
+    return {"hosted": False, **system_info()}
+
+
+_WARM_LOCK = threading.Lock()
+
+
+def _warm() -> None:
+    try:
+        manager.ensure_loaded()
+        log.info("Onboarding: model đã sẵn sàng (%s)", manager.backbone_repo)
+    except Exception as e:  # noqa: BLE001 — lỗi đã ghi vào manager.error
+        log.error("Onboarding: tải model lỗi: %s", e)
+    finally:
+        _WARM_LOCK.release()
+
+
+@app.post("/api/warmup")
+def warmup() -> Dict[str, Any]:
+    """Tải model mặc định ở nền (lần đầu sẽ download) — gọi lại an toàn."""
+    if not manager.loaded and _WARM_LOCK.acquire(blocking=False):
+        manager.loading = True
+        manager.error = None
+        threading.Thread(target=_warm, daemon=True).start()
+    return {"ok": True, "status": manager.status()}
+
+
+@app.get("/api/downloads")
+def downloads() -> Dict[str, Any]:
+    links = BRANDING.get("downloads") or {}
+    out = {}
+    for plat, fname in INSTALLERS.items():
+        path = DOWNLOAD_DIR / fname
+        if links.get(plat):
+            out[plat] = {"available": True, "url": links[plat], "size": None}
+        elif path.is_file():
+            out[plat] = {"available": True, "url": f"/api/download/{plat}", "size": path.stat().st_size}
+        else:
+            out[plat] = {"available": False, "url": None, "size": None}
+    return {"installers": out}
+
+
+@app.get("/api/download/{plat}")
+def download(plat: str) -> FileResponse:
+    fname = INSTALLERS.get(plat)
+    if not fname or not (DOWNLOAD_DIR / fname).is_file():
+        raise HTTPException(status_code=404, detail="Chưa có bộ cài cho hệ điều hành này.")
+    return FileResponse(DOWNLOAD_DIR / fname, media_type="application/zip", filename=fname)
 
 
 @app.get("/api/version")

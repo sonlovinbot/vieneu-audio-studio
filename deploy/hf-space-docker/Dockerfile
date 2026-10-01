@@ -16,7 +16,8 @@ ENV HOME=/home/user \
     VIENEU_HOST=0.0.0.0 \
     VIENEU_PORT=7860 \
     VIENEU_LIBRARY=off \
-    HF_HOME=/home/user/.cache/huggingface
+    HF_HOME=/home/user/.cache/huggingface \
+    VIENEU_DOWNLOAD_DIR=/app/downloads
 
 WORKDIR /app
 
@@ -26,6 +27,8 @@ RUN pip install --no-cache-dir --user vieneu==3.8.3
 # Giao diện CỦA BẠN: đè lên bản webapp đóng kèm trong gói pip.
 # Chạy "python -m webapp.server" từ /app sẽ ưu tiên thư mục này.
 COPY --chown=user webapp ./webapp
+# Bộ cài .zip cho nút "Tải bộ cài" trong onboarding (update-space.sh chép từ dist/).
+COPY --chown=user downloads ./downloads
 
 EXPOSE 7860
 CMD ["python", "-m", "webapp.server"]
