@@ -986,7 +986,7 @@ $("#syn-voice").addEventListener("change", () => { if (!PREVIEW_AUDIO.paused) PR
 function renderGallery() {
   const grid = $("#gallery-grid");
   const all = Object.entries(PREVIEWS.voices);
-  $("#gallery-text").textContent = (PREVIEWS.text || "").replace("{name}", "<tên giọng>");
+  $("#gallery-text").textContent = (PREVIEWS.display_text || PREVIEWS.text || "").replace("{name}", "<tên giọng>");
   const f = GALLERY_FILTER;
   const list = all.filter(([, v]) =>
     !f || (f === "star" ? v.featured : f.startsWith("g:") ? v.gender === f.slice(2) : v.region === f.slice(2)));

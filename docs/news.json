@@ -1,0 +1,20 @@
+{
+  "latest_version": "1.7.0",
+  "release_url": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest",
+  "update_note": "Chạy lại lệnh cài 1 dòng (Terminal / PowerShell) để cập nhật — giữ nguyên giọng đã lưu và lịch sử.",
+  "announcements": [
+    {
+      "id": "follow-dhs-2026-10",
+      "placement": "sidebar",
+      "tone": "promo",
+      "title": "Theo dõi Đặng Hữu Sơn",
+      "text": "Mẹo dùng AI cho công việc, video hướng dẫn và công cụ mới mỗi tuần.",
+      "image": "",
+      "link": "https://www.facebook.com/danghuuson.182/",
+      "cta": "Theo dõi trên Facebook",
+      "start": "",
+      "end": "",
+      "dismissible": true
+    }
+  ]
+}

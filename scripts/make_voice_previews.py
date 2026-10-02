@@ -68,7 +68,9 @@ def main() -> int:
         print(f"✓ {vid:16s} {len(wav) / sr:5.1f}s  {mp3.stat().st_size // 1024:4d} KB  ({time.time() - t0:.0f}s)", flush=True)
     order = [vid for _, vid in voices]
     manifest = {k: manifest[k] for k in order if k in manifest}
-    manifest_path.write_text(json.dumps({"text": TEXT, "voices": manifest}, ensure_ascii=False, indent=2) + "\n", "utf-8")
+    # display_text: chữ hiện cho người xem (tên gốc VieNeu-TTS); text: chữ đưa vào model để đọc đúng.
+    display = TEXT.replace("mô hình Vi Neu ti ti ét", "mô hình VieNeu-TTS")
+    manifest_path.write_text(json.dumps({"text": TEXT, "display_text": display, "voices": manifest}, ensure_ascii=False, indent=2) + "\n", "utf-8")
     print(f"→ {len(manifest)} giọng · {manifest_path}")
     return 0
 

@@ -1,6 +1,18 @@
 {
   "entries": [
     {
+      "version": "1.7.0",
+      "date": "2026-10-02",
+      "title": "Thông báo trong app: bản mới, sự kiện, quảng cáo",
+      "changes": [
+        "App tự báo khi có phiên bản mới (thanh trên đầu trang, kèm cách cập nhật).",
+        "Thanh thông báo trên đầu trang và thẻ ở menu trái hiển thị tin từ nhà phát triển (sự kiện, ưu đãi, hướng dẫn) — cập nhật từ xa, không cần cài lại.",
+        "An toàn: chỉ nhận chữ và link https, không chạy mã từ xa, không gửi dữ liệu người dùng; mất mạng dùng bản đã lưu; tắt bằng VIENEU_NEWS=off.",
+        "Kho giọng: câu mẫu hiển thị đúng tên mô hình VieNeu-TTS.",
+        "Trang giới thiệu mới: tải trực tiếp, nghe thử 25 giọng, video, xử lý sự cố khi cài."
+      ]
+    },
+    {
       "version": "1.6.2",
       "date": "2026-10-01",
       "title": "Gọn nhẹ: bỏ file thừa của repo gốc, cài nhẹ hơn 3 lần",

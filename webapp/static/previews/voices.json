@@ -1,5 +1,6 @@
 {
   "text": "Chào bạn, đây là giọng đọc {name}. Giọng đọc được tạo bằng trí tuệ nhân tạo, sử dụng mô hình Vi Neu ti ti ét với giấy phép mã nguồn mở. Các tính năng của phần mềm này được phát triển bởi anh Đặng Hữu Sơn. Cảm ơn bạn đã sử dụng, chúc bạn có trải nghiệm thật tốt.",
+  "display_text": "Chào bạn, đây là giọng đọc {name}. Giọng đọc được tạo bằng trí tuệ nhân tạo, sử dụng mô hình VieNeu-TTS với giấy phép mã nguồn mở. Các tính năng của phần mềm này được phát triển bởi anh Đặng Hữu Sơn. Cảm ơn bạn đã sử dụng, chúc bạn có trải nghiệm thật tốt.",
   "voices": {
     "Adam bựa": {
       "file": "adam-bua.mp3",

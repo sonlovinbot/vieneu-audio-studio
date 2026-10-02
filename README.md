@@ -143,6 +143,7 @@ Mỗi giọng đọc cùng một câu mẫu: *"Chào bạn, đây là giọng đ
 | `build-installers.sh` | Đóng gói 3 file `.zip` vào `dist/` |
 | `scripts/make_voice_previews.py` | Tạo lại audio nghe thử cho các giọng |
 | `docs/` | Trang giới thiệu GitHub Pages (video + nghe thử giọng), sinh bằng `scripts/build_pages.py` |
+| `docs/news.json` | Thông báo / quảng cáo / báo bản mới hiện trong app đã cài — xem [hướng dẫn](docs/HUONG-DAN-THONG-BAO.md) |
 | `assets/readme/` | Ảnh banner, ảnh chụp giao diện, ảnh bìa video cho README |
 
 ## 🙏 Ghi nhận
