@@ -9,6 +9,8 @@
   --c-primary-deep: #F26522;     /* cam-đỏ — premium */
   --c-blue: #2563EB;             /* xanh — phụ */
   --c-blue-light: #3B82F6;
+  --c-on-primary: #111827;       /* chữ trên nền cam: đen (6,65:1) — trắng chỉ 2,67:1 */
+  --c-primary-ink: #C2410C;      /* chữ cam trên nền sáng (5,18:1) */
 
   /* ── Text / neutrals ─────────────────────────────────── */
   --c-text: #4B5563;             /* body & heading */
@@ -33,10 +35,11 @@
   --c-success: #16A34A;
   --c-success-bright: #27C93F;
   --c-warning: #FACC15;
-  --c-danger: #F26522;
+  --c-danger: #DC2626;           /* đỏ lỗi — tách khỏi màu cam chính */
 
   /* ── Typography ──────────────────────────────────────── */
-  --font-display: "VT323", "Courier New", monospace;
+  --font-display: "Be Vietnam Pro", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont,
                "Segoe UI", "Be Vietnam Pro", sans-serif;
 
@@ -80,6 +83,8 @@
   --c-shadow: rgba(0, 0, 0, .35);
   --c-hover: #2A2017;
   --c-blue: #60A5FA;
+  --c-primary-ink: #FB923C;
+  --c-danger: #F87171;
   --c-blue-light: #93C5FD;
 }
 
@@ -123,7 +128,7 @@ a:hover { text-decoration: underline; text-decoration-color: var(--c-primary); }
 .btn:active { box-shadow: var(--shadow-deepest); transform: none; }
 .btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; transform: none; }
 
-.btn-primary { background: var(--c-primary); border-color: var(--c-primary); color: #fff; font-weight: 700; font-size: 16px; }
+.btn-primary { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-on-primary); font-weight: 700; font-size: 16px; }
 .btn-primary:hover { background: var(--c-primary-deep); border-color: var(--c-primary-deep); box-shadow: var(--shadow-hover); }
 .btn-secondary { background: var(--c-surface); color: var(--c-ink); font-weight: 700; }
 .btn-ghost {

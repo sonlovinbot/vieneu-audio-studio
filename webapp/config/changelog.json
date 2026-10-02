@@ -1,6 +1,20 @@
 {
   "entries": [
     {
+      "version": "1.7.1",
+      "date": "2026-10-02",
+      "title": "Giao diện dễ đọc hơn, bỏ font pixel",
+      "changes": [
+        "Bỏ font pixel: tên app, tiêu đề trang dùng Be Vietnam Pro; chữ code dùng font monospace hệ thống.",
+        "Nút chính, mục menu đang chọn, tab: chữ đen trên nền cam (đọc rõ 6,6:1 thay vì 2,7:1), giữ nguyên màu cam thương hiệu.",
+        "Chữ cam trên nền sáng chuyển cam đậm; chữ code và chữ phụ đậm hơn cho dễ đọc.",
+        "Màn laptop 1280–1500px: ô Giọng đọc không còn bị bóp mất tên giọng, nút cảm xúc không rớt dòng.",
+        "Điện thoại: trang API không còn tràn ngang; link nhỏ dễ bấm hơn.",
+        "Thông báo lỗi dùng màu đỏ riêng, không còn trùng màu cam của thông báo thường.",
+        "Kho giọng: hàng lọc gọn một dòng."
+      ]
+    },
+    {
       "version": "1.7.0",
       "date": "2026-10-02",
       "title": "Thông báo trong app: bản mới, sự kiện, quảng cáo",
