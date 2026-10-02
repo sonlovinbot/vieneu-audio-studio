@@ -121,6 +121,10 @@ page = f'''<!doctype html>
 <meta property="og:title" content="AI Audio Studio — Giọng nói AI tiếng Việt">
 <meta property="og:description" content="Xem video, nghe thử 25 giọng và tải miễn phí cho macOS, Windows, Linux.">
 <meta property="og:image" content="{RAW}/assets/readme/banner.png">
+<link rel="icon" type="image/svg+xml" href="brand/icon.svg">
+<link rel="icon" type="image/png" sizes="64x64" href="brand/favicon-64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
+<link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -139,7 +143,7 @@ code {{ font: 13px/1.5 ui-monospace, Menlo, monospace; background: var(--code-in
 .wrap {{ max-width: 1080px; margin: 0 auto; padding: 0 16px; }}
 nav.top {{ display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 24px 0 0; flex-wrap: wrap; }}
 .brandrow {{ display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }}
-.logo {{ width: 40px; height: 40px; border-radius: 10px; background: var(--brand); display: grid; place-items: center; font-size: 20px; }}
+.logo {{ width: 40px; height: 40px; display: block; filter: drop-shadow(0 4px 10px rgba(194, 65, 12, .3)); }}
 .brand {{ font: 700 22px/1.2 "Be Vietnam Pro", sans-serif; letter-spacing: -0.01em; }}
 .navlinks {{ display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }}
 .navlinks a {{ color: var(--muted); font-weight: 500; text-decoration: none; }}
@@ -202,8 +206,8 @@ footer {{ margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--bo
 <body>
 <div class="wrap">
   <nav class="top">
-    <a class="brandrow" href="#"><div class="logo" aria-hidden="true">⚡</div><span class="brand">AI Audio Studio</span></a>
-    <div class="navlinks"><a href="#tai-ve">Tải về</a><a href="#nghe-thu">Nghe thử</a><a href="#tinh-nang">Tính năng</a><a href="#su-co">Sự cố khi cài</a><a href="{GH}">GitHub</a></div>
+    <a class="brandrow" href="#"><img class="logo" src="brand/icon.svg" alt="" width="40" height="40"><span class="brand">AI Audio Studio</span></a>
+    <div class="navlinks"><a href="#tai-ve">Tải về</a><a href="#nghe-thu">Nghe thử</a><a href="#tinh-nang">Tính năng</a><a href="#su-co">Sự cố khi cài</a><a href="https://app.danghuuson.com/">Dự án khác</a></div>
   </nav>
 
   <h1>Giọng nói AI tiếng Việt,<br><em>chạy ngay trên máy tính của bạn</em></h1>
@@ -260,7 +264,7 @@ footer {{ margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--bo
   </div>
 
   <h2 id="moi">📝 Có gì mới</h2>
-  <p class="lead">Ba bản gần nhất — xem đầy đủ ở <a href="{GH}/releases">Releases</a>.</p>
+  <p class="lead">Ba bản gần nhất. App tự báo khi có bản mới.</p>
   <div class="cards3">
 {news_html}
   </div>
@@ -271,7 +275,7 @@ footer {{ margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--bo
 
   <footer>
     <span>Phát triển bởi <a href="{FB}">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
-    <span>Dựa trên model AI <a href="https://github.com/pnnbao97/VieNeu-TTS">VieNeu-TTS</a> của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0 · <a href="{GH}">Mã nguồn trên GitHub</a></span>
+    <span>Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0</span>
   </footer>
 </div>
 <script>
