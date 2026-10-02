@@ -1,6 +1,16 @@
 {
   "entries": [
     {
+      "version": "1.8.1",
+      "date": "2026-10-03",
+      "title": "Địa chỉ mới: app.danghuuson.com",
+      "changes": [
+        "Trang giới thiệu chuyển sang https://app.danghuuson.com/vieneu-audio-studio/ (link cũ vẫn tự chuyển hướng).",
+        "App đọc thông báo và báo bản mới từ địa chỉ mới.",
+        "Trang chủ app.danghuuson.com tổng hợp mọi phần mềm, game 3D và tài liệu AI miễn phí của Đặng Hữu Sơn."
+      ]
+    },
+    {
       "version": "1.8.0",
       "date": "2026-10-02",
       "title": "Thư ngỏ: vì sao có góc quảng cáo",

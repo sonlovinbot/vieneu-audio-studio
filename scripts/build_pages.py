@@ -270,7 +270,7 @@ footer {{ margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--bo
 {trouble_html}
 
   <footer>
-    <span>Phát triển bởi <a href="{FB}">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI.</span>
+    <span>Phát triển bởi <a href="{FB}">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
     <span>Dựa trên model AI <a href="https://github.com/pnnbao97/VieNeu-TTS">VieNeu-TTS</a> của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0 · <a href="{GH}">Mã nguồn trên GitHub</a></span>
   </footer>
 </div>

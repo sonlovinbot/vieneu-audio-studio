@@ -1,7 +1,7 @@
 # Hướng dẫn: quảng cáo, thông báo, báo bản mới cho phần mềm đã cài
 
 Mọi máy đã cài AI Audio Studio tự đọc file **[`docs/news.json`](news.json)** (qua
-`https://sonlovinbot.github.io/vieneu-audio-studio/news.json`) mỗi 3 giờ. Sửa file này, commit,
+`https://app.danghuuson.com/vieneu-audio-studio/news.json`) mỗi 3 giờ. Sửa file này, commit,
 push → khoảng 1 phút sau GitHub Pages cập nhật, các máy nhận ở lần mở app hoặc làm mới tiếp theo.
 **Không cần phát hành lại phần mềm.**
 
@@ -44,7 +44,7 @@ thể đặt sẵn quảng cáo kế tiếp, đến ngày nó tự thay chỗ �
 ```
 
 Ảnh quảng cáo nên để trong thư mục [`docs/ads/`](ads/) rồi dùng link
-`https://sonlovinbot.github.io/vieneu-audio-studio/ads/<tên-file>.jpg` (ảnh ngang ~2:1, rộng ~960px).
+`https://app.danghuuson.com/vieneu-audio-studio/ads/<tên-file>.jpg` (ảnh ngang ~2:1, rộng ~960px).
 
 ## Ví dụ: thông báo sự kiện trên đầu trang, tự tắt sau 31/10
 

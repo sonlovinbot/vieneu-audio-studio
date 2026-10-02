@@ -432,7 +432,7 @@ def system_info() -> Dict[str, Any]:
 # Chủ phần mềm sửa docs/news.json trên GitHub Pages → mọi máy đã cài tự nhận,
 # không cần phát hành lại. Chỉ nhận chữ + link https (không HTML/script); mất
 # mạng thì dùng bản đã lưu. Tắt hẳn: VIENEU_NEWS=off.
-NEWS_URL = os.environ.get("VIENEU_NEWS_URL", "https://sonlovinbot.github.io/vieneu-audio-studio/news.json")
+NEWS_URL = os.environ.get("VIENEU_NEWS_URL", "https://app.danghuuson.com/vieneu-audio-studio/news.json")
 NEWS_ENABLED = os.environ.get("VIENEU_NEWS", "on").strip().lower() not in ("0", "off", "false", "no")
 NEWS_TTL = 3 * 3600
 _NEWS: Dict[str, Any] = {"at": 0.0, "data": None}

@@ -1,5 +1,5 @@
 {
-  "latest_version": "1.8.0",
+  "latest_version": "1.8.1",
   "release_url": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest",
   "update_note": "Chạy lại lệnh cài 1 dòng (Terminal / PowerShell) để cập nhật — giữ nguyên giọng đã lưu và lịch sử.",
   "announcements": [
@@ -10,7 +10,7 @@
       "label": "Ad · Sponsor",
       "title": "Bootcamp AI Vibe Code 2026",
       "text": "Combo Vibe Code × AI Marketing — 14 ngày học Zoom thực chiến: tự dựng app, AI Agent, tự động hóa. Không cần biết code.",
-      "image": "https://sonlovinbot.github.io/vieneu-audio-studio/ads/bootcamp-2026.jpg",
+      "image": "https://app.danghuuson.com/vieneu-audio-studio/ads/bootcamp-2026.jpg",
       "link": "https://academy.coachio.ai/funnels/ai-marketing-bootcamp-2026",
       "cta": "Xem chương trình",
       "start": "",

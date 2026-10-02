@@ -5,15 +5,15 @@
 Biến văn bản tiếng Việt thành giọng nói tự nhiên, **clone giọng từ 3–5 giây audio**, tạo **hội thoại nhiều nhân vật**, và **xuất API** cho phần mềm khác (n8n, Make, script, OBS...) — chạy 100% trên máy, không cần card đồ họa.
 
 > [!TIP]
-> 🌐 **[Xem trang giới thiệu](https://sonlovinbot.github.io/vieneu-audio-studio/)**: xem video và **nghe thử 25 giọng ngay trên trang**, không cần tải gì.
+> 🌐 **[Xem trang giới thiệu](https://app.danghuuson.com/vieneu-audio-studio/)**: xem video và **nghe thử 25 giọng ngay trên trang**, không cần tải gì.
 
 **Phát triển bởi [Đặng Hữu Sơn](https://www.facebook.com/danghuuson.182/) — CEO & Co-Founder LovinBot AI**, dựa trên model AI mã nguồn mở [VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS) của Phạm Nguyễn Ngọc Bảo.
 
 ## 🎬 Video giới thiệu
 
-<a href="https://sonlovinbot.github.io/vieneu-audio-studio/"><img src="assets/readme/video-thumbnail.jpg" alt="Xem video giới thiệu AI Audio Studio trên YouTube" width="100%"></a>
+<a href="https://app.danghuuson.com/vieneu-audio-studio/"><img src="assets/readme/video-thumbnail.jpg" alt="Xem video giới thiệu AI Audio Studio trên YouTube" width="100%"></a>
 
-▶️ **[Xem video ngay trên trang giới thiệu](https://sonlovinbot.github.io/vieneu-audio-studio/)** (phát tại chỗ) · hoặc [mở trên YouTube](https://youtu.be/rsjhXh7OSHg).
+▶️ **[Xem video ngay trên trang giới thiệu](https://app.danghuuson.com/vieneu-audio-studio/)** (phát tại chỗ) · hoặc [mở trên YouTube](https://youtu.be/rsjhXh7OSHg).
 
 ## 🚀 Cài đặt — chỉ 1 lệnh (khuyên dùng)
 
@@ -81,7 +81,7 @@ Lần sau chỉ cần mở icon **AI Audio Studio** trên Desktop (hoặc để 
 
 Mỗi giọng đọc cùng một câu mẫu: *"Chào bạn, đây là giọng đọc …. Giọng đọc được tạo bằng trí tuệ nhân tạo, sử dụng mô hình VieNeu TTS với giấy phép mã nguồn mở. Các tính năng của phần mềm này được phát triển bởi anh Đặng Hữu Sơn. Cảm ơn bạn đã sử dụng, chúc bạn có trải nghiệm thật tốt."*
 
-🎧 **[Nghe thử cả 25 giọng ngay trên trang giới thiệu](https://sonlovinbot.github.io/vieneu-audio-studio/#nghe-thu)**: bấm ▶ là phát, lọc theo giới tính và vùng miền. Hoặc bấm **▶ Nghe thử** trong bảng dưới để mở trình phát của GitHub. Trong app, vào mục **🎧 Kho giọng** để nghe và chọn nhanh.
+🎧 **[Nghe thử cả 25 giọng ngay trên trang giới thiệu](https://app.danghuuson.com/vieneu-audio-studio/#nghe-thu)**: bấm ▶ là phát, lọc theo giới tính và vùng miền. Hoặc bấm **▶ Nghe thử** trong bảng dưới để mở trình phát của GitHub. Trong app, vào mục **🎧 Kho giọng** để nghe và chọn nhanh.
 
 | Giọng | Giới tính | Vùng miền | Phong cách | Audio |
 |---|---|---|---|---|
@@ -148,5 +148,6 @@ Mỗi giọng đọc cùng một câu mẫu: *"Chào bạn, đây là giọng đ
 
 ## 🙏 Ghi nhận
 
+- 🌐 Các phần mềm, game 3D và tài liệu AI miễn phí khác: **[app.danghuuson.com](https://app.danghuuson.com)**
 - Phần mềm AI Audio Studio (giao diện, tính năng, bộ cài): **Đặng Hữu Sơn** — [Facebook](https://www.facebook.com/danghuuson.182/).
 - Model AI và SDK giọng nói: **[VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS)** — thiết kế và huấn luyện bởi **Phạm Nguyễn Ngọc Bảo**, giấy phép Apache 2.0. Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.
