@@ -1,5 +1,5 @@
 {
-  "latest_version": "1.7.2",
+  "latest_version": "1.8.0",
   "release_url": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest",
   "update_note": "Chạy lại lệnh cài 1 dòng (Terminal / PowerShell) để cập nhật — giữ nguyên giọng đã lưu và lịch sử.",
   "announcements": [
@@ -15,7 +15,8 @@
       "cta": "Xem chương trình",
       "start": "",
       "end": "2026-10-04",
-      "dismissible": true
+      "dismissible": true,
+      "campaign": "bootcamp-ai-vibecode-2026"
     }
   ]
 }

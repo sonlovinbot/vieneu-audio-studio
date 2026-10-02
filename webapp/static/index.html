@@ -18,8 +18,9 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
-  <link rel="stylesheet" href="/css/coachio-theme.css?v=30" />
-  <link rel="stylesheet" href="/css/app.css?v=30" />
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=33" />
+  <link rel="stylesheet" href="/css/app.css?v=33" />
+  <link rel="stylesheet" href="/vendor/sponsor-kit/sponsor-kit.css?v=33" />
 </head>
 <body>
   <div class="app">
@@ -428,8 +429,20 @@
     </div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="/js/app.js?v=30"></script>
-  <script src="/js/onboarding.js?v=30"></script>
-  <script src="/js/news.js?v=30"></script>
+  <script src="/js/app.js?v=33"></script>
+  <script src="/js/onboarding.js?v=33"></script>
+  <script src="/vendor/sponsor-kit/sponsor-kit.js?v=33"></script>
+  <script>
+    // Góc quảng cáo + thư ngỏ (Sponsor Kit). Nội dung lấy từ docs/news.json qua /api/news.
+    SponsorKit.init({
+      appName: "AI Audio Studio",
+      feedUrl: "/api/news",
+      slots: { top: "#news-top", side: "#news-side" },
+      utm: { source: "ai_audio_studio", medium: "local_app" },
+      sponsorName: "Coachio Academy",
+      developer: { name: "Đặng Hữu Sơn", title: "CEO & Co-Founder LovinBot AI", url: "https://www.facebook.com/danghuuson.182/" },
+      storagePrefix: "vieneu_news",
+    });
+  </script>
 </body>
 </html>

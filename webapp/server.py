@@ -462,6 +462,8 @@ def _clean_news(raw: Any) -> Dict[str, Any]:
             "link": _https(a.get("link")),
             "cta": str(a.get("cta") or "")[:40],
             "label": str(a.get("label") or "")[:30],
+            "campaign": str(a.get("campaign") or "")[:60],
+            "apps": [str(x)[:40] for x in (a.get("apps") or [])][:20] if isinstance(a.get("apps"), list) else [],
             "start": str(a.get("start") or "")[:10],
             "end": str(a.get("end") or "")[:10],
             "min_version": str(a.get("min_version") or "")[:20],

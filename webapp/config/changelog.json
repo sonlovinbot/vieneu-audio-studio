@@ -1,6 +1,16 @@
 {
   "entries": [
     {
+      "version": "1.8.0",
+      "date": "2026-10-02",
+      "title": "Thư ngỏ: vì sao có góc quảng cáo",
+      "changes": [
+        "Nút (i) cạnh nhãn Ad · Sponsor mở thư ngỏ: phần mềm hoàn toàn miễn phí, góc quảng cáo nhỏ của Coachio Academy giúp có kinh phí phát triển, quảng cáo không dựa trên dữ liệu của bạn.",
+        "Link quảng cáo gắn UTM (nguồn: AI Audio Studio bản local) để nhà tài trợ biết lượt xem đến từ đâu — app không theo dõi bạn.",
+        "Góc quảng cáo, thông báo và khung Phát triển bởi chuyển sang bộ Sponsor Kit dùng chung; mất mạng vẫn hiện bản đã lưu."
+      ]
+    },
+    {
       "version": "1.7.2",
       "date": "2026-10-02",
       "title": "Quảng cáo có nhãn và lịch tự tắt",

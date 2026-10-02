@@ -1,0 +1,147 @@
+/*! Sponsor Kit v1.0 — giao diện. Đổi màu theo app bằng các biến --sk-* (đặt ở :root của app). */
+:root {
+  --sk-surface: #FFFFFF;      /* nền thẻ */
+  --sk-border: #E6E7EA;       /* viền thẻ */
+  --sk-text: #374151;         /* chữ mô tả */
+  --sk-title: #111827;        /* chữ tiêu đề */
+  --sk-muted: #4B5563;        /* chữ phụ, nhãn */
+  --sk-chip: #EEF0F3;         /* nền nhãn Ad · Sponsor */
+  --sk-link: #2563EB;         /* link "Xem ngay →" */
+  --sk-accent-soft: #FFF3E8;  /* nền thanh promo/update */
+  --sk-accent-line: #FED7AA;
+  --sk-radius: 12px;
+  --sk-font: inherit;
+}
+
+/* ── Nhãn Ad · Sponsor + nút (i) ─────────────────────── */
+.sk-adtag { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.sk-adlabel {
+  padding: 1px 6px; border-radius: 4px; background: var(--sk-chip); color: var(--sk-muted);
+  font: 700 10px/16px var(--sk-font); letter-spacing: .6px; text-transform: uppercase;
+}
+.sk-info {
+  width: 18px; height: 18px; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 1px solid var(--sk-border); background: var(--sk-surface); color: var(--sk-muted);
+  font: italic 700 11px/16px Georgia, "Times New Roman", serif;
+  position: relative;
+}
+.sk-info::after { content: ""; position: absolute; inset: -4px; } /* nới vùng bấm lên 26px */
+.sk-info:hover, .sk-info:focus-visible { color: var(--sk-title); border-color: var(--sk-muted); outline: none; }
+
+/* ── Thẻ quảng cáo (sidebar) ─────────────────────────── */
+.sk-card {
+  position: relative; padding: 12px; border-radius: var(--sk-radius);
+  border: 1px solid var(--sk-border); background: var(--sk-surface); font-family: var(--sk-font);
+}
+.sk-card .sk-close { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; background: var(--sk-surface); }
+.sk-img-link { display: block; }
+.sk-img { display: block; width: 100%; max-height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+.sk-card .sk-title { margin: 0; font-size: 14px; font-weight: 700; line-height: 20px; color: var(--sk-title); padding-right: 18px; }
+.sk-card .sk-text { margin: 4px 0 0; font-size: 13px; line-height: 18px; color: var(--sk-text); }
+.sk-cta { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--sk-link); text-decoration: none; }
+.sk-cta:hover { text-decoration: underline; }
+
+/* ── Thanh thông báo (đầu trang) ─────────────────────── */
+.sk-banner {
+  display: flex; gap: 12px; align-items: flex-start; padding: 16px; margin-bottom: 12px;
+  border-radius: calc(var(--sk-radius) + 2px); border: 1px solid var(--sk-border); background: var(--sk-surface);
+  font-family: var(--sk-font);
+}
+.sk-banner.sk-tone-warning { background: #FFFBEB; border-color: #FDE68A; }
+.sk-banner.sk-tone-promo, .sk-banner.sk-tone-update { background: var(--sk-accent-soft); border-color: var(--sk-accent-line); }
+.sk-ico { font-size: 18px; line-height: 22px; flex: none; }
+.sk-body { flex: 1; min-width: 0; }
+.sk-banner .sk-title { margin: 0; font-weight: 700; color: var(--sk-title); }
+.sk-banner .sk-text { margin: 2px 0 0; font-size: 14px; color: var(--sk-text); text-wrap: pretty; }
+.sk-actions { display: flex; align-items: center; gap: 4px; align-self: center; flex: none; }
+.sk-btn {
+  display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 8px;
+  border: 1px solid var(--sk-border); background: var(--sk-surface); color: var(--sk-title);
+  font-size: 14px; font-weight: 700; text-decoration: none;
+}
+.sk-close {
+  width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--sk-muted); cursor: pointer; font-size: 13px;
+}
+.sk-close:hover { background: var(--sk-chip); color: var(--sk-title); }
+@media (max-width: 640px) { .sk-banner { flex-wrap: wrap; } .sk-actions { width: 100%; justify-content: flex-end; } }
+
+/* ── Thư ngỏ dạng phong bì ───────────────────────────── */
+.sk-letter-backdrop {
+  position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px;
+  background: rgba(40, 26, 12, .45); backdrop-filter: blur(2px);
+  opacity: 0; transition: opacity .22s ease;
+}
+.sk-letter-backdrop[hidden] { display: none; }
+.sk-letter-backdrop.sk-open { opacity: 1; }
+.sk-envelope {
+  position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px);
+  padding: 92px 16px 16px; border-radius: 20px;
+  background: linear-gradient(180deg, #F3DDBB 0%, #EED3AA 100%);
+  box-shadow: 0 24px 60px rgba(60, 35, 10, .35);
+  transform: translateY(18px) scale(.97); opacity: 0;
+  transition: transform .26s cubic-bezier(.2, .8, .2, 1), opacity .22s ease;
+  display: flex; flex-direction: column;
+}
+.sk-open .sk-envelope { transform: none; opacity: 1; }
+.sk-flap {
+  position: absolute; top: 0; left: 0; right: 0; height: 118px; z-index: 1;
+  background: linear-gradient(180deg, #E9C996, #E2BD86);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  border-radius: 20px 20px 0 0;
+  filter: drop-shadow(0 2px 0 rgba(120, 72, 20, .15));
+}
+.sk-seal {
+  position: absolute; top: 66px; left: 50%; z-index: 3; transform: translateX(-50%);
+  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, #F0743A, #C2410C 70%);
+  color: #FFF3E6; font-size: 20px; box-shadow: 0 3px 8px rgba(120, 40, 10, .35), inset 0 -2px 4px rgba(0, 0, 0, .2);
+}
+.sk-paper {
+  position: relative; z-index: 2; overflow-y: auto; min-height: 0;
+  padding: 36px 26px 22px; border-radius: 14px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 27px, rgba(194, 120, 40, .09) 27px 28px),
+    #FFFBF2;
+  box-shadow: 0 2px 10px rgba(90, 55, 20, .12);
+  color: #4A3B2A; font-family: var(--sk-font);
+}
+.sk-stamp {
+  position: absolute; top: 14px; right: 16px; transform: rotate(7deg);
+  display: flex; flex-direction: column; align-items: center; padding: 4px 8px;
+  border: 2px dashed #E08A3C; border-radius: 6px; color: #C2410C; background: #FFF4E4;
+}
+.sk-stamp span { font: 800 14px/1 var(--sk-font); letter-spacing: 1.5px; }
+.sk-stamp small { font-size: 10px; line-height: 14px; }
+.sk-letter-title { margin: 0 64px 12px 0; font-size: 19px; line-height: 1.35; color: #7C2D12; }
+.sk-letter-p { margin: 0 0 10px; font-size: 15px; line-height: 1.7; }
+.sk-letter-p b { color: #9A3412; }
+.sk-sign { display: flex; flex-direction: column; margin-top: 14px; font-style: italic; }
+.sk-sign-hi { font-size: 14px; }
+.sk-sign-name { font-size: 17px; font-weight: 700; color: #C2410C; text-decoration: none; }
+.sk-sign-title { font-size: 12px; font-style: normal; color: #7A6650; }
+.sk-letter-ok {
+  display: block; margin: 18px auto 0; min-height: 42px; padding: 0 22px; border: 0; border-radius: 999px;
+  background: #C2410C; color: #FFFFFF; font: 700 15px var(--sk-font); cursor: pointer;
+  box-shadow: 0 4px 12px rgba(194, 65, 12, .3);
+}
+.sk-letter-ok:hover { background: #9A3412; }
+.sk-letter-ok:focus-visible { outline: 3px solid #FDBA74; outline-offset: 2px; }
+@media (max-width: 480px) {
+  .sk-envelope { padding: 84px 10px 10px; }
+  .sk-seal { top: 58px; }
+  .sk-paper { padding: 30px 18px 18px; }
+  .sk-letter-title { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) { .sk-envelope, .sk-letter-backdrop { transition: none; } }
+
+/* ── Khung "Phát triển bởi" ──────────────────────────── */
+.sk-credit {
+  display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: var(--sk-radius);
+  background: var(--sk-accent-soft); color: var(--sk-text); text-decoration: none; font-family: var(--sk-font);
+}
+a.sk-credit:hover { box-shadow: 0 1px 2px rgba(16, 24, 40, .08), 0 2px 6px rgba(16, 24, 40, .08); }
+.sk-credit-by { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--sk-muted); }
+.sk-credit-name { font-size: 15px; font-weight: 700; color: #C2410C; }
+.sk-credit-title { font-size: 12px; font-weight: 700; color: var(--sk-title); }
+.sk-credit-base { font-size: 12px; color: var(--sk-muted); }
