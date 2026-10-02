@@ -51,7 +51,7 @@ downloads = [
 ]
 dl_cards = "\n".join(f'''      <div class="dl">
         <div class="dl-head"><span class="dl-ico">{ico}</span><div><h3>{name}</h3><span class="meta">{esc(req)}</span></div></div>
-        <a class="btn primary dl-btn" href="{DL}/{file}" download>⬇ Tải {name} <span class="dl-size">{tag}{" · " + mb(file) if mb(file) else ""}</span></a>
+        <a class="btn primary dl-btn" href="{DL}/{file}" download data-os="{name}">⬇ Tải {name} <span class="dl-size">{tag}{" · " + mb(file) if mb(file) else ""}</span></a>
         <p class="meta">{how}</p>
       </div>''' for ico, name, req, file, how in downloads)
 
@@ -202,6 +202,23 @@ details ol, details ul {{ margin: 0; padding-left: 20px; }}
 details li {{ margin-bottom: 6px; }}
 footer {{ margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 6px; }}
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{{if(f.fbq)return;n=f.fbq=function(){{n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)}};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1152715006830829');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1152715006830829&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 <div class="wrap">
@@ -234,9 +251,9 @@ footer {{ margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--bo
   <p class="lead">Không phải tải hay giải nén, <b>không bị macOS / Windows chặn</b>. Chạy lại đúng lệnh = cập nhật bản mới nhất, giữ nguyên giọng đã lưu và lịch sử.</p>
   <div class="cards3">
     <div class="step"><h3>🍎 macOS · 🐧 Linux</h3><span class="meta">Mở Terminal (⌘ + Space, gõ Terminal), dán lệnh rồi Enter</span>
-      <div class="cmd"><code>{esc(INSTALL_SH)}</code><button type="button">Sao chép</button></div></div>
+      <div class="cmd"><code>{esc(INSTALL_SH)}</code><button type="button" data-os="macOS/Linux">Sao chép</button></div></div>
     <div class="step"><h3>🪟 Windows 10/11</h3><span class="meta">Mở PowerShell từ menu Start, dán lệnh rồi Enter</span>
-      <div class="cmd"><code>{esc(INSTALL_PS)}</code><button type="button">Sao chép</button></div></div>
+      <div class="cmd"><code>{esc(INSTALL_PS)}</code><button type="button" data-os="Windows">Sao chép</button></div></div>
   </div>
   <p class="note"><b>💻 Đây là phần mềm chạy trên máy tính của bạn.</b> Máy bật và app đang chạy thì dùng được giao diện và API tại <code>http://127.0.0.1:8001</code>; tắt máy, máy ngủ hoặc thoát app thì không dùng được. Khi cài, chọn <b>tự chạy khi mở máy</b> để API luôn sẵn sàng.</p>
 
@@ -276,6 +293,7 @@ footer {{ margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--bo
   <footer>
     <span>Phát triển bởi <a href="{FB}">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
     <span>Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0</span>
+    <span style="font-size:12px">Trang dùng Meta Pixel (cookie của Facebook) để đo lượt xem và lượt tải. Phần mềm tải về không chứa mã theo dõi này.</span>
   </footer>
 </div>
 <script>
@@ -290,7 +308,14 @@ document.querySelector(".filters").addEventListener("click", (e) => {{
 document.addEventListener("play", (e) => {{
   document.querySelectorAll("audio").forEach((a) => {{ if (a !== e.target) a.pause(); }});
 }}, true);
+// Meta Pixel: DownloadClick khi tải zip hoặc sao chép lệnh cài (bị trình chặn quảng cáo chặn thì bỏ qua).
+function trackDownload(method, os) {{
+  if (typeof window.fbq === "function") window.fbq("trackCustom", "DownloadClick",
+    {{ content_ids: ["vieneu-audio-studio"], content_name: "AI Audio Studio", method: method, os: os }});
+}}
+document.querySelectorAll(".dl-btn").forEach((a) => a.addEventListener("click", () => trackDownload("zip", a.dataset.os)));
 document.querySelectorAll(".cmd button").forEach((b) => b.addEventListener("click", async () => {{
+  trackDownload("command", b.dataset.os);
   try {{ await navigator.clipboard.writeText(b.previousElementSibling.textContent); b.textContent = "Đã chép ✓"; }}
   catch {{ b.textContent = "Bôi đen để chép"; }}
   setTimeout(() => (b.textContent = "Sao chép"), 2000);
