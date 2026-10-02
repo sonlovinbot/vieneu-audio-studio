@@ -1,6 +1,16 @@
 {
   "entries": [
     {
+      "version": "1.7.2",
+      "date": "2026-10-02",
+      "title": "Quảng cáo có nhãn và lịch tự tắt",
+      "changes": [
+        "Thẻ quảng cáo có nhãn Ad · Sponsor để người dùng phân biệt với nội dung của app.",
+        "Mỗi quảng cáo bắt buộc có ngày kết thúc và tự tắt đúng 0h ngày hôm sau theo giờ máy người dùng; xếp lịch sẵn được quảng cáo kế tiếp.",
+        "Sửa lỗi múi giờ: trước đây ngày hết hạn tính theo giờ UTC nên ở Việt Nam quảng cáo hiện thêm tới 7h sáng."
+      ]
+    },
+    {
       "version": "1.7.1",
       "date": "2026-10-02",
       "title": "Giao diện dễ đọc hơn, bỏ font pixel",

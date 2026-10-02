@@ -21,12 +21,30 @@ tăng `latest_version` sau mỗi lần phát hành.
 |---|---|
 | `id` | Mã riêng, **đổi mã khi đổi nội dung** (người dùng đã bấm ✕ mã cũ sẽ thấy lại nội dung mới) |
 | `tone` | `info` (trung tính) · `warning` (vàng, cần chú ý) · `promo` (cam, quảng cáo) |
+| `label` | Nhãn nhỏ trên quảng cáo, mặc định `Ad · Sponsor` |
 | `title`, `text` | Tiêu đề (≤120 ký tự) và mô tả (≤300 ký tự). Chỉ chữ thường, không HTML |
 | `image` | Ảnh cho thẻ sidebar, link `https://…` (nên ngang ~600×300) — bỏ trống nếu không dùng |
 | `link`, `cta` | Link khi bấm (`https://…`) và chữ trên nút |
-| `start`, `end` | Ngày bắt đầu / kết thúc dạng `2026-10-31` — bỏ trống = luôn hiện |
+| `start`, `end` | Ngày bắt đầu / ngày **cuối cùng còn hiện**, dạng `2026-10-31`, tính theo giờ máy người dùng. **Quảng cáo (`placement: sidebar` hoặc `tone: promo`) bắt buộc có `end`** — thiếu thì app không hiện. Thông báo thường (`info`, `warning`) bỏ trống `end` = luôn hiện |
 | `min_version`, `max_version` | Chỉ hiện cho bản trong khoảng này, ví dụ nhắc riêng người dùng bản cũ |
 | `dismissible` | `true` = có nút ✕ để tắt (nhớ trong trình duyệt) |
+
+## Xếp lịch quảng cáo nối tiếp nhau
+
+Thẻ sidebar chỉ hiện **1 quảng cáo**: quảng cáo **đầu tiên trong danh sách** đang trong thời hạn. Vì vậy có
+thể đặt sẵn quảng cáo kế tiếp, đến ngày nó tự thay chỗ — không cần ai bấm gì:
+
+```json
+"announcements": [
+  { "id": "bootcamp-ai-vibecode-2026", "placement": "sidebar", "tone": "promo",
+    "title": "Bootcamp AI Vibe Code 2026", "end": "2026-10-04", "...": "..." },
+  { "id": "elearning-2026-10", "placement": "sidebar", "tone": "promo",
+    "title": "Khoá e-learning …", "start": "2026-10-05", "end": "2026-11-30", "...": "..." }
+]
+```
+
+Ảnh quảng cáo nên để trong thư mục [`docs/ads/`](ads/) rồi dùng link
+`https://sonlovinbot.github.io/vieneu-audio-studio/ads/<tên-file>.jpg` (ảnh ngang ~2:1, rộng ~960px).
 
 ## Ví dụ: thông báo sự kiện trên đầu trang, tự tắt sau 31/10
 

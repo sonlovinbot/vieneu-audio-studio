@@ -515,3 +515,10 @@ body.onb-lock { overflow: hidden; }
 [data-theme="dark"] .method-get { color: var(--c-on-primary); }
 /* Màn rất hẹp: ba nút cảm xúc gọn lại để nằm cùng một hàng */
 @media (max-width: 420px) { .emotion-tags { gap: 6px; } .emotion-tags .btn { padding: 6px 8px; font-size: 13px; } }
+
+/* Nhãn quảng cáo trên thẻ sidebar / thanh promo */
+.news-ad-label {
+  display: inline-block; margin-bottom: 6px; padding: 1px 6px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
+  color: var(--c-text); background: var(--c-light-gray);
+}

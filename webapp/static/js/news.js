@@ -22,8 +22,16 @@
     }
     return 0;
   }
+  // Ngày theo giờ máy người dùng (không dùng UTC: ở VN lệch 7 tiếng, QC hết hạn vẫn hiện tới 7h sáng).
+  function localToday() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+  // Quảng cáo (thẻ sidebar, tông promo) bắt buộc có ngày kết thúc — thiếu thì không hiện.
+  function isAd(a) { return a.placement === "sidebar" || a.tone === "promo"; }
   function active(a, version) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = localToday();
+    if (isAd(a) && !a.end) return false;
     if (a.start && today < a.start) return false;
     if (a.end && today > a.end) return false;
     if (a.min_version && cmpVer(version, a.min_version) < 0) return false;
@@ -54,6 +62,7 @@
     box.setAttribute("role", "status");
     box.append(el("span", "news-ico", ICON[a.tone] || ICON.info));
     const body = el("div", "news-body");
+    if (a.tone === "promo") body.append(el("span", "news-ad-label", a.label || "Ad · Sponsor"));
     if (a.title) body.append(el("p", "news-title", a.title));
     if (a.text) body.append(el("p", "news-text", a.text));
     box.append(body);
@@ -66,6 +75,8 @@
 
   function sideCard(a) {
     const card = el("div", "news-side-card");
+    card.setAttribute("aria-label", "Quảng cáo");
+    card.append(el("span", "news-ad-label", a.label || "Ad · Sponsor"));
     if (a.dismissible) card.append(closeBtn(a.id, card));
     if (a.image) {
       const img = el("img", "news-img");

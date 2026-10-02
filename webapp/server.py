@@ -461,6 +461,7 @@ def _clean_news(raw: Any) -> Dict[str, Any]:
             "image": _https(a.get("image")),
             "link": _https(a.get("link")),
             "cta": str(a.get("cta") or "")[:40],
+            "label": str(a.get("label") or "")[:30],
             "start": str(a.get("start") or "")[:10],
             "end": str(a.get("end") or "")[:10],
             "min_version": str(a.get("min_version") or "")[:20],
