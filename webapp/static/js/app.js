@@ -141,12 +141,32 @@ async function init() {
     ].filter(([, u]) => u);
     links.innerHTML = items.map(([n, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${n}</a></li>`).join("");
     // Người phát triển phần mềm (khác tác giả model)
-    if (dev.name) { $("#dev-name").textContent = dev.name; $("#side-dev .dev-who").textContent = dev.name + " ↗"; }
+    if (dev.name) { $("#dev-name").textContent = dev.name; $("#side-dev .dev-who").textContent = dev.name; }
     if (dev.role) $("#dev-role").textContent = dev.role;
     if (dev.title) { $("#dev-title").textContent = dev.title; $("#side-dev .dev-title").textContent = dev.title; }
     if (dev.intro) $("#dev-intro").textContent = dev.intro;
-    if (dev.url) { $("#dev-link").href = dev.url; $("#side-dev").href = dev.url; }
-    if (dev.link_label) $("#dev-link").textContent = dev.link_label + " →";
+    // Link người phát triển: Facebook, fanpage, app.danghuuson.com — dùng cho Cài đặt và popup "Phát triển bởi"
+    const devLinks = (dev.links || []).filter((l) => /^https:\/\//.test(l.url || ""));
+    const DL = (window.DEV_LINKS = window.DEV_LINKS || []);
+    DL.splice(0, DL.length, ...devLinks);
+    if (devLinks.length) {
+      const box = $("#dev-links");
+      box.replaceChildren();
+      devLinks.forEach((l, i) => {
+        const a = document.createElement("a");
+        a.className = "btn btn-sm " + (i === 0 ? "btn-primary" : "btn-ghost");
+        let href = l.url;
+        if (l.utm !== false) {
+          const u = new URL(href);
+          u.searchParams.set("utm_source", "ai_audio_studio"); u.searchParams.set("utm_medium", "local_app");
+          u.searchParams.set("utm_campaign", l.campaign || "developer-links"); u.searchParams.set("utm_content", "settings");
+          href = u.toString();
+        }
+        a.href = href; a.target = "_blank"; a.rel = "noopener";
+        a.textContent = `${l.icon ? l.icon + " " : ""}${l.label} →`;
+        box.append(a);
+      });
+    }
     setStatus(info.status);
   } catch (e) { console.error(e); }
   loadVoices();

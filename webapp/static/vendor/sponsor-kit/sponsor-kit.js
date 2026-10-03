@@ -1,4 +1,4 @@
-/*! Sponsor Kit v1.0 — góc quảng cáo + thư ngỏ + "Phát triển bởi" cho phần mềm miễn phí.
+/*! Sponsor Kit v1.1 — góc quảng cáo + thư ngỏ + "Phát triển bởi" cho phần mềm miễn phí.
  *  Không phụ thuộc thư viện. Dùng cho cả app chạy local (đọc tin qua proxy /api/news của app)
  *  lẫn website (đọc thẳng news.json trên GitHub Pages / CDN).
  *
@@ -13,7 +13,12 @@
  *    appId: "ai_audio_studio",              // lọc mục có "apps": [...] trong feed dùng chung
  *    storagePrefix: "aias",                 // khoá localStorage riêng cho từng app
  *    slots.credit: "#credit",               // (tuỳ chọn) khung "Phát triển bởi", basedOn: "Dựa trên …"
+ *    about: {                               // (tuỳ chọn) bấm "Phát triển bởi" → popup giới thiệu thay vì mở link
+ *      avatar: "/img/dev-avatar.jpg", intro: "…",
+ *      links: [{ label: "Facebook", url: "https://…", icon: "👤", utm: false }, …],
+ *    },                                     // popup hiện lại quảng cáo đang chạy, kể cả khi người dùng đã bấm ✕
  *  })
+ *  SponsorKit.openAbout()                   // mở popup giới thiệu từ nút riêng của app
  *
  *  An toàn: mọi nội dung từ xa gắn bằng textContent / thuộc tính — không chèn HTML, không chạy
  *  mã từ xa; link và ảnh chỉ nhận https. Quảng cáo (placement "side" hoặc tone "promo") bắt buộc
@@ -23,6 +28,7 @@
   "use strict";
   const ICON = { info: "ℹ️", warning: "⚠️", promo: "🎉", update: "🚀" };
   let CFG = null;
+  let FEED = null, VER = "";                // feed + phiên bản lần tải gần nhất (popup giới thiệu dùng lại)
 
   // ── tiện ích ─────────────────────────────────────────
   const el = (tag, cls, text) => {
@@ -53,7 +59,7 @@
   const dismissed = () => store.get("dismissed", []);
   function dismiss(id) { store.set("dismissed", dismissed().filter((x) => x !== id).concat(id).slice(-50)); }
 
-  function active(a, version) {
+  function active(a, version, ignoreDismiss) {
     const today = localToday();
     if (isAd(a) && !a.end) return false;
     // Một feed dùng chung nhiều app: mục có "apps" chỉ hiện ở app có appId nằm trong danh sách.
@@ -63,17 +69,17 @@
     if (a.end && today > a.end) return false;
     if (a.min_version && version && cmpVer(version, a.min_version) < 0) return false;
     if (a.max_version && version && cmpVer(version, a.max_version) > 0) return false;
-    return !(a.dismissible !== false && dismissed().includes(a.id));
+    return ignoreDismiss || !(a.dismissible !== false && dismissed().includes(a.id));
   }
 
   // Gắn UTM để đơn vị quảng cáo biết lượt bấm đến từ app nào, vị trí nào, bản nào.
-  function withUtm(link, a, version) {
+  function withUtm(link, a, version, slotName) {
     const url = https(link);
     if (!url) return "";
     try {
       const u = new URL(url);
       if (a.utm === false || [...u.searchParams.keys()].some((k) => k.startsWith("utm_"))) return u.toString();
-      const slot = a.placement === "top" ? "top-banner" : a.id && a.id.startsWith("update-") ? "update-banner" : "sidebar-card";
+      const slot = slotName || (a.placement === "top" ? "top-banner" : a.id && a.id.startsWith("update-") ? "update-banner" : "sidebar-card");
       u.searchParams.set("utm_source", CFG.utm?.source || "free_app");
       u.searchParams.set("utm_medium", CFG.utm?.medium || "app");
       u.searchParams.set("utm_campaign", a.campaign || a.id || "sponsor");
@@ -223,6 +229,7 @@
     }
     if (!d || d.enabled === false) return;
     const version = CFG.appVersion || d.version || "";
+    FEED = d; VER = version;
     const items = (d.announcements || []).filter((a) => a && a.id && active(a, version));
     if (d.latest_version && version && cmpVer(d.latest_version, version) > 0) {
       const upd = {
@@ -239,14 +246,110 @@
     if (side && s) side.append(sideCard(s, version));
   }
 
+  // ── Popup giới thiệu người phát triển ───────────────
+  // Lời chào, giới thiệu ngắn, các link; hiện lại quảng cáo đang chạy (bỏ qua nút ✕ đã bấm —
+  // vẫn tôn trọng ngày bắt đầu/kết thúc), vì người đã tắt thẻ ở menu vẫn nên biết có chương trình gì.
+  let aboutEl = null, aboutFocus = null;
+  function aboutLink(l) {
+    let href = https(l.url);
+    if (!href) return null;
+    if (l.utm !== false) href = withUtm(href, { campaign: l.campaign || "about" }, VER, "about-popup");
+    const a = link(href, "sk-about-link", "");
+    a.rel = "noopener";
+    if (l.icon) a.append(el("span", "sk-about-link-ico", l.icon));
+    const t = el("span", "sk-about-link-tx");
+    t.append(el("b", "", l.label || href));
+    if (l.note) t.append(el("small", "", l.note));
+    a.append(t);
+    return a;
+  }
+  function buildAbout() {
+    const dev = CFG.developer || {}, A = CFG.about || {};
+    const back = el("div", "sk-letter-backdrop sk-about-backdrop");
+    back.hidden = true;
+    const box = el("div", "sk-about");
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-labelledby", "sk-about-name");
+    const x = el("button", "sk-close sk-about-x", "✕");
+    x.type = "button"; x.setAttribute("aria-label", "Đóng");
+    x.addEventListener("click", closeAbout);
+    const head = el("div", "sk-about-head");
+    head.append(el("span", "sk-about-hi", A.greeting || "Xin chào! 👋"));
+    if (A.avatar) { const im = el("img", "sk-about-av"); im.src = A.avatar; im.alt = dev.name || ""; head.append(im); }
+    else head.append(el("span", "sk-about-av sk-about-av-txt", (dev.name || "?").trim().split(/\s+/).pop().charAt(0)));
+    const body = el("div", "sk-about-body");
+    body.append(el("p", "sk-about-by", CFG.creditLabel || "Phát triển bởi"));
+    const h = el("h2", "sk-about-name", dev.name || "");
+    h.id = "sk-about-name";
+    body.append(h);
+    if (dev.title) body.append(el("p", "sk-about-title", dev.title));
+    if (A.intro) body.append(el("p", "sk-about-intro", A.intro));
+    const links = el("div", "sk-about-links");
+    (A.links || []).map(aboutLink).filter(Boolean).forEach((a) => links.append(a));
+    if (links.childElementCount) body.append(links);
+    if (CFG.basedOn) body.append(el("p", "sk-about-base", CFG.basedOn));
+    body.append(el("div", "sk-about-ad"));
+    const ok = el("button", "sk-letter-ok sk-about-ok", A.button || "Đóng");
+    ok.type = "button";
+    ok.addEventListener("click", closeAbout);
+    body.append(ok);
+    box.append(x, head, body);
+    back.append(box);
+    back.addEventListener("click", (e) => { if (e.target === back) closeAbout(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !back.hidden) closeAbout(); });
+    document.body.append(back);
+    return back;
+  }
+  function fillAboutAd() {
+    const slot = aboutEl.querySelector(".sk-about-ad");
+    slot.replaceChildren();
+    const ad = FEED && (FEED.announcements || []).find((a) => a && a.id && isAd(a) && a.placement !== "top" && active(a, VER, true));
+    if (!ad) return;
+    slot.append(el("p", "sk-about-ad-h", (CFG.about && CFG.about.adHeading) || "Chương trình đang mở"));
+    const card = el("div", "sk-card sk-about-card");
+    card.append(adTag(ad));
+    const href = withUtm(ad.link, ad, VER, "about-popup");
+    const img = https(ad.image);
+    if (img) {
+      const i = el("img", "sk-img"); i.src = img; i.alt = ad.title || "";
+      i.addEventListener("error", () => i.remove());
+      if (href) { const w = link(href, "sk-img-link", ""); w.append(i); card.append(w); } else card.append(i);
+    }
+    if (ad.title) card.append(el("p", "sk-title", ad.title));
+    if (ad.text) card.append(el("p", "sk-text", ad.text));
+    if (href) card.append(link(href, "sk-cta", (ad.cta || "Xem ngay") + " →"));
+    slot.append(card);
+  }
+  function openAbout() {
+    aboutEl = aboutEl || buildAbout();
+    fillAboutAd();
+    aboutFocus = document.activeElement;
+    aboutEl.hidden = false;
+    requestAnimationFrame(() => aboutEl.classList.add("sk-open"));
+    aboutEl.querySelector(".sk-about-ok").focus({ preventScroll: true });   // giữ popup ở đầu (ảnh + lời chào)
+    aboutEl.querySelector(".sk-about").scrollTop = 0;
+  }
+  function closeAbout() {
+    if (!aboutEl) return;
+    aboutEl.classList.remove("sk-open");
+    setTimeout(() => { aboutEl.hidden = true; aboutFocus && aboutFocus.focus && aboutFocus.focus(); }, 220);
+  }
+
   // ── Khung "Phát triển bởi" (tĩnh, không cần mạng) ──
   function renderCredit(target) {
     const host = typeof target === "string" ? document.querySelector(target) : target;
     const dev = CFG.developer || {};
     if (!host || !dev.name) return;
-    const box = https(dev.url) ? link(dev.url, "sk-credit", "") : el("div", "sk-credit");
+    let box;
+    if (CFG.about) {                       // có popup giới thiệu → bấm mở popup, không nhảy link
+      box = el("button", "sk-credit");
+      box.type = "button";
+      box.setAttribute("aria-haspopup", "dialog");
+      box.addEventListener("click", openAbout);
+    } else box = https(dev.url) ? link(dev.url, "sk-credit", "") : el("div", "sk-credit");
     box.append(el("span", "sk-credit-by", CFG.creditLabel || "Phát triển bởi"));
-    box.append(el("span", "sk-credit-name", dev.name + (https(dev.url) ? " ↗" : "")));
+    box.append(el("span", "sk-credit-name", dev.name + (!CFG.about && https(dev.url) ? " ↗" : "")));
     if (dev.title) box.append(el("span", "sk-credit-title", dev.title));
     if (CFG.basedOn) box.append(el("span", "sk-credit-base", CFG.basedOn));
     host.replaceChildren(box);
@@ -261,6 +364,7 @@
     },
     renderCredit: (t) => { if (CFG) renderCredit(t); },
     openLetter: () => { if (CFG) openLetter(); },
+    openAbout: () => { if (CFG) openAbout(); },
     _test: { withUtm: (l, a, v) => withUtm(l, a, v), active: (a, v) => active(a, v), localToday },
   };
 })(window);

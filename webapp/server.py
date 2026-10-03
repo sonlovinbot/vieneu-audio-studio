@@ -587,15 +587,31 @@ def version() -> Dict[str, Any]:
     }
 
 
+def user_changelog(entries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Bản nhật ký cho người dùng: bỏ mục "app": false, dùng app_title / app_changes nếu có."""
+    out = []
+    for e in entries:
+        if e.get("app") is False:
+            continue
+        out.append({
+            "version": e.get("version", ""),
+            "date": e.get("date", ""),
+            "title": e.get("app_title") or e.get("title", ""),
+            "changes": e.get("app_changes") or e.get("changes", []),
+        })
+    return out
+
+
 @app.get("/api/changelog")
-def changelog() -> Dict[str, Any]:
+def changelog(all: bool = False) -> Dict[str, Any]:
     path = CONFIG_DIR / "changelog.json"
     if not path.exists():
         return {"entries": []}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        entries = json.loads(path.read_text(encoding="utf-8")).get("entries", [])
     except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=f"Lỗi đọc changelog: {e}") from e
+    return {"entries": entries if all else user_changelog(entries)}
 
 
 @app.get("/api/logs")

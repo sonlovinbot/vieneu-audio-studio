@@ -20,7 +20,12 @@ esc = html.escape
 
 voices = json.loads((ROOT / "webapp/static/previews/voices.json").read_text("utf-8"))
 sample = (voices.get("display_text") or voices["text"]).replace("{name}", "…")
-changelog = json.loads((ROOT / "webapp/config/changelog.json").read_text("utf-8"))["entries"]
+# Trang giới thiệu chỉ hiện thay đổi về sản phẩm (giống app): bỏ "app": false, dùng app_title / app_changes.
+changelog = [
+    {**e, "title": e.get("app_title") or e["title"], "changes": e.get("app_changes") or e["changes"]}
+    for e in json.loads((ROOT / "webapp/config/changelog.json").read_text("utf-8"))["entries"]
+    if e.get("app") is not False
+]
 version = json.loads((ROOT / "webapp/config/branding.json").read_text("utf-8"))["app"]["version"]
 
 # Dung lượng bộ cài từ bản phát hành mới nhất (không có mạng thì bỏ qua).

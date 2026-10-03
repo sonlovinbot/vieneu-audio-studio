@@ -2,7 +2,7 @@
   "app": {
     "name": "AI Audio Studio",
     "edition": "",
-    "version": "1.8.1",
+    "version": "1.9.0",
     "tagline": "Text-to-Speech tiếng Việt offline — giọng tự nhiên, clone giọng tức thì",
     "description": "Giao diện đào tạo gọn nhẹ cho VieNeu-TTS: sinh giọng, nhân bản giọng từ 3–5s, hội thoại đa nhân vật, chạy 100% trên máy của bạn.",
     "default_port": 8001
@@ -31,7 +31,31 @@
     "role": "Người phát triển phần mềm AI Audio Studio",
     "url": "https://www.facebook.com/danghuuson.182/",
     "link_label": "Facebook Đặng Hữu Sơn",
-    "intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn, CEO & Co-Founder LovinBot AI: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Thư viện, API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo."
+    "intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn, CEO & Co-Founder LovinBot AI: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Thư viện, API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo.",
+    "fanpage": "https://www.facebook.com/coachdanghuuson/",
+    "links": [
+      {
+        "label": "Facebook Đặng Hữu Sơn",
+        "note": "Trang cá nhân",
+        "url": "https://www.facebook.com/danghuuson.182/",
+        "icon": "👤",
+        "utm": false
+      },
+      {
+        "label": "Fanpage Đặng Hữu Sơn",
+        "note": "Chia sẻ về AI, vibe code, marketing",
+        "url": "https://www.facebook.com/coachdanghuuson/",
+        "icon": "📣",
+        "utm": false
+      },
+      {
+        "label": "app.danghuuson.com",
+        "note": "Phần mềm, game 3D & workshop miễn phí",
+        "url": "https://app.danghuuson.com/",
+        "icon": "🌐",
+        "campaign": "developer-links"
+      }
+    ]
   },
   "downloads": {
     "_note": "Link bộ cài trên GitHub Releases (luôn trỏ bản mới nhất). Để trống = dùng file .zip trong dist/.",

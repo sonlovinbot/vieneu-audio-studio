@@ -1,5 +1,23 @@
 {
+  "_huong_dan": "Nhật ký đầy đủ (repo giữ hết). Bản cài gửi khách và trang giới thiệu chỉ hiện phần liên quan sản phẩm/hệ thống: \"app\": false → ẩn cả mục; \"app_title\" / \"app_changes\" → thay tiêu đề / danh sách khi hiển thị cho người dùng.",
   "entries": [
+    {
+      "version": "1.9.0",
+      "date": "2026-10-03",
+      "title": "Giới thiệu người phát triển, nhật ký gọn hơn",
+      "changes": [
+        "Bấm khung \"Phát triển bởi\" mở thẻ giới thiệu người phát triển (thay vì nhảy sang Facebook): lời chào, giới thiệu ngắn, link Facebook, fanpage và app.danghuuson.com.",
+        "Thẻ giới thiệu hiện lại chương trình tài trợ đang chạy — kể cả khi người dùng đã tắt thẻ quảng cáo ở menu trái.",
+        "Cài đặt → Người phát triển: thêm link fanpage và app.danghuuson.com.",
+        "Phiên bản & Logs và trang giới thiệu chỉ hiện thay đổi về sản phẩm, hệ thống; các bản chỉ chỉnh quảng cáo/thư ngỏ được ẩn (repo vẫn giữ đủ).",
+        "Sponsor Kit 1.1: popup giới thiệu dùng chung (SponsorKit.openAbout)."
+      ],
+      "app_changes": [
+        "Bấm khung \"Phát triển bởi\" ở menu trái mở thẻ giới thiệu người phát triển: lời chào, giới thiệu ngắn, link Facebook, fanpage và app.danghuuson.com.",
+        "Cài đặt → Người phát triển: thêm link fanpage và app.danghuuson.com.",
+        "Phiên bản & Logs gọn hơn: chỉ hiện các thay đổi về tính năng và hệ thống."
+      ]
+    },
     {
       "version": "1.8.1",
       "date": "2026-10-03",
@@ -7,6 +25,11 @@
       "changes": [
         "Trang giới thiệu chuyển sang https://app.danghuuson.com/vieneu-audio-studio/ (link cũ vẫn tự chuyển hướng).",
         "App đọc thông báo và báo bản mới từ địa chỉ mới.",
+        "Trang chủ app.danghuuson.com tổng hợp mọi phần mềm, game 3D và tài liệu AI miễn phí của Đặng Hữu Sơn."
+      ],
+      "app_changes": [
+        "Trang giới thiệu chuyển sang https://app.danghuuson.com/vieneu-audio-studio/ (link cũ vẫn tự chuyển hướng).",
+        "App kiểm tra phiên bản mới từ địa chỉ mới.",
         "Trang chủ app.danghuuson.com tổng hợp mọi phần mềm, game 3D và tài liệu AI miễn phí của Đặng Hữu Sơn."
       ]
     },
@@ -18,7 +41,8 @@
         "Nút (i) cạnh nhãn Ad · Sponsor mở thư ngỏ: phần mềm hoàn toàn miễn phí, góc quảng cáo nhỏ của Coachio Academy giúp có kinh phí phát triển, quảng cáo không dựa trên dữ liệu của bạn.",
         "Link quảng cáo gắn UTM (nguồn: AI Audio Studio bản local) để nhà tài trợ biết lượt xem đến từ đâu — app không theo dõi bạn.",
         "Góc quảng cáo, thông báo và khung Phát triển bởi chuyển sang bộ Sponsor Kit dùng chung; mất mạng vẫn hiện bản đã lưu."
-      ]
+      ],
+      "app": false
     },
     {
       "version": "1.7.2",
@@ -28,7 +52,8 @@
         "Thẻ quảng cáo có nhãn Ad · Sponsor để người dùng phân biệt với nội dung của app.",
         "Mỗi quảng cáo bắt buộc có ngày kết thúc và tự tắt đúng 0h ngày hôm sau theo giờ máy người dùng; xếp lịch sẵn được quảng cáo kế tiếp.",
         "Sửa lỗi múi giờ: trước đây ngày hết hạn tính theo giờ UTC nên ở Việt Nam quảng cáo hiện thêm tới 7h sáng."
-      ]
+      ],
+      "app": false
     },
     {
       "version": "1.7.1",
@@ -52,6 +77,13 @@
         "App tự báo khi có phiên bản mới (thanh trên đầu trang, kèm cách cập nhật).",
         "Thanh thông báo trên đầu trang và thẻ ở menu trái hiển thị tin từ nhà phát triển (sự kiện, ưu đãi, hướng dẫn) — cập nhật từ xa, không cần cài lại.",
         "An toàn: chỉ nhận chữ và link https, không chạy mã từ xa, không gửi dữ liệu người dùng; mất mạng dùng bản đã lưu; tắt bằng VIENEU_NEWS=off.",
+        "Kho giọng: câu mẫu hiển thị đúng tên mô hình VieNeu-TTS.",
+        "Trang giới thiệu mới: tải trực tiếp, nghe thử 25 giọng, video, xử lý sự cố khi cài."
+      ],
+      "app_title": "Tự báo khi có phiên bản mới",
+      "app_changes": [
+        "App tự báo khi có phiên bản mới (thanh trên đầu trang, kèm cách cập nhật).",
+        "An toàn: chỉ nhận chữ và link https, không chạy mã từ xa, không gửi dữ liệu người dùng; tắt bằng VIENEU_NEWS=off.",
         "Kho giọng: câu mẫu hiển thị đúng tên mô hình VieNeu-TTS.",
         "Trang giới thiệu mới: tải trực tiếp, nghe thử 25 giọng, video, xử lý sự cố khi cài."
       ]

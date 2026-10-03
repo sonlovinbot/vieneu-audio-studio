@@ -289,7 +289,11 @@ input[type="file"] { min-height: 32px; font: inherit; font-size: 14px; }
   padding: var(--s-3); border-radius: var(--radius); background: var(--c-hover);
   font-weight: 500; color: var(--c-text);
 }
+button.dev-credit { width: 100%; border: 0; text-align: left; font: inherit; cursor: pointer; }
 .dev-credit:hover { text-decoration: none; box-shadow: var(--shadow-deep); }
+.dev-credit:focus-visible { outline: 3px solid var(--c-primary); outline-offset: 2px; }
+.dev-links { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-2); }
+.dev-card .dev-links .btn { margin-top: 0; }
 .dev-by { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--c-text); font-weight: 700; }
 .dev-who { font-size: 15px; font-weight: 700; color: var(--c-primary-ink); }
 .dev-base { font-size: 12px; color: var(--c-text); }

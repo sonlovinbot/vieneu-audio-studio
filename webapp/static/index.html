@@ -18,9 +18,9 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
-  <link rel="stylesheet" href="/css/coachio-theme.css?v=33" />
-  <link rel="stylesheet" href="/css/app.css?v=33" />
-  <link rel="stylesheet" href="/vendor/sponsor-kit/sponsor-kit.css?v=33" />
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=34" />
+  <link rel="stylesheet" href="/css/app.css?v=34" />
+  <link rel="stylesheet" href="/vendor/sponsor-kit/sponsor-kit.css?v=34" />
 </head>
 <body>
   <div class="app">
@@ -59,12 +59,12 @@
       <div class="sidebar-foot">
         <button class="onb-open" id="onb-open" type="button">🚀 Hướng dẫn cài đặt &amp; bắt đầu</button>
         <div id="news-side"></div>
-        <a class="dev-credit" id="side-dev" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">
+        <button class="dev-credit" id="side-dev" type="button" aria-haspopup="dialog" title="Giới thiệu người phát triển">
           <span class="dev-by">Phát triển bởi</span>
-          <span class="dev-who">Đặng Hữu Sơn ↗</span>
+          <span class="dev-who">Đặng Hữu Sơn</span>
           <span class="dev-title">CEO &amp; Co-Founder LovinBot AI</span>
           <span class="dev-base">Dựa trên model AI VieNeu-TTS</span>
-        </a>
+        </button>
         <div class="nav-label">Giao diện</div>
         <div class="theme-switch" role="radiogroup" aria-label="Chế độ sáng/tối">
           <button data-theme-pref="light" role="radio" title="Sáng">☀️ Sáng</button>
@@ -352,7 +352,9 @@
         <div class="dev-title-lg" id="dev-title">CEO &amp; Co-Founder LovinBot AI</div>
         <div class="kv" id="dev-role">Người phát triển phần mềm AI Audio Studio</div>
         <p id="dev-intro" class="hint"></p>
-        <a id="dev-link" class="btn btn-primary btn-sm" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">Facebook Đặng Hữu Sơn →</a>
+        <div class="dev-links" id="dev-links">
+          <a class="btn btn-primary btn-sm" href="https://www.facebook.com/danghuuson.182/" target="_blank" rel="noopener">Facebook Đặng Hữu Sơn →</a>
+        </div>
       </div>
       <div class="card">
           <div class="section-title">🧠 Model AI VieNeu-TTS</div>
@@ -429,9 +431,9 @@
     </div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="/js/app.js?v=33"></script>
-  <script src="/js/onboarding.js?v=33"></script>
-  <script src="/vendor/sponsor-kit/sponsor-kit.js?v=33"></script>
+  <script src="/js/app.js?v=34"></script>
+  <script src="/js/onboarding.js?v=34"></script>
+  <script src="/vendor/sponsor-kit/sponsor-kit.js?v=34"></script>
   <script>
     // Góc quảng cáo + thư ngỏ (Sponsor Kit). Nội dung lấy từ docs/news.json qua /api/news.
     SponsorKit.init({
@@ -441,8 +443,16 @@
       utm: { source: "ai_audio_studio", medium: "local_app" },
       sponsorName: "Coachio Academy",
       developer: { name: "Đặng Hữu Sơn", title: "CEO & Co-Founder LovinBot AI", url: "https://www.facebook.com/danghuuson.182/" },
+      basedOn: "Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo",
+      // Bấm "Phát triển bởi" → popup giới thiệu (thay vì mở Facebook); link lấy từ config/branding.json
+      about: {
+        avatar: "/img/dev-avatar.jpg",
+        intro: "Mình làm phần mềm và game bằng AI, chia sẻ miễn phí cho mọi người. AI Audio Studio là một trong số đó — chạy ngay trên máy của bạn, không cần tài khoản.",
+        links: (window.DEV_LINKS = window.DEV_LINKS || []),  // app.js điền từ branding.json
+      },
       storagePrefix: "vieneu_news",
     });
+    document.getElementById("side-dev").addEventListener("click", () => SponsorKit.openAbout());
   </script>
 </body>
 </html>
