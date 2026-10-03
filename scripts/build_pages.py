@@ -290,6 +290,9 @@ src="https://www.facebook.com/tr?id=1152715006830829&ev=PageView&noscript=1"
   <p class="lead">Các trường hợp hay gặp và cách xử lý. Vẫn chưa được: nhắn <a href="{FB}">Đặng Hữu Sơn</a> kèm ảnh chụp màn hình lỗi.</p>
 {trouble_html}
 
+  <!-- Khung tài trợ: nội dung lấy từ app.danghuuson.com/sponsors/sponsors.json (trang "vieneu") -->
+  <div data-sponsor-page="vieneu"></div>
+
   <footer>
     <span>Phát triển bởi <a href="{FB}">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
     <span>Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0</span>
@@ -321,6 +324,7 @@ document.querySelectorAll(".cmd button").forEach((b) => b.addEventListener("clic
   setTimeout(() => (b.textContent = "Sao chép"), 2000);
 }}));
 </script>
+<script src="https://app.danghuuson.com/sponsors/sponsors.js" defer></script>
 </body>
 </html>
 '''
