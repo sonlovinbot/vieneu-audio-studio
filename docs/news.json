@@ -4,19 +4,19 @@
   "update_note": "Chạy lại lệnh cài 1 dòng (Terminal / PowerShell) để cập nhật — giữ nguyên giọng đã lưu và lịch sử.",
   "announcements": [
     {
-      "id": "bootcamp-ai-vibecode-2026",
+      "id": "app-hub-free-2026-10",
       "placement": "sidebar",
       "tone": "promo",
       "label": "Ad · Sponsor",
-      "title": "Bootcamp AI Vibe Code 2026",
-      "text": "Combo Vibe Code × AI Marketing — 14 ngày học Zoom thực chiến: tự dựng app, AI Agent, tự động hóa. Không cần biết code.",
-      "image": "https://app.danghuuson.com/vieneu-audio-studio/ads/bootcamp-2026.jpg",
-      "link": "https://academy.coachio.ai/funnels/ai-marketing-bootcamp-2026",
-      "cta": "Xem chương trình",
+      "title": "App, game 3D & workshop miễn phí",
+      "text": "Xem thêm phần mềm AI, game 3D chơi ngay trên web và lịch workshop miễn phí mới nhất của Đặng Hữu Sơn.",
+      "image": "https://app.danghuuson.com/vieneu-audio-studio/ads/app-hub.jpg",
+      "link": "https://app.danghuuson.com/",
+      "cta": "Xem tất cả",
       "start": "",
-      "end": "2026-10-04",
+      "end": "2026-12-31",
       "dismissible": true,
-      "campaign": "bootcamp-ai-vibecode-2026"
+      "campaign": "app-hub-free"
     }
   ]
 }
