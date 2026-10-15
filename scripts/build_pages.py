@@ -17,7 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO = "sonlovinbot/vieneu-audio-studio"
 GH = f"https://github.com/{REPO}"
 RAW = f"https://raw.githubusercontent.com/{REPO}/main"
-YT = "rsjhXh7OSHg"
+YT = "rsjhXh7OSHg"            # video trang chính
+YT_GLOBAL = "mOyUwLZCdCM"     # video bản Global — chỉ trang /global/ (hoặc ?ban=global)
 FB = "https://www.facebook.com/danghuuson.182/"
 esc = html.escape
 
@@ -314,7 +315,7 @@ def build(edition=""):
       <div class="badges"><span class="badge">Phiên bản {esc(tag)}</span><span class="badge">🌏 17 ngôn ngữ</span><span class="badge">🧩 MCP</span><span class="badge">macOS · Windows · Linux</span><span class="badge">25 giọng · 3 miền</span><span class="badge">Mã nguồn mở Apache 2.0</span></div>
 
       <div class="video">
-        <iframe src="https://www.youtube.com/embed/{YT}?rel=0" title="Giới thiệu AI Audio Studio" loading="lazy"
+        <iframe src="https://www.youtube.com/embed/{YT_GLOBAL if G else YT}?rel=0" title="{"Giới thiệu AI Audio Studio Global" if G else "Giới thiệu AI Audio Studio"}" loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </div>
