@@ -183,7 +183,7 @@ def build(edition=""):
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AI Audio Studio — Giọng nói AI tiếng Việt + 17 ngôn ngữ, chạy trên máy tính</title>{NOINDEX if G else ""}
-    <meta name="description" content="Biến văn bản tiếng Việt thành giọng nói tự nhiên, clone giọng từ 3–5 giây, hội thoại nhiều nhân vật, xuất API. Chạy 100% trên máy. Phát triển bởi Đặng Hữu Sơn, dựa trên model VieNeu-TTS.">
+    <meta name="description" content="Biến văn bản tiếng Việt và 17 ngôn ngữ khác thành giọng nói tự nhiên, clone giọng, hội thoại nhiều nhân vật, MCP cho Claude / ChatGPT Codex, xuất API. Chạy 100% trên máy. Phát triển bởi Đặng Hữu Sơn, dựa trên model VieNeu-TTS và OmniVoice.">
     <meta property="og:title" content="AI Audio Studio — Giọng nói AI tiếng Việt">
     <meta property="og:description" content="Xem video, nghe thử 25 giọng và tải miễn phí cho macOS, Windows, Linux.">
     <meta property="og:image" content="{RAW}/assets/readme/banner.png">
@@ -375,7 +375,7 @@ def build(edition=""):
 
       <footer>
         <span>Phát triển bởi <a href="{FB}">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
-        <span>Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0</span>
+        <span>Dựa trên model AI <a href="https://github.com/pnnbao97/VieNeu-TTS" target="_blank" rel="noopener">VieNeu-TTS</a> của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và <a href="https://github.com/k2-fsa/OmniVoice" target="_blank" rel="noopener">OmniVoice</a> của k2-fsa (Đa ngôn ngữ) · Giấy phép Apache 2.0</span>
         <span style="font-size:12px">Trang dùng Meta Pixel (cookie của Facebook) để đo lượt xem và lượt tải. Phần mềm tải về không chứa mã theo dõi này.</span>
       </footer>
     </div>

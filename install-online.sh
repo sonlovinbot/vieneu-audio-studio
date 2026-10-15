@@ -30,7 +30,7 @@ trap 'rm -rf "$TMP"' EXIT
 
 echo "============================================================"
 echo "  ⚡ AI Audio Studio — cài đặt tự động ($PLAT)"
-echo "     Phát triển bởi Đặng Hữu Sơn · model VieNeu-TTS"
+echo "     Phát triển bởi Đặng Hữu Sơn · model VieNeu-TTS + OmniVoice"
 echo "============================================================"
 echo "→ Tải bộ cài mới nhất..."
 curl -fL --progress-bar "$URL" -o "$TMP/app.zip"

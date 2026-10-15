@@ -19,7 +19,7 @@ $Tmp  = Join-Path ([IO.Path]::GetTempPath()) ("aias-" + [guid]::NewGuid())
 
 Write-Host "============================================================"
 Write-Host "  AI Audio Studio - cai dat tu dong (Windows)"
-Write-Host "  Phat trien boi Dang Huu Son - model VieNeu-TTS"
+Write-Host "  Phat trien boi Dang Huu Son - model VieNeu-TTS + OmniVoice"
 Write-Host "============================================================"
 New-Item -ItemType Directory -Force -Path $Tmp | Out-Null
 try {

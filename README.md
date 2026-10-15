@@ -7,7 +7,7 @@ Biến văn bản tiếng Việt thành giọng nói tự nhiên, **clone giọn
 > [!TIP]
 > 🌐 **[Xem trang giới thiệu](https://app.danghuuson.com/vieneu-audio-studio/)**: xem video và **nghe thử 25 giọng ngay trên trang**, không cần tải gì.
 
-**Phát triển bởi [Đặng Hữu Sơn](https://www.facebook.com/danghuuson.182/) — CEO & Co-Founder LovinBot AI**, dựa trên model AI mã nguồn mở [VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS) của Phạm Nguyễn Ngọc Bảo.
+**Phát triển bởi [Đặng Hữu Sơn](https://www.facebook.com/danghuuson.182/) — CEO & Co-Founder LovinBot AI**, dựa trên model AI mã nguồn mở [VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS) của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và [OmniVoice](https://github.com/k2-fsa/OmniVoice) của k2-fsa (chế độ Đa ngôn ngữ).
 
 ## 🎬 Video giới thiệu
 
