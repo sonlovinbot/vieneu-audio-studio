@@ -19,7 +19,12 @@ case "$(uname -s)" in
   *) echo "❌ Hệ điều hành chưa hỗ trợ: $(uname -s). Windows hãy dùng lệnh PowerShell trong README."; exit 1 ;;
 esac
 
-URL="https://github.com/$REPO/releases/latest/download/AI-Audio-Studio-$PLAT.zip"
+# Bản Global (đa ngôn ngữ): đặt VIENEU_CHANNEL=global trước lệnh → tải từ release "global" (phát hành riêng).
+if [ "${VIENEU_CHANNEL:-}" = "global" ]; then
+  URL="https://github.com/$REPO/releases/download/global/AI-Audio-Studio-Global-$PLAT.zip"
+else
+  URL="https://github.com/$REPO/releases/latest/download/AI-Audio-Studio-$PLAT.zip"
+fi
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 

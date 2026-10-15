@@ -1,0 +1,66 @@
+============================================================
+  AI Audio Studio Global — Hướng dẫn Đa ngôn ngữ
+============================================================
+
+BẢN GLOBAL CÓ GÌ KHÁC?
+  Mọi thứ của bản thường (25 giọng Việt, clone giọng, hội thoại, API)
+  + trang 🌏 Đa ngôn ngữ: đọc 17 thứ tiếng bằng model OmniVoice:
+    Anh, Hàn, Nhật, Trung, Quảng Đông, Filipino, Thái, Indonesia,
+    Mã Lai, Pháp, Tây Ban Nha, Đức, Nga, Bồ Đào Nha, Ý, Hindi, Ả Rập
+    (tiếng Việt ở dạng thử nghiệm).
+
+CÀI ĐẶT
+  Cài giống bản thường — xem file HUONG-DAN-MAC-LINUX.txt hoặc
+  HUONG-DAN-WINDOWS.txt. Đã có bản thường trong máy thì cài đè vào
+  cùng thư mục: giọng đã lưu và lịch sử được giữ nguyên.
+
+BẬT ĐA NGÔN NGỮ (làm 1 lần)
+  1. Mở app → menu trái chọn  🌏 Đa ngôn ngữ.
+  2. Đọc ghi chú tốc độ: app tự kiểm tra máy bạn (chip Apple, card
+     NVIDIA hay chỉ CPU).
+  3. Bấm  "⬇ Cài gói Đa ngôn ngữ"  → OK.
+     - Tải khoảng 4 GB (PyTorch + OmniVoice + model 3 GB).
+     - Có thanh tiến độ, mất 5–20 phút tuỳ mạng. Vẫn dùng app
+       bình thường trong lúc cài.
+     - Cần ổ trống ~6 GB và Internet. Đóng app giữa chừng thì
+       bấm lại — phần đã tải không tải lại.
+  4. Xong là dùng được. Lần sinh đầu sau khi mở app mất thêm
+     ~30–40 giây để nạp model, các lần sau nhanh hơn.
+
+DÙNG
+  • Chọn Ngôn ngữ → Giọng đọc → dán Nội dung → "Sinh audio".
+    Tối đa 2.000 ký tự/lần. "Chế độ nhanh" nhanh gần gấp đôi,
+    hợp để nghe thử.
+    - 6 giọng có sẵn (nam/nữ, nhiều độ tuổi). Tiếng Anh chọn được
+      giọng Mỹ, Anh, Úc, Canada, Ấn Độ.
+    - 25 giọng Việt của VieNeu cũng nói được tiếng nước ngoài.
+  • Clone giọng: ô Giọng đọc chọn "🎙️ Clone từ file mẫu của bạn…",
+    tải file mẫu 3–15 giây (đẹp nhất 5–10 giây, không nhạc nền)
+    và GÕ ĐÚNG từng chữ câu nói trong file mẫu.
+  • Hội thoại: mỗi lượt chọn được ngôn ngữ riêng — trộn tiếng Việt
+    với tiếng Anh, Hàn, Nhật… trong cùng một file.
+  • API: /api/multi/tts, /api/multi/clone; trang API trong app có
+    sẵn ví dụ và tự hiện danh sách ngôn ngữ, giọng.
+  • Tiếng Việt hằng ngày nên dùng trang Sinh giọng (VieNeu-TTS)
+    — nhanh hơn ~4 lần, đọc số và ngày tháng chuẩn hơn.
+
+MÁY NÀO CHẠY ĐƯỢC?
+  - Mac chip Apple (M1 trở lên): tốt, ~1 giây máy chạy / 1 giây audio.
+  - Windows/Linux có card NVIDIA: nhanh.
+  - Máy chỉ có CPU: chạy được nhưng chậm (~3 giây / 1 giây audio),
+    hợp với đoạn ngắn.
+  - Mac chip Intel: CHƯA chạy được Đa ngôn ngữ (các phần khác vẫn dùng bình thường).
+  - RAM nên từ 16 GB. Model tự tắt sau 10 phút không dùng để trả RAM.
+
+CẬP NHẬT BẢN GLOBAL
+  Dùng lệnh cài 1 dòng CÓ chữ VIENEU_CHANNEL=global (xem trang tải).
+  Lệnh không có chữ đó sẽ cài về bản thường (không có Đa ngôn ngữ).
+
+GỠ GÓI ĐA NGÔN NGỮ (lấy lại ~4 GB)
+  Trang 🌏 Đa ngôn ngữ → khung "⚙️ Gói Đa ngôn ngữ" → "Gỡ gói".
+  App vẫn chạy bình thường. ("Giải phóng RAM" chỉ tắt model tạm thời.)
+
+GHI NHẬN
+  Model đa ngôn ngữ OmniVoice của k2-fsa (giấy phép Apache 2.0),
+  dùng bộ mã hoá âm thanh Higgs Audio 2 của Boson AI.
+============================================================

@@ -12,7 +12,9 @@ $ProgressPreference = "SilentlyContinue"   # tắt thanh tiến trình chậm c�
 
 $Repo = "sonlovinbot/vieneu-audio-studio"
 $Dest = if ($env:VIENEU_INSTALL_DIR) { $env:VIENEU_INSTALL_DIR } else { Join-Path $HOME "AI-Audio-Studio" }
-$Url  = "https://github.com/$Repo/releases/latest/download/AI-Audio-Studio-Windows.zip"
+# Bản Global (đa ngôn ngữ): $env:VIENEU_CHANNEL='global' trước lệnh → tải từ release "global" (phát hành riêng).
+$Url  = if ($env:VIENEU_CHANNEL -eq "global") { "https://github.com/$Repo/releases/download/global/AI-Audio-Studio-Global-Windows.zip" }
+        else { "https://github.com/$Repo/releases/latest/download/AI-Audio-Studio-Windows.zip" }
 $Tmp  = Join-Path ([IO.Path]::GetTempPath()) ("aias-" + [guid]::NewGuid())
 
 Write-Host "============================================================"

@@ -1,7 +1,12 @@
 {
-  "latest_version": "1.9.0",
-  "release_url": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest",
-  "update_note": "Chạy lại lệnh cài 1 dòng (Terminal / PowerShell) để cập nhật — giữ nguyên giọng đã lưu và lịch sử.",
+  "latest_version": "2.0.0",
+  "release_url": "https://app.danghuuson.com/vieneu-audio-studio/#cai-dat",
+  "update_note": "Bản 2.0.0 Global: đọc 17 thứ tiếng (Anh, Hàn, Nhật, Trung…) và MCP — ra lệnh cho Claude Desktop / ChatGPT Codex tạo giọng. Cập nhật: chạy lại lệnh cài 1 dòng (Terminal / PowerShell), giữ nguyên giọng đã lưu và lịch sử.",
+  "global": {
+    "latest_version": "2.0.0",
+    "release_url": "https://app.danghuuson.com/vieneu-audio-studio/#cai-dat",
+    "update_note": "Chạy lại lệnh cài 1 dòng để cập nhật bản Global — giữ nguyên giọng đã lưu, lịch sử và gói Đa ngôn ngữ."
+  },
   "announcements": [
     {
       "id": "app-hub-free-2026-10",

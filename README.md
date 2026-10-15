@@ -116,8 +116,9 @@ Mỗi giọng đọc cùng một câu mẫu: *"Chào bạn, đây là giọng đ
 - 🔊 **Sinh giọng** — 25 giọng có sẵn (nghe thử từng giọng trong **Kho giọng**), chèn cảm xúc `[cười]` `[thở dài]` `[hắng giọng]`, bộ đếm ký tự (tối đa 5.000 ký tự/lần).
 - 🎙️ **Clone giọng** — từ 3–5 giây audio mẫu; lưu lại kèm nhãn cảm xúc (vui, buồn, thì thầm...) để dùng lại.
 - 💬 **Hội thoại** — nhiều nhân vật, mỗi lượt một giọng, làm podcast.
+- 🌏 **Đa ngôn ngữ** *(cài thêm khi cần, ~4 GB)* — đọc tiếng Anh, Hàn, Nhật, Trung, Filipino, Thái, Pháp… (17 thứ tiếng + tiếng Việt thử nghiệm) bằng model OmniVoice; giọng Việt có sẵn nói được tiếng nước ngoài, clone giọng của bạn, hội thoại trộn nhiều ngôn ngữ. Nhanh nhất trên Mac chip Apple / máy có card NVIDIA.
 - ⭐ **Thư viện** — Giọng của tôi và Lịch sử 50 lượt gần nhất.
-- 🔌 **API** — ví dụ curl / JavaScript / Python và prompt sẵn cho AI agent.
+- 🧩 **MCP & API** — kết nối Claude Desktop / ChatGPT Codex một lần rồi ra lệnh bằng lời (“đọc đoạn này bằng giọng Trúc Ly”), AI tự tạo file audio trên máy bạn; vẫn có ví dụ curl / JavaScript / Python cho phần mềm khác.
 - 🚀 **Hướng dẫn lần đầu** — kiểm tra cấu hình máy, tải model, thử tạo giọng.
 - 🌗 Giao diện sáng / tối.
 
@@ -150,4 +151,5 @@ Mỗi giọng đọc cùng một câu mẫu: *"Chào bạn, đây là giọng đ
 
 - 🌐 Các phần mềm, game 3D và tài liệu AI miễn phí khác: **[app.danghuuson.com](https://app.danghuuson.com)**
 - Phần mềm AI Audio Studio (giao diện, tính năng, bộ cài): **Đặng Hữu Sơn** — [Facebook](https://www.facebook.com/danghuuson.182/).
+- Chế độ Đa ngôn ngữ: model **[OmniVoice](https://github.com/k2-fsa/OmniVoice)** (k2-fsa, Apache-2.0). *Built with Higgs Materials licensed from Boson AI USA, Inc., Copyright Boson AI USA, Inc., All Rights Reserved and Meta Llama 3 licensed under the Meta Llama 3 Community License, Copyright Meta Platforms, Inc., All Rights Reserved.*
 - Model AI và SDK giọng nói: **[VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS)** — thiết kế và huấn luyện bởi **Phạm Nguyễn Ngọc Bảo**, giấy phép Apache 2.0. Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.

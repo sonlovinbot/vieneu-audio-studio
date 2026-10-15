@@ -218,6 +218,12 @@
       cmd: "irm https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.ps1 | iex" },
   };
 
+  // Bản Global: lệnh cài thêm biến VIENEU_CHANNEL=global để tải đúng bộ cài đa ngôn ngữ (chạy lại = cập nhật bản Global)
+  function globalize() {
+    ONE_LINER.macos.cmd = ONE_LINER.linux.cmd = "VIENEU_CHANNEL=global " + ONE_LINER.macos.cmd;
+    ONE_LINER.windows.cmd = "$env:VIENEU_CHANNEL='global'; " + ONE_LINER.windows.cmd;
+  }
+
   function fmtSize(b) { return b ? ` (${(b / 1024 / 1024).toFixed(1)} MB)` : ""; }
 
   function renderInstall() {
@@ -431,6 +437,7 @@
   fetch("/api/info").then((r) => r.json()).then((info) => {
     S.hosted = !!info.hosted;
     S.devUrl = (info.branding.developer || {}).url || "";
+    if ((info.branding.app || {}).channel === "global" && !S.globalized) { S.globalized = true; globalize(); }
     let seen = false;
     try { seen = localStorage.getItem(SEEN_KEY) === "1"; } catch {}
     if (!seen || location.hash === "#onboarding") open();

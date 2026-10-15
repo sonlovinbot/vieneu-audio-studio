@@ -134,6 +134,7 @@ gpu = [
 
 [project.scripts]
 vieneu-studio = "webapp.server:main"
+vieneu-mcp = "webapp.mcp_server:main"
 
 [tool.setuptools]
 package-dir = {"" = "src", "apps" = "apps", "webapp" = "webapp"}
@@ -144,7 +145,7 @@ include = ["vieneu*", "vieneu_utils*", "apps*", "webapp*"]
 
 [tool.setuptools.package-data]
 vieneu = ["assets/*.json", "assets/samples/*"]
-webapp = ["static/**/*", "config/*.json"]
+webapp = ["static/**/*", "config/*.json", "engines/*.py"]
 
 [tool.uv.sources]
 torch = [

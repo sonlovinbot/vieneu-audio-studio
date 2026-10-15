@@ -390,14 +390,50 @@ $("#clone-save-go").addEventListener("click", async () => {
 });
 
 // ── Conversation ───────────────────────────────────────
-function turnRow(text = "", voice = "") {
+// Ngôn ngữ của một lượt thoại: "" = tiếng Việt (VieNeu); khác = chế độ Đa ngôn ngữ (OmniVoice)
+function turnLangOptions(sel = "") {
+  const M = window.MULTI_CACHE;
+  let html = `<option value="">🇻🇳 Tiếng Việt · VieNeu</option>`;
+  if (M && M.installed && !M.hosted) {
+    html += `<optgroup label="🌏 Đa ngôn ngữ">${M.languages.map((l) =>
+      `<option value="${escapeHtml(l.id)}" ${l.id === sel ? "selected" : ""}>${escapeHtml(l.label)}</option>`).join("")}</optgroup>`;
+  } else if (M && !M.hosted) {
+    html += `<option value="" disabled>🌏 Ngôn ngữ khác — cài ở trang Đa ngôn ngữ</option>`;
+  }
+  return html;
+}
+function multiVoiceOptions(sel = "") {
+  const v = (window.MULTI_CACHE || {}).voices || { designed: [], vieneu: [] };
+  const o = (d) => `<option value="${escapeHtml(d.id)}" ${d.id === sel ? "selected" : ""}>${escapeHtml(d.label)}</option>`;
+  return `<optgroup label="Giọng có sẵn">${v.designed.map(o).join("")}</optgroup>` +
+         `<optgroup label="Giọng Việt (VieNeu) nói ngôn ngữ này">${v.vieneu.map(o).join("")}</optgroup>`;
+}
+function syncTurnVoice(row, voice = "") {
+  const lang = row.querySelector(".turn-lang").value;
+  row.querySelector(".turn-voice").innerHTML = lang ? multiVoiceOptions(voice) : voiceOptions(voice);
+  row.classList.toggle("is-multi", !!lang);
+}
+window.addEventListener("multi-ready", () => {
+  $$("#conv-turns .turn").forEach((row) => {
+    const lang = row.querySelector(".turn-lang").value || row.dataset.lang || "";
+    row.querySelector(".turn-lang").innerHTML = turnLangOptions(lang);
+    if (lang) syncTurnVoice(row, row.dataset.voice || "");
+  });
+  if (document.querySelector("#tab-api.active")) renderApiEndpoints();
+});
+
+function turnRow(text = "", voice = "", lang = "") {
   const div = document.createElement("div");
   div.className = "turn";
+  div.dataset.lang = lang; div.dataset.voice = voice;
   div.innerHTML = `
+    <select class="turn-lang" title="Ngôn ngữ của lượt này">${turnLangOptions(lang)}</select>
     <select class="turn-voice">${voiceOptions(voice)}</select>
     <textarea class="turn-text" placeholder="Lời thoại...">${escapeHtml(text)}</textarea>
     <button class="btn btn-ghost turn-del" title="Xóa">✕</button>`;
   div.querySelector(".turn-del").addEventListener("click", () => { div.remove(); updateCounts(); });
+  div.querySelector(".turn-lang").addEventListener("change", () => syncTurnVoice(div));
+  if (lang && div.querySelector(".turn-lang").value === lang) syncTurnVoice(div, voice);
   return div;
 }
 function buildConversation(turns) {
@@ -406,16 +442,18 @@ function buildConversation(turns) {
   (turns && turns.length ? turns : [
     { text: "Chào bạn, hôm nay chúng ta nói về gì?" },
     { text: "Mình sẽ giới thiệu về VieNeu Studio nhé!" },
-  ]).forEach((t) => c.appendChild(turnRow(t.text || "", t.voice || "")));
+  ]).forEach((t) => c.appendChild(turnRow(t.text || "", t.voice || "", t.language || "")));
   updateCounts();
 }
 $("#conv-add").addEventListener("click", () => $("#conv-turns").appendChild(turnRow()));
 $("#conv-go").addEventListener("click", async () => {
   const btn = $("#conv-go");
-  const turns = [...$$("#conv-turns .turn")].map((t) => ({
-    voice: t.querySelector(".turn-voice").value,
-    text: t.querySelector(".turn-text").value.trim(),
-  })).filter((t) => t.text);
+  const turns = [...$$("#conv-turns .turn")].map((t) => {
+    const lang = t.querySelector(".turn-lang").value;
+    const turn = { voice: t.querySelector(".turn-voice").value, text: t.querySelector(".turn-text").value.trim() };
+    if (lang) turn.language = lang;
+    return turn;
+  }).filter((t) => t.text);
   if (!turns.length) return toast("Thêm ít nhất một lượt thoại!", true);
   busy(btn, true, "Đang sinh hội thoại...");
   try {
@@ -439,8 +477,11 @@ let AUTH_REQUIRED = false;  // server có bật API key không (lấy từ /api/
 const ENDPOINTS = [
   { method: "POST", path: "/api/tts", desc: "Sinh giọng từ văn bản → WAV",
     body: { text: "Xin chào lớp học", voice: "Hải Đăng" } },
-  { method: "POST", path: "/api/conversation", desc: "Hội thoại đa nhân vật → WAV",
-    body: { turns: [{ voice: "Hải Đăng", text: "Chào bạn." }, { voice: "Trúc Ly", text: "Chào nhé!" }] } },
+  { method: "POST", path: "/api/conversation", desc: "Hội thoại đa nhân vật → WAV. Lượt có <code>language</code> (vd English, Korean) đọc bằng chế độ Đa ngôn ngữ",
+    body: { turns: [{ voice: "Hải Đăng", text: "Chào bạn, hôm nay mình học tiếng Anh nhé." }, { voice: "nu-tre", language: "English", accent: "american accent", text: "Hello! Nice to meet you." }, { voice: "Trúc Ly", language: "Korean", text: "안녕하세요!" }] } },
+  { method: "GET", path: "/api/multi/status", desc: "Đa ngôn ngữ: đã cài chưa + danh sách ngôn ngữ, giọng (tự cập nhật theo phiên bản app)", body: null },
+  { method: "POST", path: "/api/multi/tts", desc: "Đa ngôn ngữ (cần cài gói Đa ngôn ngữ) → WAV. voice: nu-tre, nam-tre, nu-trung-nien, nam-trung-nien, nu-teen, nam-lon-tuoi hoặc vn:&lt;giọng VieNeu&gt;",
+    body: { text: "Hello and welcome!", language: "English", voice: "nu-tre", accent: "american accent" } },
   { method: "GET", path: "/api/voices", desc: "Danh sách giọng mặc định", body: null },
   { method: "GET", path: "/api/stream?text=Xin%20chào&voice=H%E1%BA%A3i%20%C4%90%C4%83ng", desc: "Streaming WAV (phát ngay)", body: null },
   { method: "GET", path: "/api/health", desc: "Trạng thái server/model", body: null },
@@ -448,7 +489,7 @@ const ENDPOINTS = [
 
 function snippet(ep) {
   const url = ORIGIN + ep.path;
-  const isAudio = ep.path.startsWith("/api/tts") || ep.path.startsWith("/api/conversation") || ep.path.startsWith("/api/stream");
+  const isAudio = ep.path.startsWith("/api/tts") || ep.path.startsWith("/api/multi/tts") || ep.path.startsWith("/api/conversation") || ep.path.startsWith("/api/stream");
   const out = isAudio ? "output.wav" : null;
   // Chỉ endpoint sinh audio mới cần key, và chỉ khi server bật bảo mật.
   const needsKey = AUTH_REQUIRED && isAudio;
@@ -519,6 +560,7 @@ ENDPOINT KHÁC khi cần:
   Fields: text=<nội dung>, ref_audio=<file audio mẫu 3–5 giây>,
           temperature=0.8 → WAV đọc theo giọng trong file mẫu.
 
+${multiPromptBlock()}
 VÍ DỤ (curl) tạo giọng rồi lưu ra file:
   curl -X POST "${ORIGIN}/api/tts" \\
     -H "Content-Type: application/json" \\${curlKeyLine}
@@ -530,6 +572,25 @@ NGUYÊN TẮC:
 - Nội dung "text" nên là tiếng Việt có dấu để phát âm chuẩn.
 - Sau khi gọi /api/tts hoặc /api/conversation, kết quả là âm thanh WAV — hãy lưu file
   và trả về cho người dùng (đường dẫn file hoặc trình phát), không in dữ liệu nhị phân ra màn hình.`;
+}
+
+function multiPromptBlock() {
+  const M = window.MULTI_CACHE;
+  if (!M || M.hosted) return "";
+  if (!M.installed) return `\nĐA NGÔN NGỮ: máy này CHƯA cài gói Đa ngôn ngữ (chỉ đọc được tiếng Việt). Kiểm tra lại: GET ${ORIGIN}/api/multi/status\n`;
+  return `
+ĐA NGÔN NGỮ (đã cài trên máy này — model OmniVoice):
+- Danh sách cập nhật: GET ${ORIGIN}/api/multi/status → languages[].id, voices.designed[].id, voices.vieneu[].id
+- Đọc 1 đoạn: POST ${ORIGIN}/api/multi/tts (JSON)
+  Body: {"text": "...", "language": "<id ngôn ngữ>", "voice": "<id giọng>",
+         "accent": "american accent" (chỉ English, tùy chọn), "fast": false, "speed": 1.0} → WAV
+- language hiện có: ${M.languages.map((l) => l.id).join(", ")}
+- voice: ${M.voices.designed.map((d) => d.id).join(", ")} hoặc vn:<tên giọng VieNeu> (giọng Việt nói ngôn ngữ khác)
+- Clone giọng bất kỳ: POST ${ORIGIN}/api/multi/clone (multipart) text, language, ref_audio=<file 3–15s>, ref_text=<câu nói trong file>
+- Hội thoại trộn ngôn ngữ: trong /api/conversation thêm "language" cho lượt cần đọc tiếng nước ngoài,
+  vd {"voice": "nam-tre", "language": "English", "text": "Hello!"}. Lượt không có language đọc tiếng Việt bằng VieNeu.
+- Tiếng Việt vẫn nên dùng /api/tts (VieNeu) — nhanh và chuẩn hơn.
+`;
 }
 
 function renderAiPrompt(c) {
@@ -558,7 +619,7 @@ function renderApiEndpoints() {
       ? `<div class="hint" style="margin-bottom:12px">🔑 Server có bật API key — các ví dụ dưới đã tự điền key của bạn (từ tab Cài đặt).</div>`
       : `<div class="hint" style="margin-bottom:12px">🔑 Server có bật API key. Nhập key ở tab <b>Cài đặt</b> để các ví dụ tự điền, hoặc thay <code>&lt;API_KEY&gt;</code> bằng key được cấp.</div>`;
   }
-  c.innerHTML = notice + ENDPOINTS.map((ep, i) => `
+  c.innerHTML = notice + multiApiTable() + ENDPOINTS.map((ep, i) => `
     <div class="endpoint">
       <div class="endpoint-head">
         <span class="method method-${ep.method.toLowerCase()}">${ep.method}</span>
@@ -569,6 +630,23 @@ function renderApiEndpoints() {
       <pre class="code" id="ep-${i}">${escapeHtml(snippet(ep))}</pre>
     </div>`).join("");
   bindCopy();
+}
+
+// Bảng ngôn ngữ + giọng đa ngôn ngữ — lấy trực tiếp từ server nên luôn khớp phiên bản đang chạy
+function multiApiTable() {
+  const M = window.MULTI_CACHE;
+  if (!M || M.hosted) return "";
+  const langs = M.languages.map((l) => `<code>${escapeHtml(l.id)}</code>`).join(" ");
+  const voices = M.voices.designed.map((d) => `<code>${escapeHtml(d.id)}</code> ${escapeHtml(d.label)}`).join(" · ");
+  const accents = M.voices.accents.filter((a) => a.id).map((a) => `<code>${escapeHtml(a.id)}</code>`).join(" ");
+  return `<div class="endpoint multi-api">
+      <div class="endpoint-head"><b>🌏 Đa ngôn ngữ — ${M.installed ? "đã cài trên máy này" : "chưa cài (trang Đa ngôn ngữ → Cài đặt)"}</b></div>
+      <div class="hint">Danh sách tự cập nhật từ <code>GET /api/multi/status</code>.</div>
+      <p class="hint"><b>language</b> (${M.languages.length}): ${langs}</p>
+      <p class="hint"><b>voice</b>: ${voices} · hoặc <code>vn:&lt;tên giọng VieNeu&gt;</code> (vd <code>vn:Trúc Ly</code>)</p>
+      <p class="hint"><b>accent</b> (chỉ English): ${accents}</p>
+      <p class="hint"><b>Clone giọng</b>: <code>POST /api/multi/clone</code> (multipart) — <code>text</code>, <code>ref_audio</code> (file 3–15 giây), <code>ref_text</code> (câu nói trong file, bắt buộc), <code>language</code>, <code>fast</code>, <code>speed</code>.</p>
+    </div>`;
 }
 
 function renderApiTable() {
@@ -749,6 +827,7 @@ const KINDS = {
   tts: ["Sinh giọng", "badge-orange"],
   clone: ["Clone", "badge-blue"],
   conversation: ["Hội thoại", "badge-green"],
+  multi: ["Đa ngôn ngữ", "badge-purple"],
 };
 let HISTORY = [];
 
@@ -801,7 +880,9 @@ function renderHistory() {
 }
 
 function reuseRun(r) {
-  if (r.kind === "conversation") {
+  if (r.kind === "multi" && window.multiReuse) {
+    window.multiReuse(r);
+  } else if (r.kind === "conversation") {
     showTab("conversation");
     buildConversation(r.turns);
   } else if (r.kind === "clone") {

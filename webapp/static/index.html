@@ -18,9 +18,9 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
-  <link rel="stylesheet" href="/css/coachio-theme.css?v=34" />
-  <link rel="stylesheet" href="/css/app.css?v=34" />
-  <link rel="stylesheet" href="/vendor/sponsor-kit/sponsor-kit.css?v=34" />
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=37" />
+  <link rel="stylesheet" href="/css/app.css?v=37" />
+  <link rel="stylesheet" href="/vendor/sponsor-kit/sponsor-kit.css?v=37" />
 </head>
 <body>
   <div class="app">
@@ -41,6 +41,7 @@
           <button class="nav-item active" data-tab="synthesize"><span class="ico">🔊</span>Sinh giọng</button>
           <button class="nav-item" data-tab="clone"><span class="ico">🎙️</span>Clone giọng</button>
           <button class="nav-item" data-tab="conversation"><span class="ico">💬</span>Hội thoại</button>
+          <button class="nav-item" data-tab="multi"><span class="ico">🌏</span>Đa ngôn ngữ</button>
           <button class="nav-item" data-tab="gallery"><span class="ico">🎧</span>Kho giọng<span class="count" id="count-gallery"></span></button>
         </div>
         <div class="nav-group" id="nav-library">
@@ -50,7 +51,7 @@
         </div>
         <div class="nav-group">
           <div class="nav-label">Hệ thống</div>
-          <button class="nav-item" data-tab="api"><span class="ico">🔌</span>API</button>
+          <button class="nav-item" data-tab="api"><span class="ico">🧩</span>MCP &amp; API</button>
           <button class="nav-item" data-tab="version"><span class="ico">📋</span>Phiên bản &amp; Logs</button>
           <button class="nav-item" data-tab="settings"><span class="ico">⚙️</span>Cài đặt</button>
         </div>
@@ -210,7 +211,7 @@
     <div class="workspace">
       <div class="card">
         <div class="section-title">Hội thoại đa nhân vật</div>
-        <p class="hint">Mỗi dòng là một lượt thoại. Chọn giọng cho từng nhân vật để tạo podcast/hội thoại.</p>
+        <p class="hint">Mỗi dòng là một lượt thoại. Chọn giọng cho từng nhân vật để tạo podcast/hội thoại. Chọn <b>ngôn ngữ</b> khác tiếng Việt cho một lượt để đọc bằng chế độ 🌏 Đa ngôn ngữ (cần cài gói).</p>
         <div id="conv-turns"></div>
         <div class="text-meta" data-count-for="conv"><span class="count-num"></span><span class="count-msg"></span></div>
         <div class="actions">
@@ -236,6 +237,115 @@
     </section>
 
     <!-- ── Tab: My voices ───────────────────────────────── -->
+    <section class="panel" id="tab-multi">
+    <div class="workspace">
+      <div class="card">
+        <div class="section-title">Đa ngôn ngữ — Anh, Hàn, Nhật, Trung, Filipino…</div>
+        <p class="hint" style="margin-top:0">Đọc 17 thứ tiếng (+ tiếng Việt thử nghiệm) bằng model <b>OmniVoice</b>, chạy ngay trên máy bạn. Giọng Việt có sẵn của VieNeu cũng nói được tiếng nước ngoài, hoặc clone giọng của chính bạn. Đọc tiếng Việt hằng ngày vẫn nên dùng <button type="button" class="link-btn" data-goto="synthesize">🔊 Sinh giọng</button> (nhanh và chuẩn hơn).</p>
+
+        <!-- Chưa cài -->
+        <div class="multi-setup" id="multi-setup" hidden>
+          <div class="multi-setup-box">
+            <div class="multi-setup-ico">🌏</div>
+            <div>
+              <b>Cài gói Đa ngôn ngữ (≈ 4 GB, cài một lần)</b>
+              <ul class="multi-list">
+                <li>PyTorch + OmniVoice + model giọng nói (~3 GB), cài riêng — không ảnh hưởng phần tiếng Việt.</li>
+                <li id="multi-hw-note"></li>
+                <li>Gỡ bất cứ lúc nào để lấy lại dung lượng.</li>
+              </ul>
+              <div class="actions" style="margin-top:12px">
+                <button class="btn btn-primary" id="multi-install" type="button">⬇ Cài gói Đa ngôn ngữ</button>
+                <span class="hint" id="multi-install-hint">Cần mạng ổn định — tải mất 5–20 phút tuỳ tốc độ mạng.</span>
+              </div>
+              <div class="multi-progress" id="multi-progress" hidden>
+                <div class="multi-bar"><i id="multi-bar"></i></div>
+                <div class="hint" id="multi-step"></div>
+                <pre class="multi-log" id="multi-log"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đã cài -->
+        <div id="multi-form" hidden>
+          <div class="row two">
+            <div class="field">
+              <label for="multi-lang">Ngôn ngữ</label>
+              <select id="multi-lang"></select>
+            </div>
+            <div class="field">
+              <label for="multi-voice">Giọng đọc</label>
+              <select id="multi-voice"></select>
+            </div>
+          </div>
+          <div class="multi-clone" id="multi-clone" hidden>
+            <div class="field">
+              <label for="multi-ref">File giọng mẫu (3–15 giây, nói rõ, không nhạc nền)</label>
+              <input type="file" id="multi-ref" accept="audio/*" />
+            </div>
+            <div class="field">
+              <label for="multi-ref-text">Câu nói trong file mẫu <span class="hint">(bắt buộc — gõ đúng từng chữ, model dùng để học giọng)</span></label>
+              <textarea id="multi-ref-text" rows="2" placeholder="Vd: Xin chào, mình là Sơn, hôm nay mình sẽ hướng dẫn các bạn..."></textarea>
+            </div>
+          </div>
+          <div class="row two">
+            <div class="field" id="multi-accent-field">
+              <label for="multi-accent">Giọng vùng (chỉ tiếng Anh)</label>
+              <select id="multi-accent"></select>
+            </div>
+            <div class="field">
+              <label for="multi-speed">Tốc độ đọc</label>
+              <select id="multi-speed">
+                <option value="0.85">Chậm</option><option value="1" selected>Bình thường</option><option value="1.15">Nhanh</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="multi-text">Nội dung</label>
+            <textarea id="multi-text"></textarea>
+            <div class="text-meta" id="multi-count"><span class="count-num"></span><span class="count-msg"></span></div>
+          </div>
+          <label class="multi-check"><input type="checkbox" id="multi-fast" /> <span><b>Chế độ nhanh</b> — nhanh gần gấp đôi, đôi khi bỏ sót chữ. Hợp để nghe thử.</span></label>
+          <div class="actions">
+            <button class="btn btn-primary" id="multi-go" type="button">Sinh audio</button>
+            <span class="hint" id="multi-speed-note"></span>
+          </div>
+        </div>
+        <div class="empty" id="multi-hosted" hidden><div class="big">🌏</div><b>Chế độ Đa ngôn ngữ chỉ có trên bản cài máy tính.</b></div>
+      </div>
+      <aside class="side">
+        <div class="card side-card">
+          <div class="side-title">🎧 Kết quả</div>
+          <div class="result" id="multi-result"><div class="result-empty">Audio sẽ hiện ở đây sau khi bạn bấm sinh.</div></div>
+        </div>
+        <div class="card side-card" data-recent-card>
+          <div class="side-title">🕘 Gần đây <button class="link-btn" data-goto="history">Xem tất cả →</button></div>
+          <div class="recent" data-recent="multi"></div>
+        </div>
+        <div class="card side-card tips">
+          <div class="side-title">💡 Mẹo</div>
+          <ul>
+            <li>Lần sinh đầu sau khi mở app mất thêm ~30–40 giây để nạp model; các lần sau nhanh hơn.</li>
+            <li>Tiếng Anh chèn được <b>[laughter]</b> (cười), <b>[sigh]</b> (thở dài).</li>
+            <li>Giọng Việt nói tiếng nước ngoài và giọng clone chậm hơn giọng có sẵn ~2–3 lần.</li>
+            <li>Clone: file mẫu 5–10 giây là đẹp nhất; dài hơn sinh chậm hơn.</li>
+            <li>Tối đa <b>2.000 ký tự</b>/lần; đoạn dài nên chia nhỏ.</li>
+          </ul>
+        </div>
+        <div class="card side-card" id="multi-manage" hidden>
+          <div class="side-title">⚙️ Gói Đa ngôn ngữ</div>
+          <p class="hint" id="multi-state" style="margin-top:0"></p>
+          <div class="actions" style="margin-top:8px">
+            <button class="btn btn-ghost btn-sm" id="multi-unload" type="button">Giải phóng RAM</button>
+            <button class="btn btn-ghost btn-sm btn-danger" id="multi-remove" type="button">Gỡ gói</button>
+          </div>
+          <p class="multi-attr" id="multi-attr"></p>
+        </div>
+      </aside>
+    </div>
+    </section>
+
     <section class="panel" id="tab-gallery">
       <div class="lib-toolbar">
         <p class="hint" style="margin:0">Nghe thử từng giọng có sẵn với cùng một câu mẫu, rồi bấm <b>Dùng giọng này</b>.</p>
@@ -270,6 +380,7 @@
             <option value="">Tất cả</option>
             <option value="tts">Sinh giọng</option>
             <option value="clone">Clone</option>
+            <option value="multi">Đa ngôn ngữ</option>
             <option value="conversation">Hội thoại</option>
           </select>
           <button class="btn btn-ghost btn-sm" id="history-refresh">↻ Làm mới</button>
@@ -281,6 +392,12 @@
 
     <!-- ── Tab: API ─────────────────────────────────────── -->
     <section class="panel" id="tab-api">
+      <div class="tabs api-mode" role="tablist" aria-label="MCP hoặc API">
+        <button class="tab active" role="tab" data-api-mode="mcp" aria-selected="true">🧩 MCP <span class="tab-sub">Claude Desktop · ChatGPT Codex</span></button>
+        <button class="tab" role="tab" data-api-mode="api" aria-selected="false">🔌 API <span class="tab-sub">n8n · Make · script</span></button>
+      </div>
+      <div id="api-mode-mcp"><div id="mcp-root"><div class="card"><span class="spinner"></span> Đang tải…</div></div></div>
+      <div id="api-mode-api" hidden>
       <div class="card">
         <div class="section-title">🔌 API endpoint — cắm vào phần mềm khác</div>
         <p class="hint">Server đang chạy tại <code id="api-base"></code>. Dùng các đoạn dưới để vibe-code hoặc tích hợp (n8n, Make, Zapier, OBS, script riêng...). Bấm <b>Sao chép</b> rồi dán thẳng.</p>
@@ -301,6 +418,7 @@
           <summary style="list-style:none"><b>Bảng endpoint</b></summary>
           <div class="api-table" id="api-table"></div>
         </div>
+      </div>
       </div>
     </section>
 
@@ -431,9 +549,11 @@
     </div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="/js/app.js?v=34"></script>
-  <script src="/js/onboarding.js?v=34"></script>
-  <script src="/vendor/sponsor-kit/sponsor-kit.js?v=34"></script>
+  <script src="/js/app.js?v=37"></script>
+  <script src="/js/onboarding.js?v=37"></script>
+  <script src="/js/multi.js?v=37"></script>
+  <script src="/js/mcp.js?v=37"></script>
+  <script src="/vendor/sponsor-kit/sponsor-kit.js?v=37"></script>
   <script>
     // Góc quảng cáo + thư ngỏ (Sponsor Kit). Nội dung lấy từ docs/news.json qua /api/news.
     SponsorKit.init({

@@ -7,7 +7,11 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 ROOT="$(pwd)"
+# EDITION=Global bash build-installers.sh → dist/global/AI-Audio-Studio-Global-*.zip (bản đa ngôn ngữ phát hành riêng).
+# Thư mục bên trong zip giữ tên AI-Audio-Studio-<OS> để lệnh cài 1 dòng dùng chung.
+PREFIX="AI-Audio-Studio"
 OUT="$ROOT/dist"
+if [ "${EDITION:-}" = "Global" ]; then PREFIX="AI-Audio-Studio-Global"; OUT="$ROOT/dist/global"; fi
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
@@ -40,9 +44,16 @@ build() {
   for f in "${files[@]}"; do
     cp "$ROOT/$f" "$dir/"
   done
-  ( cd "$OUT" && zip -rq "AI-Audio-Studio-$name.zip" "AI-Audio-Studio-$name" -x '*/__pycache__/*' )
+  if [ "$PREFIX" != "AI-Audio-Studio" ]; then
+    # Bản Global: kèm hướng dẫn Đa ngôn ngữ; lệnh cài 1 dòng trong hướng dẫn trỏ về kênh global
+    cp "$ROOT/HUONG-DAN-DA-NGON-NGU.txt" "$dir/"
+    for t in "$dir"/HUONG-DAN-MAC-LINUX.txt; do
+      [ -f "$t" ] && sed -i.bak 's|/bin/bash -c "\$(curl|VIENEU_CHANNEL=global /bin/bash -c "$(curl|' "$t" && rm -f "$t.bak"
+    done
+  fi
+  ( cd "$OUT" && zip -rq "$PREFIX-$name.zip" "AI-Audio-Studio-$name" -x '*/__pycache__/*' )
   rm -rf "$dir"
-  echo "   ✓ dist/AI-Audio-Studio-$name.zip"
+  echo "   ✓ $OUT/$PREFIX-$name.zip"
 }
 
 build Windows install.bat tao-shortcut.bat HUONG-DAN-WINDOWS.txt

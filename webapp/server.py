@@ -26,7 +26,7 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 import uvicorn
-from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -41,13 +41,17 @@ BRANDING = json.loads((CONFIG_DIR / "branding.json").read_text(encoding="utf-8")
 
 try:
     from webapp.library import Library
+    from webapp import multilang
 except ImportError:  # chạy trực tiếp như script (python webapp/server.py)
     sys.path.insert(0, str(HERE))
     from library import Library  # type: ignore[no-redef]
+    import multilang  # type: ignore[no-redef]
 
 HOST = os.environ.get("VIENEU_HOST", "127.0.0.1")
 PORT = int(os.environ.get("VIENEU_PORT", BRANDING["app"].get("default_port", 8001)))
 VERSION = BRANDING["app"].get("version", "1.0.0")
+# Kênh phát hành: "" = bản thường; "global" = bản đa ngôn ngữ phát hành riêng (thông báo cập nhật đọc mục "global" trong news.json)
+CHANNEL = str(BRANDING["app"].get("channel") or "").strip().lower()
 
 # ── Bảo mật & giới hạn (đặt qua biến môi trường / HF Secrets) ──────────────
 # VIENEU_API_KEY   : khóa cho các endpoint tạo giọng (tts/clone/conversation/stream).
@@ -321,6 +325,10 @@ class TTSRequest(BaseModel):
 class ConvTurn(BaseModel):
     voice: Optional[str] = None
     text: str
+    # Đa ngôn ngữ: đặt language (vd "English", "Korean") → lượt này đọc bằng OmniVoice.
+    # voice khi đó: nu-tre / nam-tre / … / vn:<giọng VieNeu> (hoặc tên giọng VieNeu như "Trúc Ly").
+    language: Optional[str] = None
+    accent: Optional[str] = None
 
 
 class ConversationRequest(BaseModel):
@@ -470,10 +478,12 @@ def _clean_news(raw: Any) -> Dict[str, Any]:
             "max_version": str(a.get("max_version") or "")[:20],
             "dismissible": a.get("dismissible", True) is not False,
         })
+    # Bản Global chỉ so phiên bản với mục "global" của news.json — không bị nhắc "cập nhật" về bản thường.
+    upd = raw.get(CHANNEL) if CHANNEL and isinstance(raw.get(CHANNEL), dict) else ({} if CHANNEL else raw)
     return {
-        "latest_version": str(raw.get("latest_version") or "")[:20],
-        "release_url": _https(raw.get("release_url")),
-        "update_note": str(raw.get("update_note") or "")[:300],
+        "latest_version": str(upd.get("latest_version") or "")[:20],
+        "release_url": _https(upd.get("release_url")),
+        "update_note": str(upd.get("update_note") or "")[:300],
         "announcements": items,
     }
 
@@ -734,16 +744,44 @@ async def conversation(req: ConversationRequest,
         raise HTTPException(status_code=413, detail=f"Quá nhiều lượt thoại. Tối đa {MAX_TURNS} lượt.")
     _check_text_len("".join(t.text for t in req.turns))
 
+    def is_multi(t: ConvTurn) -> bool:
+        lang = (t.language or "").strip()
+        if lang and lang.lower() not in ("vietnamese", "vi", "tiếng việt"):
+            return True
+        return multilang.is_multi_voice(t.voice)          # giọng đa ngôn ngữ đọc tiếng Việt (thử nghiệm)
+
+    multi_turns = [t for t in req.turns if t.text.strip() and is_multi(t)]
+    if multi_turns and (HOSTED or not multilang.installer.installed()):
+        raise HTTPException(status_code=409, detail="Có lượt thoại đa ngôn ngữ nhưng máy chưa cài gói Đa ngôn ngữ "
+                            "(trang 🌏 Đa ngôn ngữ → Cài đặt).")
+    for t in multi_turns:
+        try:
+            multilang.build_request(t.text, (t.language or "Vietnamese").strip() or "Vietnamese",
+                                    multilang.map_voice(t.voice), t.accent or "")
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=f"Lượt \"{t.text[:30]}…\": {e}") from e
+
     def _run() -> bytes:
-        tts_model = manager.tts
-        sr = getattr(tts_model, "sample_rate", 48000)
+        need_vieneu = any(t.text.strip() and not is_multi(t) for t in req.turns)
+        tts_model = manager.tts if need_vieneu else None
+        sr = getattr(tts_model, "sample_rate", 48000) if tts_model else 24000
         parts: List[np.ndarray] = []
         gap = silence(req.gap_seconds, sr)
         for i, turn in enumerate(req.turns):
             if not turn.text.strip():
                 continue
-            wav = tts_model.infer(turn.text, voice=turn.voice, temperature=req.temperature)
-            if i > 0:
+            if is_multi(turn):
+                r = multilang.build_request(turn.text, (turn.language or "Vietnamese").strip() or "Vietnamese",
+                                            multilang.map_voice(turn.voice), turn.accent or "")
+                res = multilang.engine.generate(r)
+                wav = multilang.pcm16_to_float(res["wav"])
+                src = int(res.get("sample_rate") or 24000)
+                if src != sr and len(wav):                # 24 kHz → 48 kHz cho khớp giọng VieNeu
+                    n = int(round(len(wav) * sr / src))
+                    wav = np.interp(np.linspace(0, len(wav) - 1, n), np.arange(len(wav)), wav).astype(np.float32)
+            else:
+                wav = tts_model.infer(turn.text, voice=turn.voice, temperature=req.temperature)  # type: ignore[union-attr]
+            if parts:
                 parts.append(gap)
             parts.append(np.asarray(wav, dtype=np.float32))
         final = np.concatenate(parts) if parts else np.array([], dtype=np.float32)
@@ -754,8 +792,15 @@ async def conversation(req: ConversationRequest,
             data = await run_in_threadpool(_run)
     except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=f"Lỗi sinh hội thoại: {e}") from e
-    turns = [{"voice": t.voice or manager.default_voice(), "text": t.text}
-             for t in req.turns if t.text.strip()]
+    turns = []
+    for t in req.turns:
+        if not t.text.strip():
+            continue
+        if is_multi(t):
+            turns.append({"voice": multilang.map_voice(t.voice), "text": t.text,
+                          "language": (t.language or "Vietnamese").strip() or "Vietnamese", "accent": t.accent or ""})
+        else:
+            turns.append({"voice": t.voice or manager.default_voice(), "text": t.text})
     voices = ", ".join(dict.fromkeys(t["voice"] for t in turns))
     text = "\n".join(f"{t['voice']}: {t['text']}" for t in turns)
     run_id = await _record("conversation", text, voices, data, {"turns": turns})
@@ -984,6 +1029,351 @@ def delete_history(run_id: str,
 def clear_history(_lib: None = Depends(require_library),
                   _auth: None = Depends(require_api_key)) -> Dict[str, Any]:
     return {"ok": True, "deleted": library.clear_runs()}
+
+
+# ── Đa ngôn ngữ (OmniVoice, cài thêm khi người dùng bật) ─────────────────
+MULTI_MAX_CHARS = int(os.environ.get("VIENEU_MULTI_MAX_CHARS", "2000"))
+
+
+class MultiTTSRequest(BaseModel):
+    text: str
+    language: str = "English"
+    voice: str = "nu-tre"
+    accent: str = ""
+    fast: bool = False
+    speed: Optional[float] = None
+
+
+def _no_hosted() -> None:
+    if HOSTED:
+        raise HTTPException(status_code=403, detail="Chế độ Đa ngôn ngữ chỉ dùng trên bản cài máy tính.")
+
+
+@app.get("/api/multi/status")
+def multi_status(_auth: None = Depends(require_api_key)) -> Dict[str, Any]:
+    st = multilang.status()
+    st["max_chars"] = MULTI_MAX_CHARS
+    st["hosted"] = HOSTED
+    return st
+
+
+@app.post("/api/multi/install")
+def multi_install(_auth: None = Depends(require_api_key)) -> Dict[str, Any]:
+    _no_hosted()
+    hw = multilang.hardware()
+    if not hw["supported"]:
+        raise HTTPException(status_code=400, detail=hw["reason"])
+    multilang.installer.start()
+    return multilang.installer.status()
+
+
+@app.post("/api/multi/uninstall")
+def multi_uninstall(_auth: None = Depends(require_api_key)) -> Dict[str, Any]:
+    _no_hosted()
+    try:
+        return multilang.installer.uninstall(remove_model=True)
+    except RuntimeError as e:
+        raise HTTPException(status_code=409, detail=str(e)) from e
+
+
+@app.post("/api/multi/unload")
+def multi_unload(_auth: None = Depends(require_api_key)) -> Dict[str, Any]:
+    multilang.engine.stop()
+    return {"ok": True}
+
+
+@app.post("/api/multi/clone")
+async def multi_clone(
+    text: str = Form(...),
+    ref_text: str = Form(...),
+    ref_audio: UploadFile = File(...),
+    language: str = Form("English"),
+    fast: bool = Form(False),
+    speed: float = Form(1.0),
+    _auth: None = Depends(require_api_key),
+) -> StreamingResponse:
+    """Nhân bản giọng từ file mẫu (3–15 giây) + đúng câu nói trong file mẫu → đọc ngôn ngữ bất kỳ."""
+    from fastapi.concurrency import run_in_threadpool
+    import tempfile
+    _no_hosted()
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Thiếu nội dung văn bản.")
+    if len(text) > MULTI_MAX_CHARS:
+        raise HTTPException(status_code=413, detail=f"Văn bản quá dài. Tối đa {MULTI_MAX_CHARS} ký tự/lần.")
+    if not multilang.installer.installed():
+        raise HTTPException(status_code=409, detail="Chưa cài gói Đa ngôn ngữ — bấm Cài đặt trước.")
+    raw = await ref_audio.read()
+    if len(raw) > MAX_UPLOAD_MB * 1024 * 1024:
+        raise HTTPException(status_code=413, detail=f"File mẫu quá lớn. Tối đa {MAX_UPLOAD_MB}MB.")
+    suffix = Path(ref_audio.filename or "ref.wav").suffix or ".wav"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(raw)
+        tmp_path = tmp.name
+    try:
+        try:
+            r = multilang.build_request(text, language, "nu-tre", "", fast, speed, ref_audio=tmp_path, ref_text=ref_text)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e)) from e
+        log.info("Đa ngôn ngữ · clone · %s · %d ký tự", language, len(text))
+        try:
+            res = await run_in_threadpool(multilang.engine.generate, r)
+        except Exception as e:  # noqa: BLE001
+            raise HTTPException(status_code=500, detail=f"Lỗi clone đa ngôn ngữ: {e}") from e
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+    data = res["wav"]
+    run_id = None
+    if LIBRARY_ENABLED:
+        label = next((l["label"] for l in multilang.LANGUAGES if l["id"] == language), language)
+        try:
+            run = await run_in_threadpool(
+                library.add_run, "multi", text, f"Clone · {ref_audio.filename or 'audio mẫu'} · {label}",
+                "OmniVoice (đa ngôn ngữ)", data, float(res.get("duration") or 0), {"language": language})
+            run_id = run["id"]
+        except Exception as e:  # noqa: BLE001
+            log.warning("Không lưu được lịch sử: %s", e)
+    return _audio_response(data, run_id)
+
+
+@app.post("/api/multi/tts")
+async def multi_tts(req: MultiTTSRequest, _auth: None = Depends(require_api_key)) -> StreamingResponse:
+    from fastapi.concurrency import run_in_threadpool
+    _no_hosted()
+    if not req.text.strip():
+        raise HTTPException(status_code=400, detail="Thiếu nội dung văn bản.")
+    if len(req.text) > MULTI_MAX_CHARS:
+        raise HTTPException(status_code=413, detail=f"Văn bản quá dài ({len(req.text)} ký tự). "
+                            f"Chế độ Đa ngôn ngữ tối đa {MULTI_MAX_CHARS} ký tự/lần.")
+    if not multilang.installer.installed():
+        raise HTTPException(status_code=409, detail="Chưa cài gói Đa ngôn ngữ — bấm Cài đặt trước.")
+    try:
+        r = multilang.build_request(req.text, req.language, req.voice, req.accent, req.fast, req.speed)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    log.info("Đa ngôn ngữ · %s · voice=%s · %d ký tự%s", req.language, req.voice, len(req.text), " · nhanh" if req.fast else "")
+    try:
+        res = await run_in_threadpool(multilang.engine.generate, r)
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"Lỗi sinh audio đa ngôn ngữ: {e}") from e
+    data = res["wav"]
+    run_id = None
+    if LIBRARY_ENABLED:
+        label = next((l["label"] for l in multilang.LANGUAGES if l["id"] == req.language), req.language)
+        voice_label = req.voice[3:] if req.voice.startswith("vn:") else \
+            next((d["label"] for d in multilang.DESIGNED if d["id"] == req.voice), req.voice)
+        try:
+            run = await run_in_threadpool(
+                library.add_run, "multi", req.text, f"{voice_label} · {label}", "OmniVoice (đa ngôn ngữ)",
+                data, float(res.get("duration") or 0), {"language": req.language})
+            run_id = run["id"]
+        except Exception as e:  # noqa: BLE001
+            log.warning("Không lưu được lịch sử: %s", e)
+    return _audio_response(data, run_id)
+
+
+# ── MCP: cho Claude Desktop / ChatGPT Codex gọi tạo giọng (webapp/mcp_server.py) ──
+# Trang "MCP & API" sinh cấu hình đúng đường dẫn Python của bản cài này và (khi người dùng bấm)
+# tự ghi vào file cấu hình của Claude Desktop / Codex — có sao lưu file cũ trước khi sửa.
+MCP_NAME = "ai-audio-studio"
+
+
+def _local_only(request: Request) -> None:
+    """Chỉ trang app trên chính máy này được gọi (chặn trang web lạ gửi lệnh ghi file cấu hình)."""
+    if HOSTED:
+        raise HTTPException(status_code=404, detail="MCP chỉ có trên bản cài máy tính.")
+    host = request.client.host if request.client else ""
+    origin = request.headers.get("origin") or ""
+    ok_origins = {f"http://127.0.0.1:{PORT}", f"http://localhost:{PORT}"}
+    if host not in ("127.0.0.1", "::1", "localhost") or (origin and origin not in ok_origins):
+        raise HTTPException(status_code=403, detail="Chỉ dùng được từ app trên chính máy này.")
+
+
+def _mcp_spec() -> Dict[str, Any]:
+    env: Dict[str, str] = {}
+    if PORT != int(BRANDING["app"].get("default_port", 8001)):
+        env["VIENEU_URL"] = f"http://127.0.0.1:{PORT}"
+    if API_KEY:
+        env["VIENEU_API_KEY"] = API_KEY
+    return {"command": sys.executable, "args": ["-m", "webapp.mcp_server"], "env": env}
+
+
+def _claude_cfg() -> Path:
+    if sys.platform == "darwin":
+        return Path.home() / "Library/Application Support/Claude/claude_desktop_config.json"
+    if os.name == "nt":
+        return Path(os.environ.get("APPDATA") or (Path.home() / "AppData/Roaming")) / "Claude/claude_desktop_config.json"
+    return Path(os.environ.get("XDG_CONFIG_HOME") or (Path.home() / ".config")) / "Claude/claude_desktop_config.json"
+
+
+def _codex_cfg() -> Path:
+    return Path(os.environ.get("CODEX_HOME") or (Path.home() / ".codex")) / "config.toml"
+
+
+def _toml_str(v: str) -> str:
+    return json.dumps(v, ensure_ascii=False)      # chuỗi JSON cũng là chuỗi TOML hợp lệ (\\ \" \n)
+
+
+def _codex_block(spec: Dict[str, Any]) -> str:
+    lines = [f"[mcp_servers.{MCP_NAME}]",
+             f"command = {_toml_str(spec['command'])}",
+             "args = [" + ", ".join(_toml_str(a) for a in spec["args"]) + "]",
+             "startup_timeout_sec = 30",
+             "tool_timeout_sec = 900          # đọc văn bản dài / lần đầu nạp model có thể lâu"]
+    if spec["env"]:
+        lines.append("env = { " + ", ".join(f"{k} = {_toml_str(v)}" for k, v in spec["env"].items()) + " }")
+    return "\n".join(lines) + "\n"
+
+
+def _codex_strip(text: str) -> str:
+    """Bỏ mục [mcp_servers.ai-audio-studio] (cả bảng con) khỏi config.toml, giữ nguyên phần khác."""
+    import re as _re
+    head = _re.compile(r"^\s*\[\s*mcp_servers\.(\"?)" + _re.escape(MCP_NAME) + r"\1(\s*\]|\.)")
+    out, skip = [], False
+    for line in text.splitlines(keepends=True):
+        if line.lstrip().startswith("["):
+            skip = bool(head.match(line))
+        if not skip:
+            out.append(line)
+    return "".join(out).rstrip() + ("\n" if out else "")
+
+
+def _mcp_state() -> Dict[str, Any]:
+    spec = _mcp_spec()
+    claude_p, codex_p = _claude_cfg(), _codex_cfg()
+    claude_on = codex_on = False
+    try:
+        cur = json.loads(claude_p.read_text(encoding="utf-8")).get("mcpServers", {}).get(MCP_NAME) or {}
+        claude_on = cur.get("command") == spec["command"]
+    except (OSError, ValueError, AttributeError):
+        pass
+    try:
+        txt = codex_p.read_text(encoding="utf-8")
+        codex_on = f"[mcp_servers.{MCP_NAME}]" in txt and _toml_str(spec["command"]) in txt
+    except OSError:
+        pass
+    q = (lambda x: f'"{x}"' if " " in x else x)
+    cli_tail = f"-- {q(spec['command'])} " + " ".join(spec["args"])
+    env_flags = "".join(f" --env {k}={v}" for k, v in spec["env"].items())
+    return {
+        "name": MCP_NAME,
+        "spec": spec,
+        "out_dir": str(Path(os.environ.get("VIENEU_MCP_OUT") or (Path.home() / "Downloads" / "AI-Audio-Studio"))),
+        "os": "macos" if sys.platform == "darwin" else "windows" if os.name == "nt" else "linux",
+        "claude": {"path": str(claude_p), "installed": claude_p.parent.is_dir(), "connected": claude_on,
+                   "snippet": json.dumps({"mcpServers": {MCP_NAME: {k: v for k, v in spec.items() if v != {}}}},
+                                         ensure_ascii=False, indent=2)},
+        "codex": {"path": str(codex_p), "installed": codex_p.parent.is_dir(), "connected": codex_on,
+                  "snippet": _codex_block(spec),
+                  "cli": f"codex mcp add {MCP_NAME}{env_flags} {cli_tail}"},
+        "claude_code": {"cli": f"claude mcp add {MCP_NAME}{''.join(f' -e {k}={v}' for k, v in spec['env'].items())} {cli_tail}"},
+    }
+
+
+@app.get("/api/mcp")
+def mcp_info(request: Request) -> Dict[str, Any]:
+    _local_only(request)
+    return _mcp_state()
+
+
+class MCPTarget(BaseModel):
+    target: str          # "claude" | "codex"
+
+
+def _backup(p: Path) -> None:
+    if p.is_file():
+        p.with_name(p.name + f".bak-{time.strftime('%Y%m%d-%H%M%S')}").write_bytes(p.read_bytes())
+
+
+@app.post("/api/mcp/connect")
+def mcp_connect(req: MCPTarget, request: Request) -> Dict[str, Any]:
+    _local_only(request)
+    spec = _mcp_spec()
+    if req.target == "claude":
+        p = _claude_cfg()
+        data: Dict[str, Any] = {}
+        if p.is_file():
+            try:
+                data = json.loads(p.read_text(encoding="utf-8") or "{}")
+            except ValueError as e:
+                raise HTTPException(status_code=409, detail=f"File cấu hình Claude đang lỗi định dạng, không dám sửa: {p}") from e
+        _backup(p)
+        data.setdefault("mcpServers", {})[MCP_NAME] = {k: v for k, v in spec.items() if v != {}}
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    elif req.target == "codex":
+        p = _codex_cfg()
+        old = p.read_text(encoding="utf-8") if p.is_file() else ""
+        _backup(p)
+        body = _codex_strip(old)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text((body + "\n" if body.strip() else "") + _codex_block(spec), encoding="utf-8")
+    else:
+        raise HTTPException(status_code=400, detail="target phải là claude hoặc codex")
+    log.info("MCP · đã kết nối %s (%s)", req.target, p)
+    return _mcp_state()
+
+
+@app.post("/api/mcp/disconnect")
+def mcp_disconnect(req: MCPTarget, request: Request) -> Dict[str, Any]:
+    _local_only(request)
+    if req.target == "claude":
+        p = _claude_cfg()
+        if p.is_file():
+            try:
+                data = json.loads(p.read_text(encoding="utf-8") or "{}")
+            except ValueError as e:
+                raise HTTPException(status_code=409, detail=f"File cấu hình Claude đang lỗi định dạng: {p}") from e
+            if MCP_NAME in data.get("mcpServers", {}):
+                _backup(p)
+                del data["mcpServers"][MCP_NAME]
+                p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    elif req.target == "codex":
+        p = _codex_cfg()
+        if p.is_file():
+            old = p.read_text(encoding="utf-8")
+            new = _codex_strip(old)
+            if new != old:
+                _backup(p)
+                p.write_text(new, encoding="utf-8")
+    else:
+        raise HTTPException(status_code=400, detail="target phải là claude hoặc codex")
+    return _mcp_state()
+
+
+@app.post("/api/mcp/test")
+def mcp_test(request: Request) -> Dict[str, Any]:
+    """Chạy thử đúng lệnh MCP mà Claude/Codex sẽ chạy: bắt tay + lấy danh sách công cụ + kiểm tra app."""
+    import subprocess
+    _local_only(request)
+    spec = _mcp_spec()
+    msgs = [
+        {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+         "params": {"protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "app-test", "version": "1"}}},
+        {"jsonrpc": "2.0", "method": "notifications/initialized"},
+        {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
+        {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "app_status", "arguments": {}}},
+    ]
+    try:
+        r = subprocess.run([spec["command"], *spec["args"]], input="\n".join(json.dumps(m) for m in msgs) + "\n",
+                           capture_output=True, text=True, timeout=60, env={**os.environ, **spec["env"]},
+                           encoding="utf-8")
+        res = {}
+        for line in r.stdout.splitlines():
+            try:
+                d = json.loads(line)
+                res[d.get("id")] = d.get("result") or {}
+            except ValueError:
+                pass
+        tools = [t["name"] for t in res.get(2, {}).get("tools", [])]
+        status = (res.get(3, {}).get("content") or [{}])[0].get("text", "")
+        if not tools:
+            return {"ok": False, "error": (r.stderr or "MCP không trả lời")[-600:]}
+        return {"ok": True, "tools": tools, "status": status}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": f"{type(e).__name__}: {e}"}
 
 
 # ── Static frontend (mounted last so /api/* wins) ──────────────────────────

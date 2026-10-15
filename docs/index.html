@@ -1,389 +1,432 @@
 <!doctype html>
-<html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Audio Studio — Giọng nói AI tiếng Việt chạy trên máy tính</title>
-<meta name="description" content="Biến văn bản tiếng Việt thành giọng nói tự nhiên, clone giọng từ 3–5 giây, hội thoại nhiều nhân vật, xuất API. Chạy 100% trên máy. Phát triển bởi Đặng Hữu Sơn, dựa trên model VieNeu-TTS.">
-<meta property="og:title" content="AI Audio Studio — Giọng nói AI tiếng Việt">
-<meta property="og:description" content="Xem video, nghe thử 25 giọng và tải miễn phí cho macOS, Windows, Linux.">
-<meta property="og:image" content="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/banner.png">
-<link rel="icon" type="image/svg+xml" href="brand/icon.svg">
-<link rel="icon" type="image/png" sizes="64x64" href="brand/favicon-64.png">
-<link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
-<link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #F7F7F8; --surface: #FFFFFF; --border: #E6E7EA; --text: #1F2937; --muted: #5B6472;
-  --brand: #F67D1C; --brand-ink: #C2410C; --brand-soft: #FFF3E8; --code: #111318; --code-inline: #EEF0F3;
-}
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #0F1115; --surface: #171A20; --border: #2A2F38; --text: #E8EAED; --muted: #A3AAB5;
-           --brand-ink: #FB923C; --brand-soft: #2A2017; --code: #0A0C0F; --code-inline: #232831; }
-}
-* { box-sizing: border-box; }
-body { margin: 0; font: 16px/1.6 "Be Vietnam Pro", system-ui, sans-serif; color: var(--text); background: var(--bg); }
-a { color: var(--brand-ink); font-weight: 700; }
-code { font: 13px/1.5 ui-monospace, Menlo, monospace; background: var(--code-inline); padding: 1px 6px; border-radius: 6px; word-break: break-word; }
-.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
-nav.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 24px 0 0; flex-wrap: wrap; }
-.brandrow { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
-.logo { width: 40px; height: 40px; display: block; filter: drop-shadow(0 4px 10px rgba(194, 65, 12, .3)); }
-.brand { font: 700 22px/1.2 "Be Vietnam Pro", sans-serif; letter-spacing: -0.01em; }
-.navlinks { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
-.navlinks a { color: var(--muted); font-weight: 500; text-decoration: none; }
-.navlinks a:hover { color: var(--brand-ink); }
-h1 { font-size: clamp(30px, 5.2vw, 48px); line-height: 1.12; margin: 32px 0 12px; }
-h1 em { font-style: normal; color: var(--brand-ink); }
-h2 { font-size: 26px; margin: 64px 0 6px; scroll-margin-top: 16px; }
-h3 { margin: 0; font-size: 17px; }
-.lead { color: var(--muted); max-width: 760px; margin: 0 0 20px; }
-.meta { font-size: 13px; color: var(--muted); }
-.cta { display: flex; gap: 12px; flex-wrap: wrap; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px;
-        text-decoration: none; font-weight: 700; border: 1px solid var(--border); color: var(--text); background: var(--surface); }
-.btn.primary { background: var(--brand-ink); border-color: var(--brand-ink); color: #fff; }
-.badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-.badge { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
-.video { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #000; margin-top: 28px; }
-.video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.cards3 { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
-.dl, .feat, .step, .voice, .news-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
-.dl { display: flex; flex-direction: column; gap: 12px; }
-.dl-head { display: flex; gap: 12px; align-items: center; }
-.dl-ico { font-size: 28px; }
-.dl-btn { width: 100%; }
-.repo-line { margin: 14px 0 0; }
-.repo-btn { padding: 8px 14px; font-size: 14px; font-weight: 600; color: var(--muted); }
-.repo-btn:hover { color: var(--text); }
-.dl-size { font-weight: 500; opacity: .85; font-size: 13px; }
-.dl p { margin: 0; }
-.feat-ico { font-size: 24px; }
-.feat h3 { margin: 6px 0 4px; }
-.feat p { margin: 0; color: var(--muted); font-size: 15px; }
-.shots { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); margin-top: 16px; }
-@media (max-width: 480px) { .shots { grid-template-columns: 1fr; } }
-figure { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 8px; }
-figure img { display: block; width: 100%; height: auto; border-radius: 8px; }
-figcaption { padding: 8px 4px 2px; font-size: 14px; color: var(--muted); }
-.sample { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: var(--muted); font-style: italic; }
-.filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
-.chip { font: 700 14px "Be Vietnam Pro", sans-serif; padding: 6px 14px; border-radius: 999px; cursor: pointer;
-         border: 1px solid var(--border); background: var(--surface); color: var(--text); }
-.chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
-.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-.voice[hidden] { display: none; }
-.voice audio { width: 100%; margin-top: 10px; height: 40px; }
-.cmd { display: flex; gap: 8px; margin-top: 8px; }
-.cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; background: var(--code); color: #F3F4F6; padding: 10px 12px; border-radius: 8px; word-break: normal; }
-.cmd button { flex: none; font: 700 13px "Be Vietnam Pro", sans-serif; border-radius: 8px; border: 1px solid var(--border);
-               background: var(--surface); color: var(--text); padding: 0 12px; cursor: pointer; }
-.note { background: var(--brand-soft); border-radius: 14px; padding: 14px 16px; margin-top: 16px; }
-.news-head { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
-.ver { font-weight: 700; font-size: 13px; color: var(--brand-ink); background: var(--brand-soft); padding: 2px 8px; border-radius: 6px; }
-.news-item ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
-details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0 16px; margin-bottom: 8px; }
-details summary { cursor: pointer; padding: 14px 0; font-weight: 700; }
-details .ans { padding-bottom: 14px; color: var(--text); }
-details .ans p { margin: 0 0 8px; }
-details ol, details ul { margin: 0; padding-left: 20px; }
-details li { margin-bottom: 6px; }
-footer { margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 6px; }
-</style>
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1152715006830829');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1152715006830829&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
-</head>
-<body>
-<div class="wrap">
-  <nav class="top">
-    <a class="brandrow" href="#"><img class="logo" src="brand/icon.svg" alt="" width="40" height="40"><span class="brand">AI Audio Studio</span></a>
-    <div class="navlinks"><a href="#tai-ve">Tải về</a><a href="#nghe-thu">Nghe thử</a><a href="#tinh-nang">Tính năng</a><a href="#su-co">Sự cố khi cài</a><a href="https://app.danghuuson.com/">Dự án khác</a></div>
-  </nav>
+    <html lang="vi">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Audio Studio — Giọng nói AI tiếng Việt + 17 ngôn ngữ, chạy trên máy tính</title>
+    <meta name="description" content="Biến văn bản tiếng Việt thành giọng nói tự nhiên, clone giọng từ 3–5 giây, hội thoại nhiều nhân vật, xuất API. Chạy 100% trên máy. Phát triển bởi Đặng Hữu Sơn, dựa trên model VieNeu-TTS.">
+    <meta property="og:title" content="AI Audio Studio — Giọng nói AI tiếng Việt">
+    <meta property="og:description" content="Xem video, nghe thử 25 giọng và tải miễn phí cho macOS, Windows, Linux.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/banner.png">
+    <link rel="icon" type="image/svg+xml" href="brand/icon.svg">
+    <link rel="icon" type="image/png" sizes="64x64" href="brand/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
+    <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+    :root {
+      --bg: #F7F7F8; --surface: #FFFFFF; --border: #E6E7EA; --text: #1F2937; --muted: #5B6472;
+      --brand: #F67D1C; --brand-ink: #C2410C; --brand-soft: #FFF3E8; --code: #111318; --code-inline: #EEF0F3;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0F1115; --surface: #171A20; --border: #2A2F38; --text: #E8EAED; --muted: #A3AAB5;
+               --brand-ink: #FB923C; --brand-soft: #2A2017; --code: #0A0C0F; --code-inline: #232831; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.6 "Be Vietnam Pro", system-ui, sans-serif; color: var(--text); background: var(--bg); }
+    a { color: var(--brand-ink); font-weight: 700; }
+    code { font: 13px/1.5 ui-monospace, Menlo, monospace; background: var(--code-inline); padding: 1px 6px; border-radius: 6px; word-break: break-word; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+    nav.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 24px 0 0; flex-wrap: wrap; }
+    .brandrow { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+    .logo { width: 40px; height: 40px; display: block; filter: drop-shadow(0 4px 10px rgba(194, 65, 12, .3)); }
+    .brand { font: 700 22px/1.2 "Be Vietnam Pro", sans-serif; letter-spacing: -0.01em; }
+    .navlinks { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+    .navlinks a { color: var(--muted); font-weight: 500; text-decoration: none; }
+    .navlinks a:hover { color: var(--brand-ink); }
+    h1 { font-size: clamp(30px, 5.2vw, 48px); line-height: 1.12; margin: 32px 0 12px; }
+    h1 em { font-style: normal; color: var(--brand-ink); }
+    h2 { font-size: 26px; margin: 64px 0 6px; scroll-margin-top: 16px; }
+    h3 { margin: 0; font-size: 17px; }
+    .lead { color: var(--muted); max-width: 760px; margin: 0 0 20px; }
+    .meta { font-size: 13px; color: var(--muted); }
+    .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px;
+            text-decoration: none; font-weight: 700; border: 1px solid var(--border); color: var(--text); background: var(--surface); }
+    .btn.primary { background: var(--brand-ink); border-color: var(--brand-ink); color: #fff; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .badge { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
+    .video { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #000; margin-top: 28px; }
+    .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .cards3 { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+    .dl, .feat, .step, .voice, .news-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    .dl { display: flex; flex-direction: column; gap: 12px; }
+    .dl-head { display: flex; gap: 12px; align-items: center; }
+    .dl-ico { font-size: 28px; }
+    .dl-btn { width: 100%; }
+    .repo-line { margin: 14px 0 0; }
+    .repo-btn { padding: 8px 14px; font-size: 14px; font-weight: 600; color: var(--muted); }
+    .repo-btn:hover { color: var(--text); }
+    .dl-size { font-weight: 500; opacity: .85; font-size: 13px; }
+    .dl p { margin: 0; }
+    .feat-ico { font-size: 24px; }
+    .feat h3 { margin: 6px 0 4px; }
+    .feat p { margin: 0; color: var(--muted); font-size: 15px; }
+    .shots { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); margin-top: 16px; }
+    @media (max-width: 480px) { .shots { grid-template-columns: 1fr; } }
+    figure { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 8px; }
+    figure img { display: block; width: 100%; height: auto; border-radius: 8px; }
+    figcaption { padding: 8px 4px 2px; font-size: 14px; color: var(--muted); }
+    .sample { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: var(--muted); font-style: italic; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+    .chip { font: 700 14px "Be Vietnam Pro", sans-serif; padding: 6px 14px; border-radius: 999px; cursor: pointer;
+             border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+    .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+    .voice[hidden] { display: none; }
+    .voice audio { width: 100%; margin-top: 10px; height: 40px; }
+    .cmd { display: flex; gap: 8px; margin-top: 8px; }
+    .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; background: var(--code); color: #F3F4F6; padding: 10px 12px; border-radius: 8px; word-break: normal; }
+    .cmd button { flex: none; font: 700 13px "Be Vietnam Pro", sans-serif; border-radius: 8px; border: 1px solid var(--border);
+                   background: var(--surface); color: var(--text); padding: 0 12px; cursor: pointer; }
+    .note { background: var(--brand-soft); border-radius: 14px; padding: 14px 16px; margin-top: 16px; }
+    .news-head { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+    .ver { font-weight: 700; font-size: 13px; color: var(--brand-ink); background: var(--brand-soft); padding: 2px 8px; border-radius: 6px; }
+    .news-item ul { margin: 8px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+    details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0 16px; margin-bottom: 8px; }
+    details summary { cursor: pointer; padding: 14px 0; font-weight: 700; }
+    details .ans { padding-bottom: 14px; color: var(--text); }
+    details .ans p { margin: 0 0 8px; }
+    details ol, details ul { margin: 0; padding-left: 20px; }
+    details li { margin-bottom: 6px; }
+    footer { margin: 72px 0 32px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 6px; }
+    .gbadge { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; vertical-align: 3px; margin-left: 4px;
+               color: #fff; background: linear-gradient(90deg, #0EA5E9, #7C3AED); padding: 3px 9px; border-radius: 999px; }
+    .gnote { display: inline-block; margin: 28px 0 -12px; font-size: 13px; font-weight: 700; color: #6D28D9; background: #F3EEFF; padding: 4px 12px; border-radius: 999px; }
+    @media (prefers-color-scheme: dark) { .gnote { color: #C4B5FD; background: #2A2145; } }
+    .langs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; }
+    .gsteps .step { position: relative; }
+    .gsteps .step p, .step p { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+    .num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; margin-bottom: 8px;
+            font-weight: 800; font-size: 14px; color: #fff; background: var(--brand-ink); }
+    .subh { margin: 28px 0 10px; font-size: 19px; }
+    </style><script>(function(){var q=new URLSearchParams(location.search);if(q.get("ban")==="global"||q.has("global"))location.replace("global/"+location.hash);})();</script>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1152715006830829');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1152715006830829&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+    </head>
+    <body>
+    <div class="wrap">
+      <nav class="top">
+        <a class="brandrow" href="#"><img class="logo" src="brand/icon.svg" alt="" width="40" height="40"><span class="brand">AI Audio Studio <span class="gbadge">Global</span></span></a>
+        <div class="navlinks"><a href="#tai-ve">Tải về</a><a href="#da-ngon-ngu">Đa ngôn ngữ</a><a href="#mcp">MCP</a><a href="#nghe-thu">Nghe thử</a><a href="#tinh-nang">Tính năng</a><a href="#su-co">Sự cố khi cài</a><a href="https://app.danghuuson.com/">Dự án khác</a></div>
+      </nav>
 
-  <h1>Giọng nói AI tiếng Việt,<br><em>chạy ngay trên máy tính của bạn</em></h1>
-  <p class="lead">Biến văn bản thành giọng đọc tự nhiên, clone giọng từ 3–5 giây audio, tạo hội thoại nhiều nhân vật và xuất API cho phần mềm khác. Miễn phí, không cần card đồ họa, chạy offline sau lần cài đầu.</p>
-  <div class="cta">
-    <a class="btn primary" href="#tai-ve">⬇ Tải miễn phí</a>
-    <a class="btn" href="#nghe-thu">🎧 Nghe thử 25 giọng</a>
-  </div>
-  <div class="badges"><span class="badge">Phiên bản v1.9.0</span><span class="badge">macOS · Windows · Linux</span><span class="badge">25 giọng · 3 miền</span><span class="badge">Mã nguồn mở Apache 2.0</span></div>
-
-  <div class="video">
-    <iframe src="https://www.youtube.com/embed/rsjhXh7OSHg?rel=0" title="Giới thiệu AI Audio Studio" loading="lazy"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-  </div>
-
-  <h2 id="tai-ve">⬇ Tải về</h2>
-  <p class="lead">Bấm là tải ngay bộ cài bản mới nhất. Yêu cầu: RAM 8 GB, ổ trống ~5 GB, Internet ở lần cài đầu.</p>
-  <div class="cards3">
-      <div class="dl">
-        <div class="dl-head"><span class="dl-ico">🍎</span><div><h3>macOS</h3><span class="meta">macOS 12+ · chip Apple M hoặc Intel</span></div></div>
-        <a class="btn primary dl-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-macOS.zip" download data-os="macOS">⬇ Tải macOS <span class="dl-size">v1.9.0 · 5.1 MB</span></a>
-        <p class="meta">Giải nén → nhấp đúp <code>install.command</code>. macOS sẽ chặn lần đầu — xem <a href="#su-co">cách mở</a>, hoặc dùng lệnh 1 dòng để không bị chặn.</p>
+      <h1>Giọng nói AI tiếng Việt<br><em>và 17 ngôn ngữ khác</em></h1>
+      <p class="lead">Bản <b>Global</b> có mọi thứ của AI Audio Studio (25 giọng Việt, clone giọng, hội thoại, API) và thêm trang <b>🌏 Đa ngôn ngữ</b>: đọc tiếng Anh, Hàn, Nhật, Trung, Filipino, Thái, Pháp… ngay trên máy của bạn, và <b>🧩 MCP</b> để Claude Desktop / ChatGPT Codex tự tạo giọng theo lời bạn. Miễn phí, chạy offline sau khi cài.</p>
+      <div class="cta">
+        <a class="btn primary" href="#tai-ve">⬇ Tải miễn phí</a>
+        <a class="btn" href="#nghe-thu">🎧 Nghe thử 25 giọng</a>
       </div>
-      <div class="dl">
-        <div class="dl-head"><span class="dl-ico">🪟</span><div><h3>Windows</h3><span class="meta">Windows 10 / 11 · 64-bit</span></div></div>
-        <a class="btn primary dl-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Windows.zip" download data-os="Windows">⬇ Tải Windows <span class="dl-size">v1.9.0 · 5.1 MB</span></a>
-        <p class="meta">Chuột phải → <b>Extract All</b> → nhấp đúp <code>install.bat</code>. SmartScreen hiện thì bấm <b>More info → Run anyway</b>.</p>
-      </div>
-      <div class="dl">
-        <div class="dl-head"><span class="dl-ico">🐧</span><div><h3>Linux</h3><span class="meta">64-bit · Ubuntu, Debian, Fedora…</span></div></div>
-        <a class="btn primary dl-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Linux.zip" download data-os="Linux">⬇ Tải Linux <span class="dl-size">v1.9.0 · 5.1 MB</span></a>
-        <p class="meta">Giải nén → mở Terminal trong thư mục → <code>bash install.sh</code>.</p>
-      </div>
-  </div>
-  <p class="repo-line"><a class="btn repo-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Mã nguồn &amp; các bản phát hành trên GitHub ↗</a></p>
+      <div class="badges"><span class="badge">Phiên bản v1.9.0</span><span class="badge">🌏 17 ngôn ngữ</span><span class="badge">🧩 MCP</span><span class="badge">macOS · Windows · Linux</span><span class="badge">25 giọng · 3 miền</span><span class="badge">Mã nguồn mở Apache 2.0</span></div>
 
-  <h2 id="cai-dat">⚡ Hoặc cài bằng 1 lệnh (khuyên dùng)</h2>
-  <p class="lead">Không phải tải hay giải nén, <b>không bị macOS / Windows chặn</b>. Chạy lại đúng lệnh = cập nhật bản mới nhất, giữ nguyên giọng đã lưu và lịch sử.</p>
-  <div class="cards3">
-    <div class="step"><h3>🍎 macOS · 🐧 Linux</h3><span class="meta">Mở Terminal (⌘ + Space, gõ Terminal), dán lệnh rồi Enter</span>
-      <div class="cmd"><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.sh)&quot;</code><button type="button" data-os="macOS/Linux">Sao chép</button></div></div>
-    <div class="step"><h3>🪟 Windows 10/11</h3><span class="meta">Mở PowerShell từ menu Start, dán lệnh rồi Enter</span>
-      <div class="cmd"><code>irm https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.ps1 | iex</code><button type="button" data-os="Windows">Sao chép</button></div></div>
-  </div>
-  <p class="note"><b>💻 Đây là phần mềm chạy trên máy tính của bạn.</b> Máy bật và app đang chạy thì dùng được giao diện và API tại <code>http://127.0.0.1:8001</code>; tắt máy, máy ngủ hoặc thoát app thì không dùng được. Khi cài, chọn <b>tự chạy khi mở máy</b> để API luôn sẵn sàng.</p>
+      <div class="video">
+        <iframe src="https://www.youtube.com/embed/rsjhXh7OSHg?rel=0" title="Giới thiệu AI Audio Studio" loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
 
-  <h2 id="tinh-nang">✨ Tính năng</h2>
-  <div class="cards3">
+      <h2 id="tai-ve">⬇ Tải về</h2>
+      <p class="lead">Bấm là tải ngay bộ cài bản mới nhất. Yêu cầu: RAM 8 GB, ổ trống ~5 GB, Internet ở lần cài đầu.</p>
+      <div class="cards3">
+          <div class="dl">
+            <div class="dl-head"><span class="dl-ico">🍎</span><div><h3>macOS</h3><span class="meta">macOS 12+ · chip Apple M hoặc Intel (Đa ngôn ngữ cần chip Apple)</span></div></div>
+            <a class="btn primary dl-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-macOS.zip" download data-os="macOS">⬇ Tải macOS <span class="dl-size">v1.9.0 · 5.1 MB</span></a>
+            <p class="meta">Giải nén → nhấp đúp <code>install.command</code>. macOS sẽ chặn lần đầu — xem <a href="#su-co">cách mở</a>, hoặc dùng lệnh 1 dòng để không bị chặn.</p>
+          </div>
+      <div class="dl">
+            <div class="dl-head"><span class="dl-ico">🪟</span><div><h3>Windows</h3><span class="meta">Windows 10 / 11 · 64-bit</span></div></div>
+            <a class="btn primary dl-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Windows.zip" download data-os="Windows">⬇ Tải Windows <span class="dl-size">v1.9.0 · 5.1 MB</span></a>
+            <p class="meta">Chuột phải → <b>Extract All</b> → nhấp đúp <code>install.bat</code>. SmartScreen hiện thì bấm <b>More info → Run anyway</b>.</p>
+          </div>
+      <div class="dl">
+            <div class="dl-head"><span class="dl-ico">🐧</span><div><h3>Linux</h3><span class="meta">64-bit · Ubuntu, Debian, Fedora…</span></div></div>
+            <a class="btn primary dl-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Linux.zip" download data-os="Linux">⬇ Tải Linux <span class="dl-size">v1.9.0 · 5.1 MB</span></a>
+            <p class="meta">Giải nén → mở Terminal trong thư mục → <code>bash install.sh</code>.</p>
+          </div>
+      </div>
+      <p class="repo-line"><a class="btn repo-btn" href="https://github.com/sonlovinbot/vieneu-audio-studio" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>Mã nguồn &amp; các bản phát hành trên GitHub ↗</a></p>
+
+      <h2 id="cai-dat">⚡ Hoặc cài bằng 1 lệnh (khuyên dùng)</h2>
+      <p class="lead">Không phải tải hay giải nén, <b>không bị macOS / Windows chặn</b>. Chạy lại đúng lệnh = cập nhật bản mới nhất, giữ nguyên giọng đã lưu và lịch sử.</p>
+      <div class="cards3">
+        <div class="step"><h3>🍎 macOS · 🐧 Linux</h3><span class="meta">Mở Terminal (⌘ + Space, gõ Terminal), dán lệnh rồi Enter</span>
+          <div class="cmd"><code>/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.sh)&quot;</code><button type="button" data-os="macOS/Linux">Sao chép</button></div></div>
+        <div class="step"><h3>🪟 Windows 10/11</h3><span class="meta">Mở PowerShell từ menu Start, dán lệnh rồi Enter</span>
+          <div class="cmd"><code>irm https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/install-online.ps1 | iex</code><button type="button" data-os="Windows">Sao chép</button></div></div>
+      </div>
+      <p class="note"><b>💻 Đây là phần mềm chạy trên máy tính của bạn.</b> Máy bật và app đang chạy thì dùng được giao diện và API tại <code>http://127.0.0.1:8001</code>; tắt máy, máy ngủ hoặc thoát app thì không dùng được. Khi cài, chọn <b>tự chạy khi mở máy</b> để API luôn sẵn sàng.</p>
+
+      
+      <h2 id="da-ngon-ngu">🌏 Hướng dẫn chi tiết: bật Đa ngôn ngữ</h2>
+      <p class="lead">Cài bản 2.0.0 ở trên xong, làm thêm các bước sau <b>một lần</b>. Đang dùng bản cũ (1.x) thì chạy lại lệnh cài 1 dòng để lên 2.0.0 — giọng đã lưu và lịch sử giữ nguyên.</p>
+      <div class="langs"><span class="badge">🇬🇧 Anh</span><span class="badge">🇰🇷 Hàn</span><span class="badge">🇯🇵 Nhật</span><span class="badge">🇨🇳 Trung</span><span class="badge">🇭🇰 Quảng Đông</span><span class="badge">🇵🇭 Filipino</span><span class="badge">🇹🇭 Thái</span><span class="badge">🇮🇩 Indonesia</span><span class="badge">🇲🇾 Mã Lai</span><span class="badge">🇫🇷 Pháp</span><span class="badge">🇪🇸 Tây Ban Nha</span><span class="badge">🇩🇪 Đức</span><span class="badge">🇷🇺 Nga</span><span class="badge">🇵🇹 Bồ Đào Nha</span><span class="badge">🇮🇹 Ý</span><span class="badge">🇮🇳 Hindi</span><span class="badge">🇸🇦 Ả Rập</span><span class="badge">🇻🇳 Việt (thử nghiệm)</span></div>
+      <div class="cards3 gsteps">
+        <div class="step"><span class="num">1</span><h3>Mở trang 🌏 Đa ngôn ngữ</h3><p>Mở app (icon <b>AI Audio Studio</b> trên Desktop) → menu bên trái chọn <b>🌏 Đa ngôn ngữ</b>. App tự kiểm tra máy bạn: chip Apple, card NVIDIA hay chỉ CPU.</p></div>
+        <div class="step"><span class="num">2</span><h3>Bấm “⬇ Cài gói Đa ngôn ngữ”</h3><p>Tải khoảng <b>4 GB</b> (PyTorch + OmniVoice + model 3 GB), có thanh tiến độ, 5–20 phút tuỳ mạng. Cần ổ trống ~6 GB. Vẫn dùng app bình thường trong lúc cài.</p></div>
+        <div class="step"><span class="num">3</span><h3>Chọn ngôn ngữ, giọng → “Sinh audio”</h3><p>6 giọng có sẵn (tiếng Anh chọn được giọng Mỹ, Anh, Úc, Canada, Ấn Độ) hoặc 25 giọng Việt nói tiếng nước ngoài. Tối đa 2.000 ký tự/lần. Lần sinh đầu chờ thêm ~30–40 giây để nạp model.</p></div>
+        <div class="step"><span class="num">4</span><h3>Clone giọng của bạn</h3><p>Ô <b>Giọng đọc</b> chọn <b>🎙️ Clone từ file mẫu của bạn…</b>, tải file 3–15 giây (đẹp nhất 5–10 giây, không nhạc nền) và gõ đúng từng chữ câu nói trong file.</p></div>
+        <div class="step"><span class="num">5</span><h3>Hội thoại nhiều thứ tiếng</h3><p>Trang <b>💬 Hội thoại</b>: mỗi lượt chọn được ngôn ngữ riêng — trộn tiếng Việt với tiếng Anh, Hàn, Nhật… trong cùng một file audio.</p></div>
+        <div class="step"><span class="num">6</span><h3>Dùng qua API</h3><p><code>/api/multi/tts</code>, <code>/api/multi/clone</code>, và <code>"language"</code> cho từng lượt của <code>/api/conversation</code>. Trang API trong app có ví dụ sẵn và tự hiện danh sách ngôn ngữ, giọng.</p></div>
+      </div>
+      <h3 class="subh">💻 Máy nào chạy được Đa ngôn ngữ?</h3>
+      <div class="cards3">
+        <div class="step"><h3>🍎 Mac chip Apple (M1 trở lên)</h3><p class="meta">Tốt — khoảng 1 giây máy chạy cho 1 giây audio.</p></div>
+        <div class="step"><h3>🟩 Windows / Linux có card NVIDIA</h3><p class="meta">Nhanh — thường nhanh hơn đọc thật.</p></div>
+        <div class="step"><h3>🖥️ Máy chỉ có CPU</h3><p class="meta">Chạy được nhưng chậm (~3 giây cho 1 giây audio). Hợp với đoạn ngắn.</p></div>
+      </div>
+      <p class="note">⚠️ <b>Mac chip Intel</b> chưa chạy được Đa ngôn ngữ (các phần khác vẫn dùng bình thường). Nên có RAM từ 16 GB; model tự tắt sau 10 phút không dùng để trả RAM. Tiếng Việt hằng ngày nên dùng trang <b>🔊 Sinh giọng</b> (VieNeu-TTS) — nhanh hơn ~4 lần, đọc số và ngày tháng chuẩn hơn.</p>
+      <p class="note">🔄 <b>Cập nhật:</b> chạy lại lệnh cài 1 dòng ở trên. Gỡ gói Đa ngôn ngữ (lấy lại ~4 GB): trang 🌏 Đa ngôn ngữ → <b>⚙️ Gói Đa ngôn ngữ → Gỡ gói</b>.</p>
+      <p class="meta">Model đa ngôn ngữ <a href="https://github.com/k2-fsa/OmniVoice" target="_blank" rel="noopener">OmniVoice</a> của k2-fsa (Apache 2.0). Built with Higgs Materials licensed from Boson AI USA, Inc., Copyright Boson AI USA, Inc., All Rights Reserved and Meta Llama 3 licensed under the Meta Llama 3 Community License, Copyright Meta Platforms, Inc., All Rights Reserved.</p>
+
+      <h2 id="mcp">🧩 MCP: ra lệnh cho Claude Desktop, ChatGPT Codex</h2>
+      <p class="lead">Kết nối một lần, sau đó chỉ cần gõ <i>“đọc đoạn này bằng giọng Trúc Ly”</i>, <i>“viết kịch bản podcast 2 người rồi tạo audio”</i>… AI tự gọi AI Audio Studio và lưu file vào <code>Downloads/AI-Audio-Studio</code>. Không cần copy prompt dài.</p>
+      <div class="cards3 gsteps">
+        <div class="step"><span class="num">1</span><h3>Mở trang 🧩 MCP &amp; API</h3><p>Trong app, menu trái → <b>MCP &amp; API</b> (mở sẵn tab MCP). Chọn <b>Claude Desktop</b> hoặc <b>ChatGPT Codex</b>.</p></div>
+        <div class="step"><span class="num">2</span><h3>Bấm “⚡ Kết nối tự động”</h3><p>App tự thêm vào cấu hình của Claude / Codex (sao lưu file cũ, giữ các kết nối khác). Rồi thoát hẳn và mở lại Claude / Codex.</p></div>
+        <div class="step"><span class="num">3</span><h3>Gõ thử</h3><p><i>“Kiểm tra AI Audio Studio đã sẵn sàng chưa.”</i> Lần đầu AI hỏi quyền dùng công cụ → cho phép. App đang tắt thì MCP tự mở.</p></div>
+      </div>
+      <p class="note">💻 <b>Chỉ chạy khi cài trên máy tính:</b> AI Audio Studio và Claude Desktop / Codex phải cùng ở một máy. ChatGPT, Claude trên trình duyệt hay điện thoại chạy trên máy chủ nên không gọi được app trên máy bạn.</p>
+
+      <h2 id="tinh-nang">✨ Tính năng</h2>
+      <div class="cards3">
+          <div class="feat"><span class="feat-ico">🌏</span><h3>Đa ngôn ngữ</h3><p>Đọc 17 thứ tiếng: Anh, Hàn, Nhật, Trung, Filipino, Thái, Pháp… Giọng có sẵn, giọng Việt nói tiếng nước ngoài, clone giọng của bạn.</p></div>
       <div class="feat"><span class="feat-ico">🔊</span><h3>Sinh giọng</h3><p>25 giọng có sẵn, chèn cảm xúc [cười] [thở dài] [hắng giọng], tối đa 5.000 ký tự/lần.</p></div>
       <div class="feat"><span class="feat-ico">🎙️</span><h3>Clone giọng</h3><p>Nhân bản giọng từ 3–5 giây audio, lưu lại kèm nhãn cảm xúc để dùng lại.</p></div>
       <div class="feat"><span class="feat-ico">💬</span><h3>Hội thoại</h3><p>Nhiều nhân vật, mỗi lượt một giọng — làm podcast, kịch bản, bài giảng.</p></div>
-      <div class="feat"><span class="feat-ico">🔌</span><h3>API cho phần mềm khác</h3><p>Gọi từ n8n, Make, script, OBS… có sẵn ví dụ curl, JavaScript, Python và prompt cho AI agent.</p></div>
+      <div class="feat"><span class="feat-ico">🧩</span><h3>MCP & API</h3><p>Kết nối Claude Desktop / ChatGPT Codex rồi ra lệnh bằng lời: “đọc đoạn này bằng giọng Trúc Ly”. Vẫn có API cho n8n, Make, script…</p></div>
       <div class="feat"><span class="feat-ico">💻</span><h3>Chạy trên máy bạn</h3><p>Không cần card đồ họa, không gửi dữ liệu lên mạng, chạy offline sau lần cài đầu.</p></div>
       <div class="feat"><span class="feat-ico">🚀</span><h3>Dễ bắt đầu</h3><p>Hướng dẫn lần đầu: kiểm tra cấu hình máy, tải model, thử tạo giọng — vài cú nhấp.</p></div>
-  </div>
-  <div class="shots">
-      <figure><a href="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-sinh-giong.png" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-sinh-giong.png" alt="Sinh giọng — nhập văn bản, chọn giọng, chèn cảm xúc; cột phải là kết quả và lượt gần đây" loading="lazy"></a>
-        <figcaption>Sinh giọng — nhập văn bản, chọn giọng, chèn cảm xúc; cột phải là kết quả và lượt gần đây</figcaption></figure>
+      </div>
+      <div class="shots">
+          <figure><a href="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-sinh-giong.png" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-sinh-giong.png" alt="Sinh giọng — nhập văn bản, chọn giọng, chèn cảm xúc; cột phải là kết quả và lượt gần đây" loading="lazy"></a>
+            <figcaption>Sinh giọng — nhập văn bản, chọn giọng, chèn cảm xúc; cột phải là kết quả và lượt gần đây</figcaption></figure>
       <figure><a href="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-kho-giong.png" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-kho-giong.png" alt="Kho giọng — nghe thử và so sánh 25 giọng, lọc theo giới tính và vùng miền" loading="lazy"></a>
-        <figcaption>Kho giọng — nghe thử và so sánh 25 giọng, lọc theo giới tính và vùng miền</figcaption></figure>
+            <figcaption>Kho giọng — nghe thử và so sánh 25 giọng, lọc theo giới tính và vùng miền</figcaption></figure>
       <figure><a href="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-onboarding.png" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-onboarding.png" alt="Hướng dẫn lần đầu — tự kiểm tra cấu hình máy trước khi dùng" loading="lazy"></a>
-        <figcaption>Hướng dẫn lần đầu — tự kiểm tra cấu hình máy trước khi dùng</figcaption></figure>
+            <figcaption>Hướng dẫn lần đầu — tự kiểm tra cấu hình máy trước khi dùng</figcaption></figure>
       <figure><a href="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-api.png" target="_blank" rel="noopener"><img src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/assets/readme/screenshot-api.png" alt="API — ví dụ sẵn để cắm vào phần mềm khác" loading="lazy"></a>
-        <figcaption>API — ví dụ sẵn để cắm vào phần mềm khác</figcaption></figure>
-  </div>
+            <figcaption>API — ví dụ sẵn để cắm vào phần mềm khác</figcaption></figure>
+      </div>
 
-  <h2 id="nghe-thu">🎧 Nghe thử 25 giọng có sẵn</h2>
-  <p class="sample">“Chào bạn, đây là giọng đọc …. Giọng đọc được tạo bằng trí tuệ nhân tạo, sử dụng mô hình VieNeu-TTS với giấy phép mã nguồn mở. Các tính năng của phần mềm này được phát triển bởi anh Đặng Hữu Sơn. Cảm ơn bạn đã sử dụng, chúc bạn có trải nghiệm thật tốt.”</p>
-  <div class="filters" role="group" aria-label="Lọc giọng">
-    <button class="chip" data-f="" aria-pressed="true">Tất cả</button>
-    <button class="chip" data-f="g:Nữ" aria-pressed="false">Nữ</button>
-    <button class="chip" data-f="g:Nam" aria-pressed="false">Nam</button>
-    <button class="chip" data-f="r:Bắc" aria-pressed="false">Miền Bắc</button>
-    <button class="chip" data-f="r:Trung" aria-pressed="false">Miền Trung</button>
-    <button class="chip" data-f="r:Nam" aria-pressed="false">Miền Nam</button>
-    <button class="chip" data-f="star" aria-pressed="false">⭐ Nổi bật</button>
-  </div>
-  <div class="grid" id="voices">
-      <article class="voice" data-g="Nam" data-r="Bắc" data-star="1">
-        <div><h3>Adam bựa <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/adam-bua.mp3"></audio>
-      </article>
+      <h2 id="nghe-thu">🎧 Nghe thử 25 giọng có sẵn</h2>
+      <p class="sample">“Chào bạn, đây là giọng đọc …. Giọng đọc được tạo bằng trí tuệ nhân tạo, sử dụng mô hình VieNeu-TTS với giấy phép mã nguồn mở. Các tính năng của phần mềm này được phát triển bởi anh Đặng Hữu Sơn. Cảm ơn bạn đã sử dụng, chúc bạn có trải nghiệm thật tốt.”</p>
+      <div class="filters" role="group" aria-label="Lọc giọng">
+        <button class="chip" data-f="" aria-pressed="true">Tất cả</button>
+        <button class="chip" data-f="g:Nữ" aria-pressed="false">Nữ</button>
+        <button class="chip" data-f="g:Nam" aria-pressed="false">Nam</button>
+        <button class="chip" data-f="r:Bắc" aria-pressed="false">Miền Bắc</button>
+        <button class="chip" data-f="r:Trung" aria-pressed="false">Miền Trung</button>
+        <button class="chip" data-f="r:Nam" aria-pressed="false">Miền Nam</button>
+        <button class="chip" data-f="star" aria-pressed="false">⭐ Nổi bật</button>
+      </div>
+      <div class="grid" id="voices">
+          <article class="voice" data-g="Nam" data-r="Bắc" data-star="1">
+            <div><h3>Adam bựa <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/adam-bua.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Bắc" data-star="1">
-        <div><h3>Trúc Ly <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nữ · Miền Bắc · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/truc-ly.mp3"></audio>
-      </article>
+            <div><h3>Trúc Ly <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nữ · Miền Bắc · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/truc-ly.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc" data-star="1">
-        <div><h3>Thiện Minh <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách kể chuyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thien-minh.mp3"></audio>
-      </article>
+            <div><h3>Thiện Minh <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách kể chuyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thien-minh.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Bắc" data-star="1">
-        <div><h3>Mai Anh <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nữ · Miền Bắc · Phong cách tin tức</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/mai-anh.mp3"></audio>
-      </article>
+            <div><h3>Mai Anh <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nữ · Miền Bắc · Phong cách tin tức</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/mai-anh.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc" data-star="1">
-        <div><h3>Hải Đăng <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/hai-dang.mp3"></audio>
-      </article>
+            <div><h3>Hải Đăng <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/hai-dang.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Nam" data-star="1">
-        <div><h3>Thùy Dung <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nữ · Miền Nam · Phong cách tin tức</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thuy-dung.mp3"></audio>
-      </article>
+            <div><h3>Thùy Dung <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nữ · Miền Nam · Phong cách tin tức</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thuy-dung.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc" data-star="1">
-        <div><h3>Thiền Tâm Đức <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách kể chuyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thien-tam-duc.mp3"></audio>
-      </article>
+            <div><h3>Thiền Tâm Đức <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách kể chuyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thien-tam-duc.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Bắc" data-star="1">
-        <div><h3>Ngọc Huyền <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nữ · Miền Bắc · Giọng đọc tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/ngoc-huyen.mp3"></audio>
-      </article>
+            <div><h3>Ngọc Huyền <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nữ · Miền Bắc · Giọng đọc tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/ngoc-huyen.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Trung" data-star="1">
-        <div><h3>Quang Sơn <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nam · Miền Trung · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/quang-son.mp3"></audio>
-      </article>
+            <div><h3>Quang Sơn <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nam · Miền Trung · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/quang-son.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Trung" data-star="1">
-        <div><h3>Ngọc Trân <span title="Nổi bật">⭐</span></h3>
-          <span class="meta">Nữ · Miền Trung · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/ngoc-tran.mp3"></audio>
-      </article>
+            <div><h3>Ngọc Trân <span title="Nổi bật">⭐</span></h3>
+              <span class="meta">Nữ · Miền Trung · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/ngoc-tran.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc">
-        <div><h3>Minh Đức</h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách tin tức</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/minh-duc.mp3"></audio>
-      </article>
+            <div><h3>Minh Đức</h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách tin tức</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/minh-duc.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc">
-        <div><h3>Phạm Tuyên</h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/pham-tuyen.mp3"></audio>
-      </article>
+            <div><h3>Phạm Tuyên</h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/pham-tuyen.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Nam">
-        <div><h3>Thái Sơn</h3>
-          <span class="meta">Nam · Miền Nam · Phong cách kể chuyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thai-son.mp3"></audio>
-      </article>
+            <div><h3>Thái Sơn</h3>
+              <span class="meta">Nam · Miền Nam · Phong cách kể chuyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thai-son.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc">
-        <div><h3>Xuân Vĩnh</h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/xuan-vinh.mp3"></audio>
-      </article>
+            <div><h3>Xuân Vĩnh</h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/xuan-vinh.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc">
-        <div><h3>Thanh Bình</h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách kể chuyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thanh-binh.mp3"></audio>
-      </article>
+            <div><h3>Thanh Bình</h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách kể chuyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thanh-binh.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Bắc">
-        <div><h3>Ngọc Linh</h3>
-          <span class="meta">Nữ · Miền Bắc · Phong cách kể chuyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/ngoc-linh.mp3"></audio>
-      </article>
+            <div><h3>Ngọc Linh</h3>
+              <span class="meta">Nữ · Miền Bắc · Phong cách kể chuyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/ngoc-linh.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Bắc">
-        <div><h3>Đoan Trang</h3>
-          <span class="meta">Nữ · Miền Bắc · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/doan-trang.mp3"></audio>
-      </article>
+            <div><h3>Đoan Trang</h3>
+              <span class="meta">Nữ · Miền Bắc · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/doan-trang.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Nam">
-        <div><h3>Thục Đoan</h3>
-          <span class="meta">Nữ · Miền Nam · Phong cách kể chuyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thuc-doan.mp3"></audio>
-      </article>
+            <div><h3>Thục Đoan</h3>
+              <span class="meta">Nữ · Miền Nam · Phong cách kể chuyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/thuc-doan.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Nam">
-        <div><h3>Minh Triết</h3>
-          <span class="meta">Nam · Miền Nam · Phong cách tin tức</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/minh-triet.mp3"></audio>
-      </article>
+            <div><h3>Minh Triết</h3>
+              <span class="meta">Nam · Miền Nam · Phong cách tin tức</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/minh-triet.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Nam">
-        <div><h3>Mỹ Duyên</h3>
-          <span class="meta">Nữ · Miền Nam · Phong cách đọc truyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/my-duyen.mp3"></audio>
-      </article>
+            <div><h3>Mỹ Duyên</h3>
+              <span class="meta">Nữ · Miền Nam · Phong cách đọc truyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/my-duyen.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Bắc">
-        <div><h3>Quỳnh Anh</h3>
-          <span class="meta">Nữ · Miền Bắc · Phong cách đọc truyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/quynh-anh.mp3"></audio>
-      </article>
+            <div><h3>Quỳnh Anh</h3>
+              <span class="meta">Nữ · Miền Bắc · Phong cách đọc truyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/quynh-anh.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Nam">
-        <div><h3>Đức Trí</h3>
-          <span class="meta">Nam · Miền Nam · Phong cách đọc truyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/duc-tri.mp3"></audio>
-      </article>
+            <div><h3>Đức Trí</h3>
+              <span class="meta">Nam · Miền Nam · Phong cách đọc truyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/duc-tri.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nữ" data-r="Nam">
-        <div><h3>Kim Thanh</h3>
-          <span class="meta">Nữ · Miền Nam · Phong cách đọc truyện</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/kim-thanh.mp3"></audio>
-      </article>
+            <div><h3>Kim Thanh</h3>
+              <span class="meta">Nữ · Miền Nam · Phong cách đọc truyện</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/kim-thanh.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Nam">
-        <div><h3>Adam</h3>
-          <span class="meta">Nam · Miền Nam · Giọng đọc tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/adam.mp3"></audio>
-      </article>
+            <div><h3>Adam</h3>
+              <span class="meta">Nam · Miền Nam · Giọng đọc tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/adam.mp3"></audio>
+          </article>
       <article class="voice" data-g="Nam" data-r="Bắc">
-        <div><h3>Quốc Tuấn</h3>
-          <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
-        <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/quoc-tuan.mp3"></audio>
-      </article>
-  </div>
+            <div><h3>Quốc Tuấn</h3>
+              <span class="meta">Nam · Miền Bắc · Phong cách tự nhiên</span></div>
+            <audio controls preload="none" src="https://raw.githubusercontent.com/sonlovinbot/vieneu-audio-studio/main/webapp/static/previews/quoc-tuan.mp3"></audio>
+          </article>
+      </div>
 
-  <h2 id="moi">📝 Có gì mới</h2>
-  <p class="lead">Ba bản gần nhất. App tự báo khi có bản mới.</p>
-  <div class="cards3">
+      <h2 id="moi">📝 Có gì mới</h2>
+      <p class="lead">Ba bản gần nhất. App tự báo khi có bản mới.</p>
+      <div class="cards3">
+          <div class="news-item"><div class="news-head"><span class="ver">v2.0.0</span><span class="meta">2026-10-15</span></div>
+            <h3>Đa ngôn ngữ (17 thứ tiếng) + MCP cho Claude Desktop, ChatGPT Codex</h3><ul><li>Trang MCP &amp; API (mới): kết nối Claude Desktop hoặc ChatGPT Codex một lần — sau đó chỉ cần gõ “đọc đoạn này bằng giọng Trúc Ly”, “làm podcast 2 người”… AI tự tạo file audio trên máy (lưu ở Downloads/AI-Audio-Studio). Có nút Kết nối tự động, Kiểm tra kết nối và câu lệnh mẫu; chỉ chạy khi app cài trên máy tính.</li><li>Trang mới 🌏 Đa ngôn ngữ: đọc 17 thứ tiếng (Anh, Hàn, Nhật, Trung, Quảng Đông, Filipino, Thái, Indonesia, Mã Lai, Pháp, Tây Ban Nha, Đức, Nga, Bồ Đào Nha, Ý, Hindi, Ả Rập) bằng model OmniVoice, chạy ngay trên máy; thêm tiếng Việt ở dạng thử nghiệm.</li><li>6 giọng có sẵn (nam/nữ, nhiều độ tuổi; tiếng Anh chọn được giọng Mỹ, Anh, Úc, Canada, Ấn Độ), 25 giọng Việt của VieNeu nói được tiếng nước ngoài, và clone giọng của bạn từ file mẫu 3–15 giây.</li><li>Hội thoại: mỗi lượt chọn được ngôn ngữ — trộn tiếng Việt (VieNeu) với tiếng Anh, Hàn, Nhật… trong cùng một file.</li></ul></div>
       <div class="news-item"><div class="news-head"><span class="ver">v1.9.0</span><span class="meta">2026-10-03</span></div>
-        <h3>Giới thiệu người phát triển, nhật ký gọn hơn</h3><ul><li>Bấm khung &quot;Phát triển bởi&quot; ở menu trái mở thẻ giới thiệu người phát triển: lời chào, giới thiệu ngắn, link Facebook, fanpage và app.danghuuson.com.</li><li>Cài đặt → Người phát triển: thêm link fanpage và app.danghuuson.com.</li><li>Phiên bản &amp; Logs gọn hơn: chỉ hiện các thay đổi về tính năng và hệ thống.</li></ul></div>
+            <h3>Giới thiệu người phát triển, nhật ký gọn hơn</h3><ul><li>Bấm khung &quot;Phát triển bởi&quot; ở menu trái mở thẻ giới thiệu người phát triển: lời chào, giới thiệu ngắn, link Facebook, fanpage và app.danghuuson.com.</li><li>Cài đặt → Người phát triển: thêm link fanpage và app.danghuuson.com.</li><li>Phiên bản &amp; Logs gọn hơn: chỉ hiện các thay đổi về tính năng và hệ thống.</li></ul></div>
       <div class="news-item"><div class="news-head"><span class="ver">v1.8.1</span><span class="meta">2026-10-03</span></div>
-        <h3>Địa chỉ mới: app.danghuuson.com</h3><ul><li>Trang giới thiệu chuyển sang https://app.danghuuson.com/vieneu-audio-studio/ (link cũ vẫn tự chuyển hướng).</li><li>App kiểm tra phiên bản mới từ địa chỉ mới.</li><li>Trang chủ app.danghuuson.com tổng hợp mọi phần mềm, game 3D và tài liệu AI miễn phí của Đặng Hữu Sơn.</li></ul></div>
-      <div class="news-item"><div class="news-head"><span class="ver">v1.7.1</span><span class="meta">2026-10-02</span></div>
-        <h3>Giao diện dễ đọc hơn, bỏ font pixel</h3><ul><li>Bỏ font pixel: tên app, tiêu đề trang dùng Be Vietnam Pro; chữ code dùng font monospace hệ thống.</li><li>Nút chính, mục menu đang chọn, tab: chữ đen trên nền cam (đọc rõ 6,6:1 thay vì 2,7:1), giữ nguyên màu cam thương hiệu.</li><li>Chữ cam trên nền sáng chuyển cam đậm; chữ code và chữ phụ đậm hơn cho dễ đọc.</li><li>Màn laptop 1280–1500px: ô Giọng đọc không còn bị bóp mất tên giọng, nút cảm xúc không rớt dòng.</li></ul></div>
-  </div>
+            <h3>Địa chỉ mới: app.danghuuson.com</h3><ul><li>Trang giới thiệu chuyển sang https://app.danghuuson.com/vieneu-audio-studio/ (link cũ vẫn tự chuyển hướng).</li><li>App kiểm tra phiên bản mới từ địa chỉ mới.</li><li>Trang chủ app.danghuuson.com tổng hợp mọi phần mềm, game 3D và tài liệu AI miễn phí của Đặng Hữu Sơn.</li></ul></div>
+      </div>
 
-  <h2 id="su-co">🛠 Không cài được? Xem ở đây</h2>
-  <p class="lead">Các trường hợp hay gặp và cách xử lý. Vẫn chưa được: nhắn <a href="https://www.facebook.com/danghuuson.182/">Đặng Hữu Sơn</a> kèm ảnh chụp màn hình lỗi.</p>
-      <details><summary>🍎 macOS báo “install.command” Not Opened / Apple could not verify…</summary><div class="ans"><p>Không phải virus — phần mềm chưa mua chứng chỉ ký số của Apple nên macOS chặn file tải bằng trình duyệt.</p>
-     <ol><li><b>Cách dễ nhất:</b> dùng <a href="#cai-dat">lệnh cài 1 dòng</a> — tải qua Terminal nên không bị chặn.</li>
-     <li><b>macOS 15 (Sequoia) trở lên:</b> bấm <b>Done</b> → 🍎 <b>System Settings → Privacy &amp; Security</b> → kéo xuống mục Security → bấm <b>Open Anyway</b> → nhập mật khẩu → nhấp đúp <code>install.command</code> lần nữa.</li>
-     <li><b>macOS 14 trở về trước:</b> chuột phải <code>install.command</code> → <b>Open</b> → <b>Open</b>.</li>
-     <li><b>Bằng Terminal:</b> gõ <code>xattr -cr </code> (có dấu cách), kéo thả thư mục vừa giải nén vào, Enter, rồi nhấp đúp lại.</li></ol></div></details>
+      <h2 id="su-co">🛠 Không cài được? Xem ở đây</h2>
+      <p class="lead">Các trường hợp hay gặp và cách xử lý. Vẫn chưa được: nhắn <a href="https://www.facebook.com/danghuuson.182/">Đặng Hữu Sơn</a> kèm ảnh chụp màn hình lỗi.</p>
+          <details><summary>🍎 macOS báo “install.command” Not Opened / Apple could not verify…</summary><div class="ans"><p>Không phải virus — phần mềm chưa mua chứng chỉ ký số của Apple nên macOS chặn file tải bằng trình duyệt.</p>
+         <ol><li><b>Cách dễ nhất:</b> dùng <a href="#cai-dat">lệnh cài 1 dòng</a> — tải qua Terminal nên không bị chặn.</li>
+         <li><b>macOS 15 (Sequoia) trở lên:</b> bấm <b>Done</b> → 🍎 <b>System Settings → Privacy &amp; Security</b> → kéo xuống mục Security → bấm <b>Open Anyway</b> → nhập mật khẩu → nhấp đúp <code>install.command</code> lần nữa.</li>
+         <li><b>macOS 14 trở về trước:</b> chuột phải <code>install.command</code> → <b>Open</b> → <b>Open</b>.</li>
+         <li><b>Bằng Terminal:</b> gõ <code>xattr -cr </code> (có dấu cách), kéo thả thư mục vừa giải nén vào, Enter, rồi nhấp đúp lại.</li></ol></div></details>
       <details><summary>🪟 Windows hiện “Windows protected your PC” (SmartScreen)</summary><div class="ans"><p>Bấm <b>More info</b> → <b>Run anyway</b>. Hoặc dùng lệnh PowerShell 1 dòng để không hiện cảnh báo. Nếu phần mềm diệt virus chặn <code>install.bat</code>, cho phép thư mục cài rồi chạy lại.</p></div></details>
       <details><summary>⏳ Cài rất lâu hoặc báo lỗi “uv sync that bai” / lỗi tải thư viện</summary><div class="ans"><p>Lần đầu cần tải khoảng vài trăm MB thư viện. Kiểm tra Internet (mạng công ty có thể chặn), rồi <b>chạy lại đúng lệnh cài</b> — các phần đã tải sẽ không tải lại.</p>
-     <p>Vẫn lỗi ở bước cài <code>uv</code>: cài tay rồi chạy lại bộ cài —<br>macOS/Linux: <code>curl -LsSf https://astral.sh/uv/install.sh | sh</code><br>Windows (PowerShell): <code>irm https://astral.sh/uv/install.ps1 | iex</code></p></div></details>
+         <p>Vẫn lỗi ở bước cài <code>uv</code>: cài tay rồi chạy lại bộ cài —<br>macOS/Linux: <code>curl -LsSf https://astral.sh/uv/install.sh | sh</code><br>Windows (PowerShell): <code>irm https://astral.sh/uv/install.ps1 | iex</code></p></div></details>
       <details><summary>🌐 Cài xong nhưng trình duyệt không mở / trang không vào được</summary><div class="ans"><p>Mở icon <b>AI Audio Studio</b> trên Desktop, đợi cửa sổ Terminal/đen chạy xong rồi vào <b>http://127.0.0.1:8001</b>. Đóng cửa sổ đó là app tắt.</p>
-     <p>Báo cổng 8001 đang bận (có phần mềm khác dùng): tắt phần mềm đó, hoặc chạy với cổng khác — macOS/Linux: <code>VIENEU_PORT=8002 uv run vieneu-studio</code>; Windows: <code>set VIENEU_PORT=8002</code> rồi <code>uv run vieneu-studio</code> trong thư mục cài.</p></div></details>
+         <p>Báo cổng 8001 đang bận (có phần mềm khác dùng): tắt phần mềm đó, hoặc chạy với cổng khác — macOS/Linux: <code>VIENEU_PORT=8002 uv run vieneu-studio</code>; Windows: <code>set VIENEU_PORT=8002</code> rồi <code>uv run vieneu-studio</code> trong thư mục cài.</p></div></details>
       <details><summary>🐢 Bấm “Sinh audio” lần đầu chờ lâu / báo đang tải model</summary><div class="ans"><p>Lần đầu app tải model giọng nói từ Hugging Face (vài phút, tùy mạng). Các lần sau dùng offline. Nếu Hugging Face bị chặn ở mạng của bạn, thử mạng khác rồi bấm lại. Chi tiết lỗi xem ở mục <b>Phiên bản &amp; Logs</b> trong app.</p></div></details>
       <details><summary>💻 Máy chậm, giật khi sinh văn bản dài</summary><div class="ans"><p>Cần RAM 8 GB (tối thiểu 4 GB). Chia văn bản thành đoạn ≤ 1.500 ký tự, đóng bớt ứng dụng khác. Máy Mac chip Intel chạy được nhưng chậm hơn chip Apple M.</p></div></details>
       <details><summary>🗑️ Gỡ cài đặt</summary><div class="ans"><ul><li>Xóa thư mục cài (mặc định <code>AI-Audio-Studio</code> trong thư mục người dùng) và icon trên Desktop.</li>
-     <li>Xóa giọng đã lưu và lịch sử: thư mục <code>.vieneu</code> trong thư mục người dùng.</li>
-     <li>Tắt tự chạy — macOS: <code>launchctl unload ~/Library/LaunchAgents/com.vieneu.studio.plist</code> rồi xóa file đó; Windows: xóa “AI Audio Studio (autostart).bat” trong thư mục Startup (gõ <code>shell:startup</code> vào ô Run).</li></ul></div></details>
+         <li>Xóa giọng đã lưu và lịch sử: thư mục <code>.vieneu</code> trong thư mục người dùng.</li>
+         <li>Tắt tự chạy — macOS: <code>launchctl unload ~/Library/LaunchAgents/com.vieneu.studio.plist</code> rồi xóa file đó; Windows: xóa “AI Audio Studio (autostart).bat” trong thư mục Startup (gõ <code>shell:startup</code> vào ô Run).</li></ul></div></details>
 
-  <!-- Khung tài trợ: nội dung lấy từ app.danghuuson.com/sponsors/sponsors.json (trang "vieneu") -->
-  <div data-sponsor-page="vieneu"></div>
+      <!-- Khung tài trợ: nội dung lấy từ app.danghuuson.com/sponsors/sponsors.json (trang "vieneu") -->
+      <div data-sponsor-page="vieneu"></div>
 
-  <footer>
-    <span>Phát triển bởi <a href="https://www.facebook.com/danghuuson.182/">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
-    <span>Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0</span>
-    <span style="font-size:12px">Trang dùng Meta Pixel (cookie của Facebook) để đo lượt xem và lượt tải. Phần mềm tải về không chứa mã theo dõi này.</span>
-  </footer>
-</div>
-<script>
-document.querySelector(".filters").addEventListener("click", (e) => {
-  const c = e.target.closest(".chip"); if (!c) return;
-  document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === c));
-  const f = c.dataset.f;
-  document.querySelectorAll(".voice").forEach((v) => {
-    v.hidden = !(!f || (f === "star" ? v.dataset.star : f.startsWith("g:") ? v.dataset.g === f.slice(2) : v.dataset.r === f.slice(2)));
-  });
-});
-document.addEventListener("play", (e) => {
-  document.querySelectorAll("audio").forEach((a) => { if (a !== e.target) a.pause(); });
-}, true);
-// Meta Pixel: DownloadClick khi tải zip hoặc sao chép lệnh cài (bị trình chặn quảng cáo chặn thì bỏ qua).
-function trackDownload(method, os) {
-  if (typeof window.fbq === "function") window.fbq("trackCustom", "DownloadClick",
-    { content_ids: ["vieneu-audio-studio"], content_name: "AI Audio Studio", method: method, os: os });
-}
-document.querySelectorAll(".dl-btn").forEach((a) => a.addEventListener("click", () => trackDownload("zip", a.dataset.os)));
-document.querySelectorAll(".cmd button").forEach((b) => b.addEventListener("click", async () => {
-  trackDownload("command", b.dataset.os);
-  try { await navigator.clipboard.writeText(b.previousElementSibling.textContent); b.textContent = "Đã chép ✓"; }
-  catch { b.textContent = "Bôi đen để chép"; }
-  setTimeout(() => (b.textContent = "Sao chép"), 2000);
-}));
-</script>
-<script src="https://app.danghuuson.com/sponsors/sponsors.js" defer></script>
-</body>
-</html>
+      <footer>
+        <span>Phát triển bởi <a href="https://www.facebook.com/danghuuson.182/">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
+        <span>Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0</span>
+        <span style="font-size:12px">Trang dùng Meta Pixel (cookie của Facebook) để đo lượt xem và lượt tải. Phần mềm tải về không chứa mã theo dõi này.</span>
+      </footer>
+    </div>
+    <script>
+    document.querySelector(".filters").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip"); if (!c) return;
+      document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === c));
+      const f = c.dataset.f;
+      document.querySelectorAll(".voice").forEach((v) => {
+        v.hidden = !(!f || (f === "star" ? v.dataset.star : f.startsWith("g:") ? v.dataset.g === f.slice(2) : v.dataset.r === f.slice(2)));
+      });
+    });
+    document.addEventListener("play", (e) => {
+      document.querySelectorAll("audio").forEach((a) => { if (a !== e.target) a.pause(); });
+    }, true);
+    // Meta Pixel: DownloadClick khi tải zip hoặc sao chép lệnh cài (bị trình chặn quảng cáo chặn thì bỏ qua).
+    function trackDownload(method, os) {
+      if (typeof window.fbq === "function") window.fbq("trackCustom", "DownloadClick",
+        { content_ids: ["vieneu-audio-studio"], content_name: "AI Audio Studio", method: method, os: os });
+    }
+    document.querySelectorAll(".dl-btn").forEach((a) => a.addEventListener("click", () => trackDownload("zip", a.dataset.os)));
+    document.querySelectorAll(".cmd button").forEach((b) => b.addEventListener("click", async () => {
+      trackDownload("command", b.dataset.os);
+      try { await navigator.clipboard.writeText(b.previousElementSibling.textContent); b.textContent = "Đã chép ✓"; }
+      catch { b.textContent = "Bôi đen để chép"; }
+      setTimeout(() => (b.textContent = "Sao chép"), 2000);
+    }));
+    </script>
+    <script src="https://app.danghuuson.com/sponsors/sponsors.js" defer></script>
+    </body>
+    </html>
+    

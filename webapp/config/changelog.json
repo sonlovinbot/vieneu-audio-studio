@@ -2,6 +2,21 @@
   "_huong_dan": "Nhật ký đầy đủ (repo giữ hết). Bản cài gửi khách và trang giới thiệu chỉ hiện phần liên quan sản phẩm/hệ thống: \"app\": false → ẩn cả mục; \"app_title\" / \"app_changes\" → thay tiêu đề / danh sách khi hiển thị cho người dùng.",
   "entries": [
     {
+      "version": "2.0.0",
+      "date": "2026-10-15",
+      "title": "Đa ngôn ngữ (17 thứ tiếng) + MCP cho Claude Desktop, ChatGPT Codex",
+      "changes": [
+        "Trang MCP & API (mới): kết nối Claude Desktop hoặc ChatGPT Codex một lần — sau đó chỉ cần gõ “đọc đoạn này bằng giọng Trúc Ly”, “làm podcast 2 người”… AI tự tạo file audio trên máy (lưu ở Downloads/AI-Audio-Studio). Có nút Kết nối tự động, Kiểm tra kết nối và câu lệnh mẫu; chỉ chạy khi app cài trên máy tính.",
+        "Trang mới 🌏 Đa ngôn ngữ: đọc 17 thứ tiếng (Anh, Hàn, Nhật, Trung, Quảng Đông, Filipino, Thái, Indonesia, Mã Lai, Pháp, Tây Ban Nha, Đức, Nga, Bồ Đào Nha, Ý, Hindi, Ả Rập) bằng model OmniVoice, chạy ngay trên máy; thêm tiếng Việt ở dạng thử nghiệm.",
+        "6 giọng có sẵn (nam/nữ, nhiều độ tuổi; tiếng Anh chọn được giọng Mỹ, Anh, Úc, Canada, Ấn Độ), 25 giọng Việt của VieNeu nói được tiếng nước ngoài, và clone giọng của bạn từ file mẫu 3–15 giây.",
+        "Hội thoại: mỗi lượt chọn được ngôn ngữ — trộn tiếng Việt (VieNeu) với tiếng Anh, Hàn, Nhật… trong cùng một file.",
+        "API: /api/multi/tts, /api/multi/clone, /api/conversation nhận \"language\" cho từng lượt; trang API và AI Prompt tự hiện danh sách ngôn ngữ, giọng đang có.",
+        "Gói Đa ngôn ngữ (~4 GB) chỉ cài khi bấm, có thanh tiến độ; tự chọn bản PyTorch hợp với máy (Mac chip Apple, card NVIDIA, hoặc CPU); gỡ một nút để lấy lại dung lượng. Model chạy ở tiến trình riêng, tự tắt sau 10 phút không dùng.",
+        "Tiếng Việt hằng ngày vẫn dùng VieNeu-TTS (nhanh hơn ~4 lần, đọc số và ngày tháng chuẩn hơn).",
+        "Popup giới thiệu người phát triển và Cài đặt: còn link Facebook và app.danghuuson.com (bỏ link fanpage cũ)."
+      ]
+    },
+    {
       "version": "1.9.0",
       "date": "2026-10-03",
       "title": "Giới thiệu người phát triển, nhật ký gọn hơn",

@@ -1,11 +1,12 @@
 {
   "app": {
     "name": "AI Audio Studio",
-    "edition": "",
-    "version": "1.9.0",
+    "edition": "Global",
+    "version": "2.0.0",
     "tagline": "Text-to-Speech tiếng Việt offline — giọng tự nhiên, clone giọng tức thì",
     "description": "Giao diện đào tạo gọn nhẹ cho VieNeu-TTS: sinh giọng, nhân bản giọng từ 3–5s, hội thoại đa nhân vật, chạy 100% trên máy của bạn.",
-    "default_port": 8001
+    "default_port": 8001,
+    "channel": "global"
   },
   "about_note": "AI Audio Studio do Đặng Hữu Sơn — CEO & Co-Founder LovinBot AI — phát triển (giao diện, tính năng, đóng gói phần mềm), dựa trên model AI VieNeu-TTS mã nguồn mở của Phạm Nguyễn Ngọc Bảo.",
   "author": {
@@ -32,20 +33,12 @@
     "url": "https://www.facebook.com/danghuuson.182/",
     "link_label": "Facebook Đặng Hữu Sơn",
     "intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn, CEO & Co-Founder LovinBot AI: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Thư viện, API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo.",
-    "fanpage": "https://www.facebook.com/coachdanghuuson/",
     "links": [
       {
         "label": "Facebook Đặng Hữu Sơn",
         "note": "Trang cá nhân",
         "url": "https://www.facebook.com/danghuuson.182/",
         "icon": "👤",
-        "utm": false
-      },
-      {
-        "label": "Fanpage Đặng Hữu Sơn",
-        "note": "Chia sẻ về AI, vibe code, marketing",
-        "url": "https://www.facebook.com/coachdanghuuson/",
-        "icon": "📣",
         "utm": false
       },
       {
@@ -58,9 +51,9 @@
     ]
   },
   "downloads": {
-    "_note": "Link bộ cài trên GitHub Releases (luôn trỏ bản mới nhất). Để trống = dùng file .zip trong dist/.",
-    "macos": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-macOS.zip",
-    "windows": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Windows.zip",
-    "linux": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Linux.zip"
+    "_note": "Bản Global (đa ngôn ngữ) phát hành riêng ở release \"global\" (pre-release, không phải bản mới nhất). Để trống = dùng file .zip trong dist/.",
+    "macos": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/download/global/AI-Audio-Studio-Global-macOS.zip",
+    "windows": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/download/global/AI-Audio-Studio-Global-Windows.zip",
+    "linux": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/download/global/AI-Audio-Studio-Global-Linux.zip"
   }
 }
