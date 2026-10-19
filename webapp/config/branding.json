@@ -1,14 +1,14 @@
 {
   "app": {
     "name": "AI Audio Studio",
-    "edition": "Global",
-    "version": "2.0.0",
+    "edition": "",
+    "version": "2.0.1",
     "tagline": "Text-to-Speech tiếng Việt offline — giọng tự nhiên, clone giọng tức thì",
     "description": "Giao diện đào tạo gọn nhẹ cho VieNeu-TTS: sinh giọng, nhân bản giọng từ 3–5s, hội thoại đa nhân vật, chạy 100% trên máy của bạn.",
     "default_port": 8001,
-    "channel": "global"
+    "channel": ""
   },
-  "about_note": "AI Audio Studio do Đặng Hữu Sơn — CEO & Co-Founder LovinBot AI — phát triển (giao diện, tính năng, đóng gói phần mềm), dựa trên model AI mã nguồn mở VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (chế độ Đa ngôn ngữ).",
+  "about_note": "AI Audio Studio do Đặng Hữu Sơn — CEO & Co-Founder LovinBot AI — phát triển (giao diện, tính năng, đóng gói phần mềm), dựa trên model AI VieNeu-TTS mã nguồn mở của Phạm Nguyễn Ngọc Bảo.",
   "author": {
     "name": "Phạm Nguyễn Ngọc Bảo",
     "role": "Tác giả & nhà phát triển VieNeu-TTS",
@@ -24,7 +24,7 @@
     "app_github": "https://github.com/sonlovinbot/vieneu-audio-studio",
     "app_hub": "https://app.danghuuson.com/"
   },
-  "credits": "Phần mềm do Đặng Hữu Sơn phát triển, dựa trên model AI và mã nguồn mở VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ, Apache 2.0). Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.",
+  "credits": "Phần mềm do Đặng Hữu Sơn phát triển, dựa trên model AI và mã nguồn mở VieNeu-TTS của Phạm Nguyễn Ngọc Bảo. Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.",
   "license_note": "Sử dụng theo giấy phép của dự án VieNeu-TTS gốc.",
   "developer": {
     "name": "Đặng Hữu Sơn",
@@ -32,7 +32,7 @@
     "role": "Người phát triển phần mềm AI Audio Studio",
     "url": "https://www.facebook.com/danghuuson.182/",
     "link_label": "Facebook Đặng Hữu Sơn",
-    "intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn, CEO & Co-Founder LovinBot AI: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Đa ngôn ngữ, Thư viện, MCP & API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ).",
+    "intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn, CEO & Co-Founder LovinBot AI: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Thư viện, MCP & API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo.",
     "links": [
       {
         "label": "Facebook Đặng Hữu Sơn",
@@ -51,9 +51,15 @@
     ]
   },
   "downloads": {
-    "_note": "Bản Global (đa ngôn ngữ) phát hành riêng ở release \"global\" (pre-release, không phải bản mới nhất). Để trống = dùng file .zip trong dist/.",
-    "macos": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/download/global/AI-Audio-Studio-Global-macOS.zip",
-    "windows": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/download/global/AI-Audio-Studio-Global-Windows.zip",
-    "linux": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/download/global/AI-Audio-Studio-Global-Linux.zip"
+    "_note": "Bản Free: link bộ cài bản mới nhất. Bản Global được build-installers.sh (EDITION=Global) đổi sang release \"global\". Để trống = dùng file .zip trong dist/.",
+    "macos": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-macOS.zip",
+    "windows": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Windows.zip",
+    "linux": "https://github.com/sonlovinbot/vieneu-audio-studio/releases/latest/download/AI-Audio-Studio-Linux.zip"
+  },
+  "global": {
+    "_note": "Bản Global (EDITION=Global / VIENEU_CHANNEL=global) dùng các dòng này thay cho bản Free.",
+    "about_note": "AI Audio Studio do Đặng Hữu Sơn — CEO & Co-Founder LovinBot AI — phát triển (giao diện, tính năng, đóng gói phần mềm), dựa trên model AI mã nguồn mở VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (chế độ Đa ngôn ngữ).",
+    "credits": "Phần mềm do Đặng Hữu Sơn phát triển, dựa trên model AI và mã nguồn mở VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ, Apache 2.0). Vui lòng giữ nguyên phần ghi nhận tác giả khi phân phối lại.",
+    "developer_intro": "Phần mềm AI Audio Studio được phát triển bởi Đặng Hữu Sơn, CEO & Co-Founder LovinBot AI: thiết kế giao diện, các tính năng Sinh giọng, Clone giọng, Hội thoại, Đa ngôn ngữ, Thư viện, MCP & API và bộ cài đặt. Phần lõi giọng nói dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ)."
   }
 }

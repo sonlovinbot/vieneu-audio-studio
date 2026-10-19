@@ -18,9 +18,9 @@
       document.documentElement.setAttribute("data-theme", t);
     })();
   </script>
-  <link rel="stylesheet" href="/css/coachio-theme.css?v=39" />
-  <link rel="stylesheet" href="/css/app.css?v=39" />
-  <link rel="stylesheet" href="/vendor/sponsor-kit/sponsor-kit.css?v=39" />
+  <link rel="stylesheet" href="/css/coachio-theme.css?v=41" />
+  <link rel="stylesheet" href="/css/app.css?v=41" />
+  <link rel="stylesheet" href="/vendor/sponsor-kit/sponsor-kit.css?v=41" />
 </head>
 <body>
   <div class="app">
@@ -64,7 +64,7 @@
           <span class="dev-by">Phát triển bởi</span>
           <span class="dev-who">Đặng Hữu Sơn</span>
           <span class="dev-title">CEO &amp; Co-Founder LovinBot AI</span>
-          <span class="dev-base">Dựa trên model AI VieNeu-TTS · OmniVoice</span>
+          <span class="dev-base" id="dev-base">Dựa trên model AI VieNeu-TTS</span>
         </button>
         <div class="nav-label">Giao diện</div>
         <div class="theme-switch" role="radiogroup" aria-label="Chế độ sáng/tối">
@@ -482,8 +482,10 @@
           <p id="author-note" class="hint"></p>
           <ul class="link-list" id="author-links"></ul>
           <p class="hint" id="credits"></p>
-          <div class="kv" style="margin-top:14px"><b>OmniVoice</b> — chế độ 🌏 Đa ngôn ngữ</div>
+          <div id="omni-credit" hidden>
+          <div class="kv" style="margin-top:14px"><b>OmniVoice</b> — chế độ 🌏 Đa ngôn ngữ (bản Global)</div>
           <p class="hint">Model của k2-fsa, giấy phép Apache 2.0. Built with Higgs Materials licensed from Boson AI USA, Inc., Copyright Boson AI USA, Inc., All Rights Reserved and Meta Llama 3 licensed under the Meta Llama 3 Community License, Copyright Meta Platforms, Inc., All Rights Reserved.</p>
+          </div>
         </div>
       <div class="card">
         <div class="section-title">🔑 Khóa truy cập (API key)</div>
@@ -552,21 +554,21 @@
     </div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="/js/app.js?v=39"></script>
-  <script src="/js/onboarding.js?v=39"></script>
-  <script src="/js/multi.js?v=39"></script>
-  <script src="/js/mcp.js?v=39"></script>
-  <script src="/vendor/sponsor-kit/sponsor-kit.js?v=39"></script>
+  <script src="/js/app.js?v=41"></script>
+  <script src="/js/onboarding.js?v=41"></script>
+  <script src="/js/multi.js?v=41"></script>
+  <script src="/js/mcp.js?v=41"></script>
+  <script src="/vendor/sponsor-kit/sponsor-kit.js?v=41"></script>
   <script>
     // Góc quảng cáo + thư ngỏ (Sponsor Kit). Nội dung lấy từ docs/news.json qua /api/news.
-    SponsorKit.init({
+    SponsorKit.init(window.SK_CFG = {
       appName: "AI Audio Studio",
       feedUrl: "/api/news",
       slots: { top: "#news-top", side: "#news-side" },
       utm: { source: "ai_audio_studio", medium: "local_app" },
       sponsorName: "Coachio Academy",
       developer: { name: "Đặng Hữu Sơn", title: "CEO & Co-Founder LovinBot AI", url: "https://www.facebook.com/danghuuson.182/" },
-      basedOn: "Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ)",
+      basedOn: "Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo",   // bản Global: app.js đổi thành VieNeu-TTS + OmniVoice
       // Bấm "Phát triển bởi" → popup giới thiệu (thay vì mở Facebook); link lấy từ config/branding.json
       about: {
         avatar: "/img/dev-avatar.jpg",

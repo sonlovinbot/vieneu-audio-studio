@@ -1,6 +1,28 @@
 {
-  "_huong_dan": "Nhật ký đầy đủ (repo giữ hết). Bản cài gửi khách và trang giới thiệu chỉ hiện phần liên quan sản phẩm/hệ thống: \"app\": false → ẩn cả mục; \"app_title\" / \"app_changes\" → thay tiêu đề / danh sách khi hiển thị cho người dùng.",
+  "_huong_dan": "Nhật ký đầy đủ (repo giữ hết). Bản cài gửi khách và trang giới thiệu chỉ hiện phần liên quan sản phẩm/hệ thống: \"app\": false → ẩn cả mục; \"app_title\" / \"app_changes\" → thay tiêu đề / danh sách khi hiển thị cho người dùng. \"channel\": \"free\" / \"global\" → mục chỉ hiện ở bản đó (không ghi = cả hai).",
   "entries": [
+    {
+      "version": "2.0.1",
+      "date": "2026-10-20",
+      "channel": "free",
+      "title": "MCP: ra lệnh cho Claude, ChatGPT Codex tạo giọng",
+      "changes": [
+        "Trang MCP & API (mới, mở sẵn tab MCP): kết nối Claude Desktop, Claude Code hoặc ChatGPT Codex một lần — sau đó chỉ cần gõ “đọc đoạn này bằng giọng Trúc Ly”, “làm podcast 2 người”… AI tự tạo file audio tiếng Việt trên máy (lưu ở Downloads/AI-Audio-Studio).",
+        "Nút Kết nối tự động (có sao lưu cấu hình cũ), Kiểm tra kết nối và câu lệnh mẫu; MCP tự mở app nếu app đang tắt, văn bản dài tự chia đoạn rồi ghép liền. Chỉ chạy khi app cài trên máy tính.",
+        "Bản Global (bản đầy đủ) có thêm Đa ngôn ngữ: đọc tiếng Anh, Hàn, Nhật… — bản Free giữ nguyên tiếng Việt."
+      ]
+    },
+    {
+      "version": "2.0.1",
+      "date": "2026-10-19",
+      "title": "Đa ngôn ngữ ổn định hơn + MCP cho Claude Code",
+      "changes": [
+        "Sửa lỗi đọc tiếng Anh có chọn giọng vùng (Mỹ, Anh, Úc, Canada, Ấn Độ) đôi khi ra âm thanh lạ, lặp lại: đoạn dài được chia khúc ngắn rồi ghép liền, app tự phát hiện audio bị lặp và tạo lại. Thử 52 mẫu đều đọc đúng.",
+        "MCP & API: thêm Claude Code (nút Kết nối tự động, dùng được ở mọi thư mục dự án).",
+        "MCP hiểu cách gọi tự nhiên hơn (\"en\", \"Tiếng Anh\", \"American\"…), báo rõ khi app đang chạy là bản cũ chưa có Đa ngôn ngữ hoặc chưa cài gói."
+      ],
+      "channel": "global"
+    },
     {
       "version": "2.0.0",
       "date": "2026-10-15",
@@ -14,7 +36,8 @@
         "Gói Đa ngôn ngữ (~4 GB) chỉ cài khi bấm, có thanh tiến độ; tự chọn bản PyTorch hợp với máy (Mac chip Apple, card NVIDIA, hoặc CPU); gỡ một nút để lấy lại dung lượng. Model chạy ở tiến trình riêng, tự tắt sau 10 phút không dùng.",
         "Tiếng Việt hằng ngày vẫn dùng VieNeu-TTS (nhanh hơn ~4 lần, đọc số và ngày tháng chuẩn hơn).",
         "Popup giới thiệu người phát triển và Cài đặt: còn link Facebook và app.danghuuson.com (bỏ link fanpage cũ)."
-      ]
+      ],
+      "channel": "global"
     },
     {
       "version": "1.9.0",

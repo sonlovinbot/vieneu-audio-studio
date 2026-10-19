@@ -11,8 +11,11 @@ const MCP_EXAMPLES = [
   "Đọc đoạn sau bằng giọng Trúc Ly, đặt tên file là loi-chao: “Xin chào các bạn, chào mừng đến với kênh của mình.”",
   "Liệt kê các giọng tiếng Việt, rồi chọn 1 giọng nam miền Nam đọc thử câu: “Hôm nay trời đẹp quá.”",
   "Viết kịch bản podcast 6 lượt về cách học tiếng Anh, 2 người dẫn (1 nam, 1 nữ), rồi tạo file audio hội thoại.",
-  "Đọc câu này bằng tiếng Anh, giọng nữ trẻ, giọng Anh-Anh: “Welcome to our English class.”",
+  "Đọc câu này bằng tiếng Anh, giọng nữ trẻ, giọng Anh-Anh: “Welcome to our English class.”",   // chỉ bản Global
 ];
+
+// Bản Free không có Đa ngôn ngữ → bỏ câu mẫu đọc tiếng Anh
+const mcpExamples = () => MCP_EXAMPLES.filter((x) => window.IS_GLOBAL || !x.includes("bằng tiếng Anh"));
 
 function mcpCopyBtn(id, label = "Sao chép") {
   return `<button class="btn btn-ghost btn-sm" type="button" data-mcp-copy="${id}">${label}</button>`;
@@ -40,8 +43,10 @@ function mcpConnectBlock(key) {
     ? `<button class="btn btn-ghost" type="button" data-mcp-connect="${key}">↻ Kết nối lại</button>
        <button class="btn btn-ghost" type="button" data-mcp-disconnect="${key}">Gỡ kết nối</button>`
     : `<button class="btn btn-primary" type="button" data-mcp-connect="${key}">⚡ Kết nối tự động</button>`;
-  return `<div class="actions" style="margin-top:8px">${btn}</div>
-    <p class="hint">App tự thêm AI Audio Studio vào file cấu hình <code>${escapeHtml(t.path)}</code> (file cũ được sao lưu thành <code>….bak-ngày-giờ</code>, các kết nối khác giữ nguyên).</p>`;
+  const how = key === "claude_code"
+    ? `App chạy lệnh <code>claude mcp add --scope user</code> của Claude Code — dùng được ở mọi thư mục dự án, các kết nối khác giữ nguyên.`
+    : `App tự thêm AI Audio Studio vào file cấu hình <code>${escapeHtml(t.path)}</code> (file cũ được sao lưu thành <code>….bak-ngày-giờ</code>, các kết nối khác giữ nguyên).`;
+  return `<div class="actions" style="margin-top:8px">${btn}</div><p class="hint">${how}</p>`;
 }
 
 function mcpStepsClaude() {
@@ -57,8 +62,26 @@ function mcpStepsClaude() {
       <p class="hint">${MCP.os === "linux" ? "⚠️ Claude Desktop chưa có bản chính thức cho Linux — dùng ChatGPT Codex hoặc Claude Code (mục Nâng cao)." : "Claude trên trình duyệt (claude.ai) và điện thoại không dùng được — phải là app Claude Desktop trên máy này."}</p>`, c.installed),
     mcpStep(2, "Kết nối với AI Audio Studio", mcpConnectBlock("claude"), c.connected),
     mcpStep(3, "Khởi động lại Claude Desktop", `<p>${quit}, rồi mở Claude lại. Claude chỉ đọc cấu hình mới lúc khởi động.</p>`),
-    mcpStep(4, "Dùng thử", `<p>Mở cuộc trò chuyện mới, gõ: <i>“Kiểm tra AI Audio Studio đã sẵn sàng chưa.”</i> Lần đầu Claude hỏi quyền dùng công cụ → bấm <b>Always allow</b> (Luôn cho phép).</p><p>Thử thêm: <i>“Đọc file kịch bản.txt bằng giọng Hải Đăng”</i> (văn bản dài tự chia đoạn rồi ghép), <i>“Clone giọng từ file mau.wav rồi đọc tiếng Anh”</i>, <i>“Liệt kê 5 lượt tạo audio gần nhất”</i>, <i>“Cài gói Đa ngôn ngữ”</i>.</p>
+    mcpStep(4, "Dùng thử", `<p>Mở cuộc trò chuyện mới, gõ: <i>“Kiểm tra AI Audio Studio đã sẵn sàng chưa.”</i> Lần đầu Claude hỏi quyền dùng công cụ → bấm <b>Always allow</b> (Luôn cho phép).</p><p>Thử thêm: <i>“Đọc file kịch bản.txt bằng giọng Hải Đăng”</i> (văn bản dài tự chia đoạn rồi ghép), ${window.IS_GLOBAL ? "<i>“Clone giọng từ file mau.wav rồi đọc tiếng Anh”</i>" : "<i>“Clone giọng từ file mau.wav rồi đọc đoạn chào mừng”</i>"}, <i>“Liệt kê 5 lượt tạo audio gần nhất”</i>${window.IS_GLOBAL ? ", <i>“Cài gói Đa ngôn ngữ”</i>" : ""}.</p>
       <p class="hint">Không thấy? Vào <b>Settings → Developer</b> trong Claude Desktop: dòng <code>ai-audio-studio</code> phải ở trạng thái <b>running</b>. Báo lỗi thì bấm <b>🧪 Kiểm tra kết nối</b> bên dưới.</p>`),
+  ].join("");
+}
+
+const MCP_NAMES = { claude: "Claude Desktop", claude_code: "Claude Code", codex: "ChatGPT Codex" };
+
+function mcpStepsClaudeCode() {
+  const c = MCP.claude_code;
+  return [
+    mcpStep(1, "Cài Claude Code", `<p>Claude Code chạy trong Terminal / VS Code, đăng nhập tài khoản Claude (Pro, Max…). Hướng dẫn cài: <a href="https://docs.anthropic.com/en/docs/claude-code/overview" target="_blank" rel="noopener">docs.anthropic.com → Claude Code</a>.
+      ${c.installed ? `<span class="mcp-pill ok">✓ Đã thấy Claude Code trên máy</span>` : ""}</p>
+      <p class="hint">Claude Code trên web (claude.ai/code) chạy trên máy chủ nên không gọi được app trên máy bạn.</p>`, c.installed),
+    mcpStep(2, "Kết nối với AI Audio Studio", `${mcpConnectBlock("claude_code")}
+      <details class="mcp-more"><summary>Hoặc dán 1 lệnh vào Terminal</summary>
+        <div class="mcp-cmd"><code id="mcp-cc-cli2">${escapeHtml(c.cli)}</code>${mcpCopyBtn("mcp-cc-cli2")}</div>
+        <p class="hint">Nhớ có <code>--scope user</code> — thiếu nó, MCP chỉ có trong đúng thư mục đang mở.</p>
+      </details>`, c.connected),
+    mcpStep(3, "Mở phiên Claude Code mới", `<p>Thoát phiên đang chạy (<code>/exit</code>) rồi gõ <code>claude</code> lại. Gõ <code>/mcp</code> để thấy <code>ai-audio-studio</code> ở trạng thái <b>connected</b>.</p>`),
+    mcpStep(4, "Dùng thử", `<p>Gõ: <i>“Kiểm tra AI Audio Studio đã sẵn sàng chưa.”</i> Claude sẽ gọi công cụ <code>ai-audio-studio</code>. Nếu Claude trả lời kiểu “chỉ là REST API, không phải MCP” tức là phiên đó chưa kết nối — làm lại bước 2–3.</p>`),
   ].join("");
 }
 
@@ -85,14 +108,15 @@ function mcpStepsCodex() {
 function renderMcp() {
   const root = $("#mcp-root");
   if (!MCP) return;
-  const steps = MCP_APP === "codex" ? mcpStepsCodex() : mcpStepsClaude();
+  if (!MCP[MCP_APP]) MCP_APP = "claude";
+  const steps = MCP_APP === "codex" ? mcpStepsCodex() : MCP_APP === "claude_code" ? mcpStepsClaudeCode() : mcpStepsClaude();
   root.innerHTML = `
   <div class="card mcp-hero">
     <div class="section-title">🧩 Ra lệnh bằng lời — AI tự tạo giọng cho bạn</div>
-    <p class="mcp-lead">Kết nối một lần, sau đó chỉ cần nói với <b>Claude Desktop</b> hoặc <b>ChatGPT Codex</b>: <i>“đọc đoạn này bằng giọng Trúc Ly”</i>, <i>“làm podcast 2 người”</i>… AI tự gọi AI Audio Studio và lưu file audio vào máy bạn. Không cần copy prompt dài.</p>
+    <p class="mcp-lead">Kết nối một lần, sau đó chỉ cần nói với <b>Claude Desktop</b>, <b>Claude Code</b> hoặc <b>ChatGPT Codex</b>: <i>“đọc đoạn này bằng giọng Trúc Ly”</i>, <i>“làm podcast 2 người”</i>… AI tự gọi AI Audio Studio và lưu file audio vào máy bạn. Không cần copy prompt dài.</p>
     <div class="mcp-flow" aria-label="Cách hoạt động">
       <span class="mcp-node">💬 Bạn gõ yêu cầu</span><span class="mcp-arrow">→</span>
-      <span class="mcp-node">🤖 Claude Desktop / Codex</span><span class="mcp-arrow">→</span>
+      <span class="mcp-node">🤖 Claude / Codex</span><span class="mcp-arrow">→</span>
       <span class="mcp-node hl">🎙️ AI Audio Studio<br><small>trên máy này</small></span><span class="mcp-arrow">→</span>
       <span class="mcp-node">📁 File .wav<br><small>${escapeHtml(MCP.out_dir.split(/[\\/]/).slice(-2).join("/"))}</small></span>
     </div>
@@ -103,16 +127,17 @@ function renderMcp() {
     <div class="section-title">1️⃣ Bạn dùng phần mềm AI nào?</div>
     <div class="mcp-apps">
       ${mcpAppCard("claude", "✳️", "Claude Desktop", "App Claude trên máy tính · macOS, Windows")}
+      ${MCP.claude_code ? mcpAppCard("claude_code", "⌨️", "Claude Code", "Terminal · VS Code · dùng tài khoản Claude") : ""}
       ${mcpAppCard("codex", "⌘", "ChatGPT Codex", "Codex CLI, VS Code, app Codex · dùng tài khoản ChatGPT")}
     </div>
   </div>
 
   <div class="card">
-    <div class="section-title">2️⃣ Làm theo ${MCP_APP === "codex" ? "4 bước với ChatGPT Codex" : "4 bước với Claude Desktop"}</div>
+    <div class="section-title">2️⃣ Làm theo 4 bước với ${MCP_NAMES[MCP_APP]}</div>
     <ol class="mcp-steps">${steps}</ol>
     <div class="mcp-test">
       <button class="btn btn-ghost" type="button" id="mcp-test">🧪 Kiểm tra kết nối</button>
-      <span class="hint">Chạy thử đúng lệnh MCP mà ${MCP_APP === "codex" ? "Codex" : "Claude"} sẽ chạy.</span>
+      <span class="hint">Chạy thử đúng lệnh MCP mà ${MCP_NAMES[MCP_APP]} sẽ chạy.</span>
       <div id="mcp-test-out"></div>
     </div>
   </div>
@@ -120,13 +145,13 @@ function renderMcp() {
   <div class="row two">
     <div class="card">
       <div class="section-title">💬 Câu lệnh mẫu — bấm để chép</div>
-      <div class="mcp-examples">${MCP_EXAMPLES.map((x, i) => `<button class="mcp-ex" type="button" data-mcp-ex="${i}">${escapeHtml(x)}</button>`).join("")}</div>
-      <p class="hint">Văn bản tiếng Việt tối đa 5.000 ký tự/lần, ngôn ngữ khác 2.000 ký tự/lần — dài hơn AI sẽ tự chia.</p>
+      <div class="mcp-examples">${mcpExamples().map((x, i) => `<button class="mcp-ex" type="button" data-mcp-ex="${i}">${escapeHtml(x)}</button>`).join("")}</div>
+      <p class="hint">Văn bản dài AI tự chia đoạn rồi ghép liền${window.IS_GLOBAL ? " (tiếng Việt 5.000, ngôn ngữ khác 2.000 ký tự mỗi đoạn)" : ""}.</p>
     </div>
     <div class="card">
       <div class="section-title">🛠 AI làm được gì</div>
       <ul class="mcp-tools">
-        <li><b>Đọc văn bản</b> — 25 giọng Việt, giọng bạn đã clone; 17 ngôn ngữ khác nếu đã cài gói 🌏 Đa ngôn ngữ.</li>
+        <li><b>Đọc văn bản</b> — 25 giọng Việt, giọng bạn đã clone${window.IS_GLOBAL ? "; 17 ngôn ngữ khác nếu đã cài gói 🌏 Đa ngôn ngữ" : ""}.</li>
         <li><b>Tạo hội thoại</b> — nhiều nhân vật, mỗi lượt một giọng, trộn được nhiều thứ tiếng.</li>
         <li><b>Xem danh sách giọng</b> — AI tự chọn giọng hợp với yêu cầu.</li>
         <li><b>Kiểm tra app</b> — app chạy chưa, model nạp chưa.</li>
@@ -162,11 +187,11 @@ function bindMcp() {
     try { await navigator.clipboard.writeText(el.textContent); toast("Đã sao chép!"); } catch { toast("Bôi đen rồi chép thủ công nhé.", true); }
   }));
   $$("[data-mcp-ex]").forEach((b) => b.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(MCP_EXAMPLES[+b.dataset.mcpEx]); toast("Đã chép — dán vào Claude / Codex"); } catch {}
+    try { await navigator.clipboard.writeText(mcpExamples()[+b.dataset.mcpEx]); toast("Đã chép — dán vào Claude / Codex"); } catch {}
   }));
   $$("[data-mcp-connect]").forEach((b) => b.addEventListener("click", () => mcpAction("connect", b)));
   $$("[data-mcp-disconnect]").forEach((b) => b.addEventListener("click", () => {
-    if (confirm("Gỡ AI Audio Studio khỏi " + (b.dataset.mcpDisconnect === "codex" ? "Codex" : "Claude Desktop") + "?")) mcpAction("disconnect", b);
+    if (confirm("Gỡ AI Audio Studio khỏi " + MCP_NAMES[b.dataset.mcpDisconnect] + "?")) mcpAction("disconnect", b);
   }));
   const t = $("#mcp-test");
   if (t) t.addEventListener("click", mcpTest);
@@ -180,7 +205,7 @@ async function mcpAction(kind, btn) {
   try {
     MCP = await apiJson("/api/mcp/" + kind, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ target }) });
     renderMcp();
-    const who = target === "codex" ? "Codex" : "Claude Desktop";
+    const who = MCP_NAMES[target];
     toast(kind === "connect" ? `Đã kết nối! Giờ khởi động lại ${who} (bước 3).` : `Đã gỡ khỏi ${who}.`);
   } catch (e) {
     btn.disabled = false; btn.innerHTML = old;

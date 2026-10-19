@@ -1,9 +1,11 @@
 """Sinh docs/index.html (GitHub Pages): video nhúng, tải trực tiếp, tính năng + ảnh,
 nghe thử 25 giọng, có gì mới, xử lý sự cố.
 
-Từ 2.0.0 bản Global (đa ngôn ngữ + MCP) là bản chính. docs/global/index.html giữ lại cho link đã gửi
-trước đó (app.danghuuson.com/vieneu-audio-studio/global/ hoặc ?ban=global): cùng nội dung, bộ cài từ
-release "global", lệnh cài có VIENEU_CHANNEL=global, gắn noindex.
+Hai bản:
+  docs/index.html         — bản Free (tiếng Việt + MCP), bộ cài từ release mới nhất.
+  docs/global/index.html  — bản Global (bản đầy đủ, thêm Đa ngôn ngữ 17 thứ tiếng). Trang ẩn: chỉ ai có link
+                            (app.danghuuson.com/vieneu-audio-studio/global/ hoặc ?ban=global), gắn noindex;
+                            bộ cài từ release "global", lệnh cài có VIENEU_CHANNEL=global.
 
 Chạy lại sau mỗi lần phát hành (lấy dung lượng bộ cài mới nhất từ GitHub):
     python3 scripts/build_pages.py
@@ -48,7 +50,8 @@ def release(api_path, fallback_tag):
 def build(edition=""):
     G = edition == "global"
     A = "../" if G else ""                                # trang global nằm trong thư mục con
-    changelog = ALL_CHANGES
+    # "channel": "free" / "global" → mục chỉ hiện ở trang của bản đó
+    changelog = [e for e in ALL_CHANGES if e.get("channel", "global" if G else "free") == ("global" if G else "free")]
     if G:
         _, sizes = release("tags/global", "global")
         tag = f"v{GLOBAL_VERSION}"
@@ -66,7 +69,7 @@ def build(edition=""):
     INSTALL_PS = ("$env:VIENEU_CHANNEL='global'; " if G else "") + f"irm {RAW}/install-online.ps1 | iex"
 
     downloads = [
-        ("🍎", "macOS", "macOS 12+ · chip Apple M hoặc Intel (Đa ngôn ngữ cần chip Apple)", f"{PREFIX}-macOS.zip",
+        ("🍎", "macOS", "macOS 12+ · chip Apple M hoặc Intel" + (" (Đa ngôn ngữ cần chip Apple)" if G else ""), f"{PREFIX}-macOS.zip",
          "Giải nén → nhấp đúp <code>install.command</code>. macOS sẽ chặn lần đầu — xem <a href=\"#su-co\">cách mở</a>, hoặc dùng lệnh 1 dòng để không bị chặn."),
         ("🪟", "Windows", "Windows 10 / 11 · 64-bit", f"{PREFIX}-Windows.zip",
          "Chuột phải → <b>Extract All</b> → nhấp đúp <code>install.bat</code>. SmartScreen hiện thì bấm <b>More info → Run anyway</b>."),
@@ -88,7 +91,8 @@ def build(edition=""):
         ("🚀", "Dễ bắt đầu", "Hướng dẫn lần đầu: kiểm tra cấu hình máy, tải model, thử tạo giọng — vài cú nhấp."),
     ]
     features[3:4] = [("🧩", "MCP & API", "Kết nối Claude Desktop / ChatGPT Codex rồi ra lệnh bằng lời: “đọc đoạn này bằng giọng Trúc Ly”. Vẫn có API cho n8n, Make, script…")]
-    features.insert(0, ("🌏", "Đa ngôn ngữ", "Đọc 17 thứ tiếng: Anh, Hàn, Nhật, Trung, Filipino, Thái, Pháp… Giọng có sẵn, giọng Việt nói tiếng nước ngoài, clone giọng của bạn."))
+    if G:
+        features.insert(0, ("🌏", "Đa ngôn ngữ", "Đọc 17 thứ tiếng: Anh, Hàn, Nhật, Trung, Filipino, Thái, Pháp… Giọng có sẵn, giọng Việt nói tiếng nước ngoài, clone giọng của bạn."))
     feature_html = "\n".join(f'      <div class="feat"><span class="feat-ico">{i}</span><h3>{t}</h3><p>{d}</p></div>' for i, t, d in features)
 
     shots = [
@@ -139,14 +143,15 @@ def build(edition=""):
 
     NOINDEX = '\n<meta name="robots" content="noindex, nofollow">'
     HERO = """<h1>Giọng nói AI tiếng Việt,<br><em>chạy ngay trên máy tính của bạn</em></h1>
-      <p class="lead">Biến văn bản thành giọng đọc tự nhiên, clone giọng từ 3–5 giây audio, tạo hội thoại nhiều nhân vật và xuất API cho phần mềm khác. Miễn phí, không cần card đồ họa, chạy offline sau lần cài đầu.</p>"""
-    HERO_GLOBAL = """<h1>Giọng nói AI tiếng Việt<br><em>và 17 ngôn ngữ khác</em></h1>
-      <p class="lead">Bản <b>Global</b> có mọi thứ của AI Audio Studio (25 giọng Việt, clone giọng, hội thoại, API) và thêm trang <b>🌏 Đa ngôn ngữ</b>: đọc tiếng Anh, Hàn, Nhật, Trung, Filipino, Thái, Pháp… ngay trên máy của bạn, và <b>🧩 MCP</b> để Claude Desktop / ChatGPT Codex tự tạo giọng theo lời bạn. Miễn phí, chạy offline sau khi cài.</p>"""
+      <p class="lead">Biến văn bản thành giọng đọc tự nhiên, clone giọng từ 3–5 giây audio, tạo hội thoại nhiều nhân vật, ra lệnh cho Claude / ChatGPT Codex qua <b>MCP</b> và xuất API cho phần mềm khác. Miễn phí, không cần card đồ họa, chạy offline sau lần cài đầu.</p>"""
+    HERO_GLOBAL = """<p class="gnote">🌏 Bản Global — bản đầy đủ, dành cho người có link</p>
+      <h1>Giọng nói AI tiếng Việt<br><em>và 17 ngôn ngữ khác</em></h1>
+      <p class="lead">Bản <b>Global</b> có mọi thứ của AI Audio Studio (25 giọng Việt, clone giọng, hội thoại, API) và thêm trang <b>🌏 Đa ngôn ngữ</b>: đọc tiếng Anh, Hàn, Nhật, Trung, Filipino, Thái, Pháp… ngay trên máy của bạn, và <b>🧩 MCP</b> để Claude / ChatGPT Codex tự tạo giọng theo lời bạn. Chạy offline sau khi cài.</p>"""
     LANGS = ["🇬🇧 Anh", "🇰🇷 Hàn", "🇯🇵 Nhật", "🇨🇳 Trung", "🇭🇰 Quảng Đông", "🇵🇭 Filipino", "🇹🇭 Thái", "🇮🇩 Indonesia", "🇲🇾 Mã Lai",
              "🇫🇷 Pháp", "🇪🇸 Tây Ban Nha", "🇩🇪 Đức", "🇷🇺 Nga", "🇵🇹 Bồ Đào Nha", "🇮🇹 Ý", "🇮🇳 Hindi", "🇸🇦 Ả Rập", "🇻🇳 Việt (thử nghiệm)"]
     GUIDE = f"""
       <h2 id="da-ngon-ngu">🌏 Hướng dẫn chi tiết: bật Đa ngôn ngữ</h2>
-      <p class="lead">Cài bản 2.0.0 ở trên xong, làm thêm các bước sau <b>một lần</b>. Đang dùng bản cũ (1.x) thì chạy lại lệnh cài 1 dòng để lên 2.0.0 — giọng đã lưu và lịch sử giữ nguyên.</p>
+      <p class="lead">Cài bản Global ở trên xong, làm thêm các bước sau <b>một lần</b>. Đang dùng bản Free thì cài bản Global đè lên — giọng đã lưu và lịch sử giữ nguyên.</p>
       <div class="langs">{"".join(f'<span class="badge">{l}</span>' for l in LANGS)}</div>
       <div class="cards3 gsteps">
         <div class="step"><span class="num">1</span><h3>Mở trang 🌏 Đa ngôn ngữ</h3><p>Mở app (icon <b>AI Audio Studio</b> trên Desktop) → menu bên trái chọn <b>🌏 Đa ngôn ngữ</b>. App tự kiểm tra máy bạn: chip Apple, card NVIDIA hay chỉ CPU.</p></div>
@@ -163,18 +168,21 @@ def build(edition=""):
         <div class="step"><h3>🖥️ Máy chỉ có CPU</h3><p class="meta">Chạy được nhưng chậm (~3 giây cho 1 giây audio). Hợp với đoạn ngắn.</p></div>
       </div>
       <p class="note">⚠️ <b>Mac chip Intel</b> chưa chạy được Đa ngôn ngữ (các phần khác vẫn dùng bình thường). Nên có RAM từ 16 GB; model tự tắt sau 10 phút không dùng để trả RAM. Tiếng Việt hằng ngày nên dùng trang <b>🔊 Sinh giọng</b> (VieNeu-TTS) — nhanh hơn ~4 lần, đọc số và ngày tháng chuẩn hơn.</p>
-      <p class="note">🔄 <b>Cập nhật:</b> chạy lại lệnh cài 1 dòng ở trên. Gỡ gói Đa ngôn ngữ (lấy lại ~4 GB): trang 🌏 Đa ngôn ngữ → <b>⚙️ Gói Đa ngôn ngữ → Gỡ gói</b>.</p>
+      <p class="note">🔄 <b>Cập nhật bản Global:</b> chạy lại lệnh cài 1 dòng ở trên (có chữ <code>VIENEU_CHANNEL=global</code>). Lệnh không có chữ đó sẽ cài bản Free (không có Đa ngôn ngữ). Gỡ gói Đa ngôn ngữ (lấy lại ~4 GB): trang 🌏 Đa ngôn ngữ → <b>⚙️ Gói Đa ngôn ngữ → Gỡ gói</b>.</p>
       <p class="meta">Model đa ngôn ngữ OmniVoice của k2-fsa (Apache 2.0). Built with Higgs Materials licensed from Boson AI USA, Inc., Copyright Boson AI USA, Inc., All Rights Reserved and Meta Llama 3 licensed under the Meta Llama 3 Community License, Copyright Meta Platforms, Inc., All Rights Reserved.</p>
-
-      <h2 id="mcp">🧩 MCP: ra lệnh cho Claude Desktop, ChatGPT Codex</h2>
+"""
+    MCP_SECTION = f"""
+      <h2 id="mcp">🧩 MCP: ra lệnh cho Claude, ChatGPT Codex</h2>
       <p class="lead">Kết nối một lần, sau đó chỉ cần gõ <i>“đọc đoạn này bằng giọng Trúc Ly”</i>, <i>“viết kịch bản podcast 2 người rồi tạo audio”</i>… AI tự gọi AI Audio Studio và lưu file vào <code>Downloads/AI-Audio-Studio</code>. Không cần copy prompt dài.</p>
       <div class="cards3 gsteps">
-        <div class="step"><span class="num">1</span><h3>Mở trang 🧩 MCP &amp; API</h3><p>Trong app, menu trái → <b>MCP &amp; API</b> (mở sẵn tab MCP). Chọn <b>Claude Desktop</b> hoặc <b>ChatGPT Codex</b>.</p></div>
+        <div class="step"><span class="num">1</span><h3>Mở trang 🧩 MCP &amp; API</h3><p>Trong app, menu trái → <b>MCP &amp; API</b> (mở sẵn tab MCP). Chọn <b>Claude Desktop</b>, <b>Claude Code</b> hoặc <b>ChatGPT Codex</b>.</p></div>
         <div class="step"><span class="num">2</span><h3>Bấm “⚡ Kết nối tự động”</h3><p>App tự thêm vào cấu hình của Claude / Codex (sao lưu file cũ, giữ các kết nối khác). Rồi thoát hẳn và mở lại Claude / Codex.</p></div>
         <div class="step"><span class="num">3</span><h3>Gõ thử</h3><p><i>“Kiểm tra AI Audio Studio đã sẵn sàng chưa.”</i> Lần đầu AI hỏi quyền dùng công cụ → cho phép. App đang tắt thì MCP tự mở.</p></div>
       </div>
       <p class="note">💻 <b>Chỉ chạy khi cài trên máy tính:</b> AI Audio Studio và Claude Desktop / Codex phải cùng ở một máy. ChatGPT, Claude trên trình duyệt hay điện thoại chạy trên máy chủ nên không gọi được app trên máy bạn.</p>
 """
+    DESC = ("Bản Global: giọng nói AI tiếng Việt và 17 ngôn ngữ khác, clone giọng, hội thoại, MCP cho Claude / ChatGPT Codex. Chạy trên máy. Dựa trên model VieNeu-TTS và OmniVoice."
+            if G else "Biến văn bản tiếng Việt thành giọng nói tự nhiên, clone giọng từ 3–5 giây, hội thoại nhiều nhân vật, MCP cho Claude / ChatGPT Codex, xuất API. Chạy 100% trên máy. Phát triển bởi Đặng Hữu Sơn, dựa trên model VieNeu-TTS.")
     # Trang chính: ?ban=global (hoặc ?global) → chuyển sang trang ẩn global/
     GO_GLOBAL = """<script>(function(){var q=new URLSearchParams(location.search);if(q.get("ban")==="global"||q.has("global"))location.replace("global/"+location.hash);})();</script>"""
 
@@ -183,8 +191,8 @@ def build(edition=""):
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AI Audio Studio — Giọng nói AI tiếng Việt + 17 ngôn ngữ, chạy trên máy tính</title>{NOINDEX if G else ""}
-    <meta name="description" content="Biến văn bản tiếng Việt và 17 ngôn ngữ khác thành giọng nói tự nhiên, clone giọng, hội thoại nhiều nhân vật, MCP cho Claude / ChatGPT Codex, xuất API. Chạy 100% trên máy. Phát triển bởi Đặng Hữu Sơn, dựa trên model VieNeu-TTS và OmniVoice.">
+    <title>{"AI Audio Studio Global — Giọng nói AI tiếng Việt + 17 ngôn ngữ" if G else "AI Audio Studio — Giọng nói AI tiếng Việt chạy trên máy tính"}</title>{NOINDEX if G else ""}
+    <meta name="description" content="{DESC}">
     <meta property="og:title" content="AI Audio Studio — Giọng nói AI tiếng Việt">
     <meta property="og:description" content="Xem video, nghe thử 25 giọng và tải miễn phí cho macOS, Windows, Linux.">
     <meta property="og:image" content="{RAW}/assets/readme/banner.png">
@@ -303,16 +311,16 @@ def build(edition=""):
     <body>
     <div class="wrap">
       <nav class="top">
-        <a class="brandrow" href="#"><img class="logo" src="{A}brand/icon.svg" alt="" width="40" height="40"><span class="brand">AI Audio Studio <span class="gbadge">Global</span></span></a>
-        <div class="navlinks"><a href="#tai-ve">Tải về</a><a href="#da-ngon-ngu">Đa ngôn ngữ</a><a href="#mcp">MCP</a><a href="#nghe-thu">Nghe thử</a><a href="#tinh-nang">Tính năng</a><a href="#su-co">Sự cố khi cài</a><a href="https://app.danghuuson.com/">Dự án khác</a></div>
+        <a class="brandrow" href="#"><img class="logo" src="{A}brand/icon.svg" alt="" width="40" height="40"><span class="brand">AI Audio Studio{' <span class="gbadge">Global</span>' if G else ""}</span></a>
+        <div class="navlinks"><a href="#tai-ve">Tải về</a>{'<a href="#da-ngon-ngu">Đa ngôn ngữ</a>' if G else ""}<a href="#mcp">MCP</a><a href="#nghe-thu">Nghe thử</a><a href="#tinh-nang">Tính năng</a><a href="#su-co">Sự cố khi cài</a><a href="https://app.danghuuson.com/">Dự án khác</a></div>
       </nav>
 
-      {HERO_GLOBAL}
+      {HERO_GLOBAL if G else HERO}
       <div class="cta">
         <a class="btn primary" href="#tai-ve">⬇ Tải miễn phí</a>
         <a class="btn" href="#nghe-thu">🎧 Nghe thử 25 giọng</a>
       </div>
-      <div class="badges"><span class="badge">Phiên bản {esc(tag)}</span><span class="badge">🌏 17 ngôn ngữ</span><span class="badge">🧩 MCP</span><span class="badge">macOS · Windows · Linux</span><span class="badge">25 giọng · 3 miền</span><span class="badge">Mã nguồn mở Apache 2.0</span></div>
+      <div class="badges"><span class="badge">Phiên bản {esc(tag)}</span>{'<span class="badge">🌏 17 ngôn ngữ</span>' if G else ""}<span class="badge">🧩 MCP</span><span class="badge">macOS · Windows · Linux</span><span class="badge">25 giọng · 3 miền</span><span class="badge">Mã nguồn mở Apache 2.0</span></div>
 
       <div class="video">
         <iframe src="https://www.youtube.com/embed/{YT_GLOBAL if G else YT}?rel=0" title="{"Giới thiệu AI Audio Studio Global" if G else "Giới thiệu AI Audio Studio"}" loading="lazy"
@@ -337,7 +345,7 @@ def build(edition=""):
       </div>
       <p class="note"><b>💻 Đây là phần mềm chạy trên máy tính của bạn.</b> Máy bật và app đang chạy thì dùng được giao diện và API tại <code>http://127.0.0.1:8001</code>; tắt máy, máy ngủ hoặc thoát app thì không dùng được. Khi cài, chọn <b>tự chạy khi mở máy</b> để API luôn sẵn sàng.</p>
 
-      {GUIDE}
+      {GUIDE if G else ""}{MCP_SECTION}
       <h2 id="tinh-nang">✨ Tính năng</h2>
       <div class="cards3">
     {feature_html}
@@ -376,7 +384,7 @@ def build(edition=""):
 
       <footer>
         <span>Phát triển bởi <a href="{FB}">Đặng Hữu Sơn</a> — CEO &amp; Co-Founder LovinBot AI · <a href="https://app.danghuuson.com/">Xem các dự án khác →</a></span>
-        <span>Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ) · Giấy phép Apache 2.0</span>
+        <span>{"Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ) · Giấy phép Apache 2.0" if G else "Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo · Giấy phép Apache 2.0"}</span>
         <span style="font-size:12px">Trang dùng Meta Pixel (cookie của Facebook) để đo lượt xem và lượt tải. Phần mềm tải về không chứa mã theo dõi này.</span>
       </footer>
     </div>

@@ -7,7 +7,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 ROOT="$(pwd)"
-# EDITION=Global bash build-installers.sh → dist/global/AI-Audio-Studio-Global-*.zip (bản đa ngôn ngữ phát hành riêng).
+# bash build-installers.sh                → dist/AI-Audio-Studio-*.zip        (bản Free: tiếng Việt + MCP)
+# EDITION=Global bash build-installers.sh → dist/global/AI-Audio-Studio-Global-*.zip (bản Global — bản đầy đủ, thêm Đa ngôn ngữ).
 # Thư mục bên trong zip giữ tên AI-Audio-Studio-<OS> để lệnh cài 1 dòng dùng chung.
 PREFIX="AI-Audio-Studio"
 OUT="$ROOT/dist"
@@ -45,7 +46,16 @@ build() {
     cp "$ROOT/$f" "$dir/"
   done
   if [ "$PREFIX" != "AI-Audio-Studio" ]; then
-    # Bản Global: kèm hướng dẫn Đa ngôn ngữ; lệnh cài 1 dòng trong hướng dẫn trỏ về kênh global
+    # Bản Global: đổi cấu hình sang kênh global (nhãn GLOBAL, bật Đa ngôn ngữ, link tải + thông báo cập nhật kênh global)
+    python3 - "$dir/webapp/config/branding.json" <<'PY'
+import json, sys
+p = sys.argv[1]; b = json.load(open(p, encoding="utf-8"))
+b["app"]["edition"], b["app"]["channel"] = "Global", "global"
+g = "https://github.com/sonlovinbot/vieneu-audio-studio/releases/download/global/AI-Audio-Studio-Global-"
+b["downloads"] = {"macos": g + "macOS.zip", "windows": g + "Windows.zip", "linux": g + "Linux.zip"}
+json.dump(b, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PY
+    # kèm hướng dẫn Đa ngôn ngữ; lệnh cài 1 dòng trong hướng dẫn trỏ về kênh global
     cp "$ROOT/HUONG-DAN-DA-NGON-NGU.txt" "$dir/"
     for t in "$dir"/HUONG-DAN-MAC-LINUX.txt; do
       [ -f "$t" ] && sed -i.bak 's|/bin/bash -c "\$(curl|VIENEU_CHANNEL=global /bin/bash -c "$(curl|' "$t" && rm -f "$t.bak"

@@ -34,11 +34,48 @@ API_KEY = os.environ.get("VIENEU_API_KEY", "").strip()
 OUT_DIR = Path(os.environ.get("VIENEU_MCP_OUT") or (Path.home() / "Downloads" / "AI-Audio-Studio"))
 AUTOSTART = os.environ.get("VIENEU_MCP_AUTOSTART", "1").strip() not in ("0", "off", "false", "no")
 PROTOCOLS = ("2025-06-18", "2025-03-26", "2024-11-05")
-VIETNAMESE = ("", "vietnamese", "vi", "tiếng việt", "tieng viet")
+VIETNAMESE = ("", "vietnamese", "vi", "vi-vn", "tiếng việt", "tieng viet", "việt", "viet")
+
+# AI hay gửi "en", "English (US)", "Tiếng Anh", "American"… → đổi về đúng id app nhận.
+_LANG_ALIASES = {
+    "en": "English", "eng": "English", "en-us": "English", "en-gb": "English", "english (us)": "English",
+    "tiếng anh": "English", "anh": "English", "ko": "Korean", "kr": "Korean", "tiếng hàn": "Korean", "hàn": "Korean",
+    "ja": "Japanese", "jp": "Japanese", "tiếng nhật": "Japanese", "nhật": "Japanese",
+    "zh": "Chinese", "zh-cn": "Chinese", "mandarin": "Chinese", "tiếng trung": "Chinese", "trung": "Chinese",
+    "yue": "Cantonese", "quảng đông": "Cantonese", "tl": "Filipino", "tagalog": "Filipino", "fil": "Filipino",
+    "th": "Thai", "thái": "Thai", "id": "Indonesian", "ms": "Malay", "fr": "French", "pháp": "French",
+    "es": "Spanish", "tây ban nha": "Spanish", "de": "German", "đức": "German", "ru": "Russian", "nga": "Russian",
+    "pt": "Portuguese", "it": "Italian", "ý": "Italian", "hi": "Hindi", "ar": "Standard Arabic", "arabic": "Standard Arabic",
+}
+_ACCENT_ALIASES = {
+    "american": "american accent", "us": "american accent", "usa": "american accent", "mỹ": "american accent", "my": "american accent",
+    "british": "british accent", "uk": "british accent", "england": "british accent", "anh": "british accent",
+    "australian": "australian accent", "au": "australian accent", "úc": "australian accent",
+    "canadian": "canadian accent", "ca": "canadian accent", "canada": "canadian accent",
+    "indian": "indian accent", "in": "indian accent", "ấn độ": "indian accent", "an do": "indian accent",
+}
+ACCENT_IDS = ("american accent", "british accent", "australian accent", "canadian accent", "indian accent")
+
+
+def norm_language(lang: Any) -> str:
+    l = str(lang or "").strip()
+    k = l.lower()
+    if k in VIETNAMESE:
+        return "" if not k else "Vietnamese"
+    return _LANG_ALIASES.get(k) or (l[:1].upper() + l[1:] if l else "")
+
+
+def norm_accent(acc: Any) -> str:
+    k = str(acc or "").strip().lower()
+    if not k or k in ("auto", "none", "default", "tự động"):
+        return ""
+    if k in ACCENT_IDS:
+        return k
+    return _ACCENT_ALIASES.get(k.replace(" accent", "").strip(), "")
 
 INSTRUCTIONS = (
     "AI Audio Studio chạy trên máy người dùng: đọc văn bản tiếng Việt (25 giọng có sẵn + giọng đã clone) "
-    "và — nếu đã cài gói Đa ngôn ngữ — 17 thứ tiếng khác. Gọi list_voices trước khi chọn giọng. "
+    "và — ở bản Global đã cài gói Đa ngôn ngữ — 17 thứ tiếng khác. Gọi list_voices trước khi chọn giọng. "
     "File audio được lưu trên máy người dùng; báo lại đường dẫn file cho họ."
 )
 
@@ -188,11 +225,32 @@ def ensure_app() -> None:
     raise AppError("Đã thử mở AI Audio Studio nhưng app chưa lên sau 90 giây. Mở icon trên Desktop rồi thử lại.")
 
 
+def _app_info() -> Dict[str, Any]:
+    try:
+        return (_get_json("/api/info").get("branding") or {}).get("app") or {}
+    except (AppError, OSError, ValueError):
+        return {}
+
+
 def _multi() -> Dict[str, Any]:
     try:
         return _get_json("/api/multi/status")
-    except AppError:
-        return {"installed": False}
+    except AppError as e:
+        return {"installed": False, "missing": "HTTP 404" in str(e) or "HTTP 405" in str(e)}
+
+
+def _need_multi() -> None:
+    """Gọi đa ngôn ngữ mà app đang chạy là bản cũ (chưa có) hoặc chưa cài gói → báo rõ cách sửa."""
+    m = _multi()
+    if m.get("missing"):
+        info = _app_info()
+        if info.get("channel") != "global" and info.get("version", "0") >= "2.0.1":
+            raise AppError("Đọc tiếng nước ngoài (Đa ngôn ngữ) chỉ có ở bản Global — bản đầy đủ. Bản đang dùng là bản Free: "
+                           "đọc tiếng Việt với 25 giọng có sẵn và giọng đã clone.")
+        raise AppError(f"App đang chạy ở {BASE} là bản {info.get('version', '?')} — chưa có Đa ngôn ngữ (tính năng của bản Global).")
+    if not m.get("installed"):
+        raise AppError("Chưa cài gói Đa ngôn ngữ. Mở app → trang 🌏 Đa ngôn ngữ → Cài gói (~4 GB), "
+                       "hoặc gọi multilang_package với action=install nếu người dùng đồng ý.")
 
 
 def _slug(s: str) -> str:
@@ -245,10 +303,13 @@ def tool_app_status(_: Dict[str, Any]) -> str:
     h = _get_json("/api/health")
     m = _multi()
     st = h.get("status", {})
+    info = _app_info()
+    old = m.get("missing")
     return "\n".join([
-        f"AI Audio Studio {APP.get('version')} {APP.get('edition') or ''} đang chạy tại {BASE}".replace("  ", " "),
+        f"AI Audio Studio {info.get('version', '?')} {info.get('edition') or ''} đang chạy tại {BASE}".replace("  ", " "),
         f"Model tiếng Việt: {'đã nạp' if st.get('loaded') else 'chưa nạp (tự nạp ở lần đọc đầu, có thể mất 1–2 phút)'}",
-        f"Gói Đa ngôn ngữ: {'đã cài' if m.get('installed') else 'chưa cài (chỉ đọc được tiếng Việt)'}",
+        ("Đa ngôn ngữ: không có ở bản này (chỉ bản Global) — đọc tiếng Việt" if old else
+         f"Gói Đa ngôn ngữ: {'đã cài' if m.get('installed') else 'chưa cài (chỉ đọc được tiếng Việt)'}"),
         f"Khoá API: {'đang bật' if h.get('auth_required') else 'không bật'}",
         f"File audio lưu tại: {OUT_DIR}",
     ])
@@ -273,7 +334,8 @@ def tool_list_voices(_: Dict[str, Any]) -> str:
         if acc:
             out.append("accent (chỉ tiếng Anh): " + ", ".join(acc))
     else:
-        out += ["", "Đa ngôn ngữ: CHƯA CÀI — chỉ đọc được tiếng Việt. Người dùng cài ở trang 🌏 Đa ngôn ngữ của app (bản Global)."]
+        out += ["", "Đa ngôn ngữ: " + ("không có ở bản này (chỉ bản Global) — chỉ đọc tiếng Việt." if m.get("missing") else
+                                     "CHƯA CÀI — chỉ đọc được tiếng Việt. Người dùng cài ở trang 🌏 Đa ngôn ngữ của app.")]
     return "\n".join(out)
 
 
@@ -282,7 +344,7 @@ def _tts_once(text: str, lang: str, voice: Optional[str], a: Dict[str, Any]) -> 
         data, headers = _request("POST", "/api/tts", {"text": text, "voice": voice})
         return data, headers, f"Đã đọc tiếng Việt bằng giọng {voice or 'mặc định'}"
     body = {"text": text, "language": lang or "Vietnamese", "voice": voice or "nu-tre",
-            "accent": a.get("accent") or "", "fast": bool(a.get("fast"))}
+            "accent": norm_accent(a.get("accent")) if (lang or "") == "English" else "", "fast": bool(a.get("fast"))}
     if a.get("speed"):
         body["speed"] = float(a["speed"])
     data, headers = _request("POST", "/api/multi/tts", body)
@@ -294,9 +356,11 @@ def tool_text_to_speech(a: Dict[str, Any]) -> str:
     if not text:
         raise AppError("Thiếu text.")
     ensure_app()
-    lang = str(a.get("language") or "").strip()
+    lang = norm_language(a.get("language"))
     voice = (a.get("voice") or "").strip() or None
     vi = lang.lower() in VIETNAMESE and not (voice or "").startswith("vn:") and voice not in _designed_ids()
+    if not vi:
+        _need_multi()
     limit = 4500 if vi else 1900                      # app giới hạn 5.000 / 2.000 ký tự mỗi lần
     chunks = _split_text(text, limit)
     results = [_tts_once(c, lang, voice, a) for c in chunks]
@@ -315,7 +379,18 @@ def tool_conversation(a: Dict[str, Any]) -> str:
     if not isinstance(turns, list) or not turns:
         raise AppError("Thiếu turns (danh sách lượt thoại).")
     ensure_app()
-    body = {"turns": [{k: t.get(k) for k in ("voice", "text", "language", "accent") if t.get(k)} for t in turns],
+    clean = []
+    for t in turns:
+        x = {k: t.get(k) for k in ("voice", "text") if t.get(k)}
+        lang = norm_language(t.get("language"))
+        if lang and lang != "Vietnamese":
+            x["language"] = lang
+            if lang == "English" and norm_accent(t.get("accent")):
+                x["accent"] = norm_accent(t.get("accent"))
+        clean.append(x)
+    if any(x.get("language") or (x.get("voice") or "").startswith("vn:") or x.get("voice") in _designed_ids() for x in clean):
+        _need_multi()
+    body = {"turns": clean,
             "gap_seconds": float(a.get("gap_seconds") or 0.4)}
     data, headers = _request("POST", "/api/conversation", body)
     first = next((t.get("text", "") for t in turns if t.get("text")), "hoi-thoai")
@@ -335,11 +410,12 @@ def tool_clone_voice(a: Dict[str, Any]) -> str:
         raise AppError("Thiếu text cần đọc.")
     ref = _path_arg(a.get("ref_audio"), "ref_audio (đường dẫn file audio mẫu 3–15 giây)")
     ensure_app()
-    lang = str(a.get("language") or "").strip()
+    lang = norm_language(a.get("language"))
     if lang.lower() in VIETNAMESE:
         data, headers = _request_form("/api/clone", {"text": text}, "ref_audio", ref)
         what = "Đã clone giọng từ file mẫu và đọc tiếng Việt"
     else:
+        _need_multi()
         ref_text = str(a.get("ref_text") or "").strip()
         if not ref_text:
             raise AppError("Clone sang ngôn ngữ khác cần ref_text: gõ ĐÚNG từng chữ câu nói trong file mẫu.")
@@ -440,7 +516,8 @@ TOOLS = [
          "text": {"type": "string", "description": "Nội dung cần đọc."},
          "voice": {"type": "string", "description": "id giọng lấy từ list_voices. Bỏ trống = giọng mặc định."},
          "language": {"type": "string", "description": "\"Vietnamese\" (mặc định) hoặc một ngôn ngữ trong list_voices, vd \"English\", \"Korean\", \"Japanese\"."},
-         "accent": {"type": "string", "description": "Chỉ tiếng Anh: giọng vùng, vd \"american accent\", \"british accent\"."},
+         "accent": {"type": "string", "enum": ["", *ACCENT_IDS],
+                    "description": "Chỉ tiếng Anh: giọng vùng. Bỏ trống = tự nhiên (khuyên dùng)."},
          "speed": {"type": "number", "description": "Chỉ đa ngôn ngữ: tốc độ 0.7–1.3 (1 = bình thường)."},
          "fast": {"type": "boolean", "description": "Chỉ đa ngôn ngữ: chế độ nhanh (nhanh ~2 lần, đôi khi sót chữ)."},
          **_COMMON}},
@@ -453,7 +530,7 @@ TOOLS = [
                  "voice": {"type": "string", "description": "id giọng từ list_voices."},
                  "text": {"type": "string"},
                  "language": {"type": "string", "description": "Bỏ trống = tiếng Việt; vd \"English\" (cần gói Đa ngôn ngữ)."},
-                 "accent": {"type": "string"}}}},
+                 "accent": {"type": "string", "enum": ["", *ACCENT_IDS]}}}},
          "gap_seconds": {"type": "number", "description": "Khoảng lặng giữa các lượt (giây), mặc định 0.4."},
          **_COMMON}},
      "fn": tool_conversation},

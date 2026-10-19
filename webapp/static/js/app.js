@@ -127,6 +127,15 @@ async function init() {
     $("#app-title").textContent = b.app.name;
     $("#app-edition").textContent = (b.app.edition || "").toUpperCase();
     $("#app-tagline").textContent = b.app.tagline || "";
+    // Bản Free: không có Đa ngôn ngữ (tính năng của bản Global)
+    window.IS_GLOBAL = b.app.channel === "global";
+    const navMulti = document.querySelector('.nav-item[data-tab="multi"]');
+    if (navMulti) navMulti.hidden = !window.IS_GLOBAL;
+    if (window.IS_GLOBAL) {
+      $("#omni-credit").hidden = false;
+      $("#dev-base").textContent = "Dựa trên model AI VieNeu-TTS · OmniVoice";
+      if (window.SK_CFG) window.SK_CFG.basedOn = "Dựa trên model AI VieNeu-TTS của Phạm Nguyễn Ngọc Bảo (tiếng Việt) và OmniVoice của k2-fsa (Đa ngôn ngữ)";
+    }
     document.title = `${b.app.name} — ${b.app.edition || ""}`;
     // Author / about
     $("#author-name").textContent = b.author.name;
@@ -474,6 +483,8 @@ const ORIGIN = window.location.origin;
 let API_LANG = "curl";
 let AUTH_REQUIRED = false;  // server có bật API key không (lấy từ /api/info)
 
+// Endpoint /api/multi/* chỉ hiện ở bản Global
+const apiEndpoints = () => ENDPOINTS.filter((ep) => window.IS_GLOBAL || !ep.path.startsWith("/api/multi"));
 const ENDPOINTS = [
   { method: "POST", path: "/api/tts", desc: "Sinh giọng từ văn bản → WAV",
     body: { text: "Xin chào lớp học", voice: "Hải Đăng" } },
@@ -619,7 +630,7 @@ function renderApiEndpoints() {
       ? `<div class="hint" style="margin-bottom:12px">🔑 Server có bật API key — các ví dụ dưới đã tự điền key của bạn (từ tab Cài đặt).</div>`
       : `<div class="hint" style="margin-bottom:12px">🔑 Server có bật API key. Nhập key ở tab <b>Cài đặt</b> để các ví dụ tự điền, hoặc thay <code>&lt;API_KEY&gt;</code> bằng key được cấp.</div>`;
   }
-  c.innerHTML = notice + multiApiTable() + ENDPOINTS.map((ep, i) => `
+  c.innerHTML = notice + multiApiTable() + apiEndpoints().map((ep, i) => `
     <div class="endpoint">
       <div class="endpoint-head">
         <span class="method method-${ep.method.toLowerCase()}">${ep.method}</span>
@@ -652,7 +663,7 @@ function multiApiTable() {
 function renderApiTable() {
   const t = $("#api-table");
   if (!t) return;
-  t.innerHTML = ENDPOINTS.concat([
+  t.innerHTML = apiEndpoints().concat([
     { method: "POST", path: "/api/clone", desc: "Clone giọng: multipart text + ref_audio (file 3–5s)" },
     { method: "POST", path: "/api/load", desc: "(nâng cao) đổi model: {mode, backbone_repo, device}" },
     { method: "GET", path: "/api/version", desc: "Phiên bản app/SDK/python" },

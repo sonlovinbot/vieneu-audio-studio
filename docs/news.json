@@ -1,11 +1,11 @@
 {
-  "latest_version": "2.0.0",
-  "release_url": "https://app.danghuuson.com/vieneu-audio-studio/#cai-dat",
-  "update_note": "Bản 2.0.0 Global: đọc 17 thứ tiếng (Anh, Hàn, Nhật, Trung…) và MCP — ra lệnh cho Claude Desktop / ChatGPT Codex tạo giọng. Cập nhật: chạy lại lệnh cài 1 dòng (Terminal / PowerShell), giữ nguyên giọng đã lưu và lịch sử.",
+  "latest_version": "2.0.1",
+  "release_url": "https://app.danghuuson.com/vieneu-audio-studio/#mcp",
+  "update_note": "Bản 2.0.1: MCP — ra lệnh cho Claude Desktop, Claude Code, ChatGPT Codex tạo giọng tiếng Việt. Cập nhật: chạy lại lệnh cài 1 dòng (Terminal / PowerShell), giữ nguyên giọng đã lưu và lịch sử.",
   "global": {
-    "latest_version": "2.0.0",
-    "release_url": "https://app.danghuuson.com/vieneu-audio-studio/#cai-dat",
-    "update_note": "Chạy lại lệnh cài 1 dòng để cập nhật bản Global — giữ nguyên giọng đã lưu, lịch sử và gói Đa ngôn ngữ."
+    "latest_version": "2.0.1",
+    "release_url": "https://app.danghuuson.com/vieneu-audio-studio/global/#cai-dat",
+    "update_note": "Bản Global 2.0.1: sửa lỗi đọc tiếng Anh có giọng vùng bị lặp, thêm MCP cho Claude Code. Cập nhật bằng lệnh cài có VIENEU_CHANNEL=global (xem trang bản Global) — giữ nguyên giọng, lịch sử và gói Đa ngôn ngữ."
   },
   "announcements": [
     {

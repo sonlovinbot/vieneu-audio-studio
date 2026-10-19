@@ -381,6 +381,9 @@ class Engine:
             self.last_used = time.time()
             if not res.get("ok"):
                 raise RuntimeError(res.get("error") or "Lỗi sinh audio đa ngôn ngữ.")
+            if res.get("retries"):
+                log.info("Đa ngôn ngữ · audio bị lặp, đã tự tạo lại %s lần (loop_score cuối %.2f)",
+                         res["retries"], float(res.get("loop_score") or 0))
             try:
                 res["wav"] = out.read_bytes()
             finally:
@@ -436,7 +439,9 @@ def build_request(text: str, language: str, voice: str, accent: str = "", fast: 
         ins = d["instruct"]
         if accent and language == "English" and accent in ACCENT_IDS:
             ins += ", " + accent
-        req.update(instruct=ins, seed=d["seed"])
+        # Giọng thiết kế hay hỏng ở đoạn dài ("so we're so we're…"), nhất là khi có giọng vùng (thử 48 mẫu:
+        # 13/30 hỏng). Chia khúc ngắn rồi ghép liền: có giọng vùng 5 giây, không có 8 giây → đọc đúng.
+        req.update(instruct=ins, seed=d["seed"], chunk_seconds=5.0 if ins != d["instruct"] else 8.0)
     return req
 
 

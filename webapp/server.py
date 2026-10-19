@@ -51,7 +51,19 @@ HOST = os.environ.get("VIENEU_HOST", "127.0.0.1")
 PORT = int(os.environ.get("VIENEU_PORT", BRANDING["app"].get("default_port", 8001)))
 VERSION = BRANDING["app"].get("version", "1.0.0")
 # Kênh phát hành: "" = bản thường; "global" = bản đa ngôn ngữ phát hành riêng (thông báo cập nhật đọc mục "global" trong news.json)
-CHANNEL = str(BRANDING["app"].get("channel") or "").strip().lower()
+CHANNEL = (os.environ.get("VIENEU_CHANNEL") or str(BRANDING["app"].get("channel") or "")).strip().lower()
+# Bản Free (mặc định) chỉ đọc tiếng Việt; Đa ngôn ngữ (OmniVoice) là tính năng của bản Global (bản đầy đủ).
+GLOBAL = CHANNEL == "global"
+GLOBAL_ONLY = "Đa ngôn ngữ chỉ có ở bản Global (bản đầy đủ). Bản đang dùng là bản Free — đọc tiếng Việt."
+BRANDING["app"]["channel"] = CHANNEL                     # VIENEU_CHANNEL=global (chạy thử) → giao diện theo đúng bản
+if GLOBAL and not BRANDING["app"].get("edition"):
+    BRANDING["app"]["edition"] = "Global"
+if GLOBAL and isinstance(BRANDING.get("global"), dict):   # chữ giới thiệu / ghi nhận model của bản Global
+    _g = BRANDING["global"]
+    BRANDING["about_note"] = _g.get("about_note") or BRANDING.get("about_note")
+    BRANDING["credits"] = _g.get("credits") or BRANDING.get("credits")
+    if _g.get("developer_intro"):
+        BRANDING["developer"]["intro"] = _g["developer_intro"]
 
 # ── Bảo mật & giới hạn (đặt qua biến môi trường / HF Secrets) ──────────────
 # VIENEU_API_KEY   : khóa cho các endpoint tạo giọng (tts/clone/conversation/stream).
@@ -601,7 +613,8 @@ def user_changelog(entries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Bản nhật ký cho người dùng: bỏ mục "app": false, dùng app_title / app_changes nếu có."""
     out = []
     for e in entries:
-        if e.get("app") is False:
+        ch = e.get("channel")
+        if e.get("app") is False or (ch and (ch.replace("free", "") != CHANNEL)):
             continue
         out.append({
             "version": e.get("version", ""),
@@ -751,6 +764,8 @@ async def conversation(req: ConversationRequest,
         return multilang.is_multi_voice(t.voice)          # giọng đa ngôn ngữ đọc tiếng Việt (thử nghiệm)
 
     multi_turns = [t for t in req.turns if t.text.strip() and is_multi(t)]
+    if multi_turns and not GLOBAL:
+        raise HTTPException(status_code=409, detail="Có lượt thoại đa ngôn ngữ — " + GLOBAL_ONLY)
     if multi_turns and (HOSTED or not multilang.installer.installed()):
         raise HTTPException(status_code=409, detail="Có lượt thoại đa ngôn ngữ nhưng máy chưa cài gói Đa ngôn ngữ "
                             "(trang 🌏 Đa ngôn ngữ → Cài đặt).")
@@ -1045,12 +1060,16 @@ class MultiTTSRequest(BaseModel):
 
 
 def _no_hosted() -> None:
+    if not GLOBAL:
+        raise HTTPException(status_code=404, detail=GLOBAL_ONLY)
     if HOSTED:
         raise HTTPException(status_code=403, detail="Chế độ Đa ngôn ngữ chỉ dùng trên bản cài máy tính.")
 
 
 @app.get("/api/multi/status")
 def multi_status(_auth: None = Depends(require_api_key)) -> Dict[str, Any]:
+    if not GLOBAL:
+        raise HTTPException(status_code=404, detail=GLOBAL_ONLY)
     st = multilang.status()
     st["max_chars"] = MULTI_MAX_CHARS
     st["hosted"] = HOSTED
@@ -1212,6 +1231,40 @@ def _codex_cfg() -> Path:
     return Path(os.environ.get("CODEX_HOME") or (Path.home() / ".codex")) / "config.toml"
 
 
+def _claude_bin() -> Optional[str]:
+    """Đường dẫn lệnh `claude` (Claude Code) — app chạy nền nên PATH có thể thiếu, dò thêm chỗ cài thường gặp."""
+    import shutil
+    found = shutil.which("claude")
+    if found:
+        return found
+    home = Path.home()
+    for c in (home / ".local/bin/claude", home / ".claude/local/claude", Path("/opt/homebrew/bin/claude"),
+              Path("/usr/local/bin/claude"), home / "AppData/Roaming/npm/claude.cmd", home / ".npm-global/bin/claude"):
+        if c.is_file():
+            return str(c)
+    return None
+
+
+def _claude_code_cfg() -> Path:
+    return Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home()) / ".claude.json"
+
+
+def _claude_code_connected(spec: Dict[str, Any]) -> bool:
+    try:
+        cur = json.loads(_claude_code_cfg().read_text(encoding="utf-8")).get("mcpServers", {}).get(MCP_NAME) or {}
+        return cur.get("command") == spec["command"]
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
+def _claude_code_run(args: List[str]) -> Any:
+    import subprocess
+    exe = _claude_bin()
+    if not exe:
+        raise HTTPException(status_code=409, detail="Chưa thấy Claude Code trên máy (lệnh claude). Cài Claude Code rồi bấm lại.")
+    return subprocess.run([exe, *args], capture_output=True, text=True, timeout=60, encoding="utf-8")
+
+
 def _toml_str(v: str) -> str:
     return json.dumps(v, ensure_ascii=False)      # chuỗi JSON cũng là chuỗi TOML hợp lệ (\\ \" \n)
 
@@ -1268,7 +1321,9 @@ def _mcp_state() -> Dict[str, Any]:
         "codex": {"path": str(codex_p), "installed": codex_p.parent.is_dir(), "connected": codex_on,
                   "snippet": _codex_block(spec),
                   "cli": f"codex mcp add {MCP_NAME}{env_flags} {cli_tail}"},
-        "claude_code": {"cli": f"claude mcp add {MCP_NAME}{''.join(f' -e {k}={v}' for k, v in spec['env'].items())} {cli_tail}"},
+        "claude_code": {"path": str(_claude_code_cfg()), "installed": bool(_claude_bin()),
+                        "connected": _claude_code_connected(spec),
+                        "cli": f"claude mcp add --scope user {MCP_NAME}{''.join(f' -e {k}={v}' for k, v in spec['env'].items())} {cli_tail}"},
     }
 
 
@@ -1303,6 +1358,14 @@ def mcp_connect(req: MCPTarget, request: Request) -> Dict[str, Any]:
         data.setdefault("mcpServers", {})[MCP_NAME] = {k: v for k, v in spec.items() if v != {}}
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    elif req.target == "claude_code":
+        # Dùng chính lệnh của Claude Code (không tự sửa ~/.claude.json khi Claude Code có thể đang ghi file đó).
+        p = _claude_code_cfg()
+        _claude_code_run(["mcp", "remove", "--scope", "user", MCP_NAME])
+        envs = [x for k, v in spec["env"].items() for x in ("-e", f"{k}={v}")]
+        r = _claude_code_run(["mcp", "add", "--scope", "user", *envs, MCP_NAME, "--", spec["command"], *spec["args"]])
+        if r.returncode != 0:
+            raise HTTPException(status_code=500, detail=f"Lệnh claude mcp add lỗi: {(r.stderr or r.stdout).strip()[-300:]}")
     elif req.target == "codex":
         p = _codex_cfg()
         old = p.read_text(encoding="utf-8") if p.is_file() else ""
@@ -1311,7 +1374,7 @@ def mcp_connect(req: MCPTarget, request: Request) -> Dict[str, Any]:
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text((body + "\n" if body.strip() else "") + _codex_block(spec), encoding="utf-8")
     else:
-        raise HTTPException(status_code=400, detail="target phải là claude hoặc codex")
+        raise HTTPException(status_code=400, detail="target phải là claude, claude_code hoặc codex")
     log.info("MCP · đã kết nối %s (%s)", req.target, p)
     return _mcp_state()
 
@@ -1330,6 +1393,8 @@ def mcp_disconnect(req: MCPTarget, request: Request) -> Dict[str, Any]:
                 _backup(p)
                 del data["mcpServers"][MCP_NAME]
                 p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    elif req.target == "claude_code":
+        _claude_code_run(["mcp", "remove", "--scope", "user", MCP_NAME])
     elif req.target == "codex":
         p = _codex_cfg()
         if p.is_file():
@@ -1339,7 +1404,7 @@ def mcp_disconnect(req: MCPTarget, request: Request) -> Dict[str, Any]:
                 _backup(p)
                 p.write_text(new, encoding="utf-8")
     else:
-        raise HTTPException(status_code=400, detail="target phải là claude hoặc codex")
+        raise HTTPException(status_code=400, detail="target phải là claude, claude_code hoặc codex")
     return _mcp_state()
 
 
